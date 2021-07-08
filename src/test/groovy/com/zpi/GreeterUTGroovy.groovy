@@ -1,7 +1,5 @@
 package com.zpi
 
-import com.zpi.Greeter
-import com.zpi.MessageProvider
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 import spock.lang.Subject
@@ -16,12 +14,12 @@ class GreeterUTGroovy extends Specification {
 
     def "should check if greeter welcomes"() {
         given:
-        messageProvider.getMessage() >> "Welcome!"
+            messageProvider.getMessage() >> "Welcome!"
 
         when:
-        def message = greeter.hello()
+            def message = greeter.hello()
 
         then:
-        message == "Welcome!"
+            message == "Welcome!"
     }
 }
