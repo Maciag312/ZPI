@@ -17,14 +17,9 @@ class UserServiceUT extends Specification {
 
     def "should create user"() {
         given:
-            UserDTO user = UserDTO.builder()
-                    .name("Name")
-                    .surname("Surname")
-                    .login("Login")
-                    .password("Password")
-                    .build()
+            def user = createSampleUser()
 
-            User hashedUser = user.toHashedDomain();
+            def hashedUser = user.toHashedDomain();
 
             userRepository.getByKey(hashedUser.getLogin()) >> Optional.empty()
 
@@ -37,20 +32,22 @@ class UserServiceUT extends Specification {
 
     def "should return conflict if user exists"() {
         given:
-            UserDTO user = UserDTO.builder()
-                    .name("Name")
-                    .surname("Surname")
-                    .login("Login")
-                    .password("Password")
-                    .build()
+            def user = createSampleUser()
 
-            User hashedUser = user.toHashedDomain();
-            userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(user.toHashedDomain())
+            def hashedUser = user.toHashedDomain();
+            userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser)
 
         when:
             def response = userService.createUser(user)
 
         then:
             response == new ResponseEntity<>(HttpStatus.CONFLICT)
+    }
+
+    private static UserDTO createSampleUser() {
+        return UserDTO.builder()
+                .login("Login")
+                .password("Password")
+                .build()
     }
 }

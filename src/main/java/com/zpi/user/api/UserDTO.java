@@ -2,23 +2,25 @@ package com.zpi.user.api;
 
 import com.zpi.user.domain.User;
 import com.zpi.utils.HashGenerator;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Builder
+@AllArgsConstructor
 public class UserDTO {
-    private final String name;
-    private final String surname;
+    @NotNull
     private final String login;
+    @NotNull
     private final String password;
 
     public User toHashedDomain() {
         var generator = new HashGenerator();
 
         return User.builder()
-                .name(generator.generate(name))
-                .surname(generator.generate(surname))
                 .login(generator.generate(login))
                 .password(generator.generate(password))
                 .build();
