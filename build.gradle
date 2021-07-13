@@ -40,6 +40,7 @@ dependencies {
     testImplementation("org.spockframework:spock-core:${spockVersion}")
     testImplementation("org.spockframework:spock-spring:${spockVersion}")
     testImplementation("org.codehaus.groovy:groovy:${groovyVersion}")
+    testImplementation("org.codehaus.groovy:groovy-json:${groovyVersion}")
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
