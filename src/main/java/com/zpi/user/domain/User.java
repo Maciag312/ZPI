@@ -1,4 +1,4 @@
-package com.zpi.user;
+package com.zpi.user.domain;
 
 import lombok.Builder;
 import lombok.Getter;

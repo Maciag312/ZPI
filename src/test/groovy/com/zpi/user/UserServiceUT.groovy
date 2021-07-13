@@ -1,6 +1,9 @@
 package com.zpi.user
 
 import com.zpi.user.api.UserDTO
+import com.zpi.user.domain.User
+import com.zpi.user.domain.UserRepository
+import com.zpi.user.domain.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
@@ -15,7 +18,10 @@ class UserServiceUT extends Specification {
     def "should create user"() {
         given:
             UserDTO user = UserDTO.builder()
+                    .name("Name")
+                    .surname("Surname")
                     .login("Login")
+                    .password("Password")
                     .build()
 
             User hashedUser = user.toHashedDomain();
@@ -32,7 +38,10 @@ class UserServiceUT extends Specification {
     def "should return conflict if user exists"() {
         given:
             UserDTO user = UserDTO.builder()
+                    .name("Name")
+                    .surname("Surname")
                     .login("Login")
+                    .password("Password")
                     .build()
 
             User hashedUser = user.toHashedDomain();

@@ -1,6 +1,6 @@
 package com.zpi.user.api;
 
-import com.zpi.user.User;
+import com.zpi.user.domain.User;
 import com.zpi.utils.HashGenerator;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,11 +14,13 @@ public class UserDTO {
     private final String password;
 
     public User toHashedDomain() {
+        var generator = new HashGenerator();
+
         return User.builder()
-                .name(HashGenerator.generate(name))
-                .surname(HashGenerator.generate(surname))
-                .login(HashGenerator.generate(login))
-                .password(HashGenerator.generate(password))
+                .name(generator.generate(name))
+                .surname(generator.generate(surname))
+                .login(generator.generate(login))
+                .password(generator.generate(password))
                 .build();
     }
 }

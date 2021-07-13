@@ -1,7 +1,7 @@
 package com.zpi.user.infrastructure;
 
-import com.zpi.user.User;
-import com.zpi.user.UserRepository;
+import com.zpi.user.domain.User;
+import com.zpi.user.domain.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

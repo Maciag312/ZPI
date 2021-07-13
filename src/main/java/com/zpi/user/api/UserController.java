@@ -1,6 +1,6 @@
 package com.zpi.user.api;
 
-import com.zpi.user.UserService;
+import com.zpi.user.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

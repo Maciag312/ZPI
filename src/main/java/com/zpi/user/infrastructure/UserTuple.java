@@ -1,6 +1,6 @@
 package com.zpi.user.infrastructure;
 
-import com.zpi.user.User;
+import com.zpi.user.domain.User;
 import com.zpi.utils.IdGenerator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

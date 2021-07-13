@@ -1,4 +1,4 @@
-package com.zpi.user;
+package com.zpi.user.domain;
 
 import com.zpi.user.api.UserDTO;
 import lombok.RequiredArgsConstructor;
