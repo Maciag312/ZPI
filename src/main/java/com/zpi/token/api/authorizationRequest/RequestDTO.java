@@ -1,4 +1,4 @@
-package com.zpi.token.api;
+package com.zpi.token.api.authorizationRequest;
 
 import com.zpi.token.domain.authorizationRequest.Request;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AuthRequestDTO {
+public class RequestDTO {
     private final String clientId;
     private final String redirectUri;
     private final String responseType;

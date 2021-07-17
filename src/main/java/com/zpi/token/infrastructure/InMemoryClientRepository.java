@@ -12,6 +12,11 @@ public class InMemoryClientRepository implements WebClientRepository {
     private final HashMap<String, WebClientTuple> clients = new HashMap<>();
 
     @Override
+    public void save(String key, WebClient client) {
+        clients.put(key, new WebClientTuple(client));
+    }
+
+    @Override
     public Optional<WebClient> getByKey(String key) {
         var tuple = Optional.ofNullable(clients.get(key));
         return tuple.map(WebClientTuple::toDomain);

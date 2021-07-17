@@ -24,7 +24,7 @@ public class RequestValidation {
         if (isUnauthorizedClient()) {
             var error = RequestError.builder()
                     .error(RequestErrorType.UNAUTHORIZED_CLIENT)
-                    .error_description("Unauthorized client id")
+                    .errorDescription("Unauthorized client id")
                     .build();
             throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
         }
@@ -38,7 +38,7 @@ public class RequestValidation {
         if (isInvalidRedirectUri()) {
             var error = RequestError.builder()
                     .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
-                    .error_description("Unrecognized redirect uri")
+                    .errorDescription("Unrecognized redirect uri")
                     .build();
             throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
         }
@@ -52,7 +52,7 @@ public class RequestValidation {
         if (isUnsupportedResponseType()) {
             var error = RequestError.builder()
                     .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
-                    .error_description("Unrecognized response type: " + request.getResponseType())
+                    .errorDescription("Unrecognized response type: " + request.getResponseType())
                     .build();
             throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
         }
@@ -67,7 +67,7 @@ public class RequestValidation {
         if (isScopeInvalid(request.getScope())) {
             var error = RequestError.builder()
                     .error(RequestErrorType.INVALID_SCOPE)
-                    .error_description("Invalid scope")
+                    .errorDescription("Invalid scope")
                     .build();
             throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
         }
@@ -90,7 +90,7 @@ public class RequestValidation {
             var description = missingRequiredParametersDescription(missing);
             var error = RequestError.builder()
                     .error(RequestErrorType.INVALID_REQUEST)
-                    .error_description(description)
+                    .errorDescription(description)
                     .build();
             throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
         }

@@ -1,6 +1,7 @@
 package com.zpi.token.authorizationRequest
 
-import com.zpi.token.api.AuthRequestDTO
+import com.zpi.token.api.authorizationRequest.RequestDTO
+import com.zpi.token.api.authorizationRequest.RequestErrorDTO
 import com.zpi.token.domain.TokenService
 import com.zpi.token.domain.WebClient
 import com.zpi.token.domain.WebClientRepository
@@ -40,10 +41,12 @@ class RequestValidationUT extends Specification {
             def response = tokenService.validateAuthorizationRequest(request)
 
         then:
-            def requestError = RequestError.builder()
-                    .error(RequestErrorType.UNAUTHORIZED_CLIENT)
-                    .error_description("Unauthorized client id")
-                    .build()
+            def requestError = new RequestErrorDTO(
+                    RequestError.builder()
+                            .error(RequestErrorType.UNAUTHORIZED_CLIENT)
+                            .errorDescription("Unauthorized client id")
+                            .build()
+            )
 
             response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
     }
@@ -59,10 +62,12 @@ class RequestValidationUT extends Specification {
             def response = tokenService.validateAuthorizationRequest(request)
 
         then:
-            def requestError = RequestError.builder()
-                    .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
-                    .error_description("Unrecognized redirect uri")
-                    .build()
+            def requestError = new RequestErrorDTO(
+                    RequestError.builder()
+                            .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
+                            .errorDescription("Unrecognized redirect uri")
+                            .build()
+            )
             response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
     }
 
@@ -75,10 +80,12 @@ class RequestValidationUT extends Specification {
             def response = tokenService.validateAuthorizationRequest(request)
 
         then:
-            def requestError = RequestError.builder()
-                    .error(RequestErrorType.INVALID_REQUEST)
-                    .error_description("Missing: " + errorDescription)
-                    .build()
+            def requestError = new RequestErrorDTO(
+                    RequestError.builder()
+                            .error(RequestErrorType.INVALID_REQUEST)
+                            .errorDescription("Missing: " + errorDescription)
+                            .build()
+            )
             response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
 
         where:
@@ -96,10 +103,12 @@ class RequestValidationUT extends Specification {
             def response = tokenService.validateAuthorizationRequest(request)
 
         then:
-            def requestError = RequestError.builder()
-                    .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
-                    .error_description(errorDescription)
-                    .build()
+            def requestError = new RequestErrorDTO(
+                    RequestError.builder()
+                            .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
+                            .errorDescription(errorDescription)
+                            .build()
+            )
             response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
 
         where:
@@ -116,10 +125,12 @@ class RequestValidationUT extends Specification {
             def response = tokenService.validateAuthorizationRequest(request)
 
         then:
-            def requestError = RequestError.builder()
-                    .error(RequestErrorType.INVALID_SCOPE)
-                    .error_description(errorDescription)
-                    .build()
+            def requestError = new RequestErrorDTO(
+                    RequestError.builder()
+                            .error(RequestErrorType.INVALID_SCOPE)
+                            .errorDescription(errorDescription)
+                            .build()
+            )
             response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
 
         where:
@@ -131,8 +142,8 @@ class RequestValidationUT extends Specification {
     private class Fixtures {
         private static final String defaultUri = "uri"
 
-        static AuthRequestDTO correctRequest() {
-            return AuthRequestDTO.builder()
+        static RequestDTO correctRequest() {
+            return RequestDTO.builder()
                     .clientId("client_id")
                     .redirectUri(defaultUri)
                     .responseType("code")
@@ -141,8 +152,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static AuthRequestDTO requestWithCustomUri(String uri) {
-            return AuthRequestDTO.builder()
+        static RequestDTO requestWithCustomUri(String uri) {
+            return RequestDTO.builder()
                     .clientId("client_id")
                     .redirectUri(uri)
                     .responseType("code")
@@ -151,8 +162,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static AuthRequestDTO nullClientId() {
-            return AuthRequestDTO.builder()
+        static RequestDTO nullClientId() {
+            return RequestDTO.builder()
                     .clientId(null)
                     .redirectUri(defaultUri)
                     .responseType("code")
@@ -161,8 +172,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static AuthRequestDTO nullState() {
-            return AuthRequestDTO.builder()
+        static RequestDTO nullState() {
+            return RequestDTO.builder()
                     .clientId("client_id")
                     .redirectUri(defaultUri)
                     .responseType("code")
@@ -171,8 +182,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static AuthRequestDTO invalidResponseType() {
-            return AuthRequestDTO.builder()
+        static RequestDTO invalidResponseType() {
+            return RequestDTO.builder()
                     .clientId("client_id")
                     .redirectUri(defaultUri)
                     .responseType("invalid")
@@ -181,8 +192,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static AuthRequestDTO emptyScope() {
-            return AuthRequestDTO.builder()
+        static RequestDTO emptyScope() {
+            return RequestDTO.builder()
                     .clientId("client_id")
                     .redirectUri(defaultUri)
                     .responseType("code")
@@ -191,8 +202,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static AuthRequestDTO scopeWithoutOpenId() {
-            return AuthRequestDTO.builder()
+        static RequestDTO scopeWithoutOpenId() {
+            return RequestDTO.builder()
                     .clientId("client_id")
                     .redirectUri(defaultUri)
                     .responseType("code")
