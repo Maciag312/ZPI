@@ -1,7 +1,6 @@
 package com.zpi.user
 
 import com.zpi.user.api.UserDTO
-import com.zpi.user.domain.User
 import com.zpi.user.domain.UserRepository
 import com.zpi.user.domain.UserService
 import org.springframework.http.HttpStatus
