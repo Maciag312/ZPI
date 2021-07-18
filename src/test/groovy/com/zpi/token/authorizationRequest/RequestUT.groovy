@@ -3,13 +3,13 @@ package com.zpi.token.authorizationRequest
 
 import com.zpi.token.api.authorizationRequest.ResponseDTO
 import com.zpi.token.domain.TokenService
-import com.zpi.token.domain.WebClientRepository
+import com.zpi.token.domain.ClientRepository
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import spock.lang.Subject
 
 class RequestUT extends Specification {
-    def clientRepository = Mock(WebClientRepository)
+    def clientRepository = Mock(ClientRepository)
 
     @Subject
     private TokenService tokenService = new TokenService(clientRepository)

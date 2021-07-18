@@ -14,7 +14,7 @@ import javax.validation.Valid;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
-public class UserController {
+public class EndUserController {
     private final EndUserService userService;
 
     @PostMapping("/register")

@@ -1,27 +1,35 @@
 package com.zpi.token.domain.authorizationRequest.request;
 
-import com.zpi.token.domain.WebClient;
+import com.zpi.token.domain.Client;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.util.*;
 
 @AllArgsConstructor
 public class RequestValidation {
-    private final Request request;
-    private final WebClient client;
-    private final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
+    private static final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
 
-    public void validate() throws InvalidRequestException {
-        validateClient();
-        validateRedirectUri();
-        validateResponseType();
-        validateScope();
-        validateRequiredParameters();
+    @Getter
+    @AllArgsConstructor
+    private static class RequestValidationParams {
+        private final Request request;
+        private final Client client;
     }
 
-    private void validateClient() throws InvalidRequestException {
-        if (isUnauthorizedClient()) {
+    public static void validate(Request request, Client client) throws InvalidRequestException {
+        var params = new RequestValidationParams(request, client);
+
+        validateClient(params);
+        validateRedirectUri(params);
+        validateResponseType(params);
+        validateScope(params);
+        validateRequiredParameters(params);
+    }
+
+    private static void validateClient(RequestValidationParams params) throws InvalidRequestException {
+        if (isUnauthorizedClient(params)) {
             var error = RequestError.builder()
                     .error(RequestErrorType.UNAUTHORIZED_CLIENT)
                     .errorDescription("Unauthorized client id")
@@ -30,12 +38,12 @@ public class RequestValidation {
         }
     }
 
-    private boolean isUnauthorizedClient() {
-        return client == null;
+    private static boolean isUnauthorizedClient(RequestValidationParams params) {
+        return params.client == null;
     }
 
-    private void validateRedirectUri() throws InvalidRequestException {
-        if (isInvalidRedirectUri()) {
+    private static void validateRedirectUri(RequestValidationParams params) throws InvalidRequestException {
+        if (isInvalidRedirectUri(params)) {
             var error = RequestError.builder()
                     .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
@@ -44,27 +52,27 @@ public class RequestValidation {
         }
     }
 
-    private boolean isInvalidRedirectUri() {
-        return !client.containsRedirectUri(request.getRedirectUri());
+    private static boolean isInvalidRedirectUri(RequestValidationParams params) {
+        return !params.client.containsRedirectUri(params.request.getRedirectUri());
     }
 
-    private void validateResponseType() throws InvalidRequestException {
-        if (isUnsupportedResponseType()) {
+    private static void validateResponseType(RequestValidationParams params) throws InvalidRequestException {
+        if (isUnsupportedResponseType(params)) {
             var error = RequestError.builder()
                     .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
-                    .errorDescription("Unrecognized response type: " + request.getResponseType())
+                    .errorDescription("Unrecognized response type: " + params.request.getResponseType())
                     .build();
             throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
         }
     }
 
-    private boolean isUnsupportedResponseType() {
-        var responseType = request.getResponseType();
+    private static boolean isUnsupportedResponseType(RequestValidationParams params) {
+        var responseType = params.request.getResponseType();
         return responseType == null || !supportedResponseTypes.contains(responseType);
     }
 
-    private void validateScope() throws InvalidRequestException {
-        if (isScopeInvalid(request.getScope())) {
+    private static void validateScope(RequestValidationParams params) throws InvalidRequestException {
+        if (isScopeInvalid(params.request.getScope())) {
             var error = RequestError.builder()
                     .error(RequestErrorType.INVALID_SCOPE)
                     .errorDescription("Invalid scope")
@@ -73,7 +81,7 @@ public class RequestValidation {
         }
     }
 
-    private boolean isScopeInvalid(String scope) {
+    private static boolean isScopeInvalid(String scope) {
         if (scope == null) {
             return true;
         }
@@ -83,8 +91,8 @@ public class RequestValidation {
         return !Arrays.asList(scopeValues).contains("openid");
     }
 
-    private void validateRequiredParameters() throws InvalidRequestException {
-        var missing = missingRequiredParameters();
+    private static void validateRequiredParameters(RequestValidationParams params) throws InvalidRequestException {
+        var missing = missingRequiredParameters(params);
 
         if (missing.size() != 0) {
             var description = missingRequiredParametersDescription(missing);
@@ -96,18 +104,18 @@ public class RequestValidation {
         }
     }
 
-    private String missingRequiredParametersDescription(List<String> missing) {
+    private static String missingRequiredParametersDescription(List<String> missing) {
         return "Missing: " + String.join(" ", missing);
     }
 
-    private List<String> missingRequiredParameters() {
+    private static List<String> missingRequiredParameters(RequestValidationParams params) {
         var result = new ArrayList<String>();
 
-        if (request.getState() == null) {
+        if (params.request.getState() == null) {
             result.add("state");
         }
 
-        if (request.getClientId() == null) {
+        if (params.request.getClientId() == null) {
             result.add("client_id");
         }
 

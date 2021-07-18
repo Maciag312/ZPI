@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 @Getter
 @Builder
-public class WebClient {
+public class Client {
     private HashSet<String> availableRedirectUri;
     private final String id;
 

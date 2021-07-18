@@ -1,7 +1,7 @@
 package com.zpi.token.authorizationRequest;
 
 import com.zpi.token.api.authorizationRequest.RequestDTO;
-import com.zpi.token.domain.WebClient;
+import com.zpi.token.domain.Client;
 
 class CommonFixtures {
     static final String defaultUri = "uri";
@@ -18,8 +18,8 @@ class CommonFixtures {
                 .build();
     }
 
-    static WebClient defaultClient() {
-        var client = WebClient.builder()
+    static Client defaultClient() {
+        var client = Client.builder()
                 .id(defaultClientId)
                 .availableRedirectUri(null)
                 .build();

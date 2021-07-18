@@ -3,8 +3,8 @@ package com.zpi.token.authorizationRequest
 import com.zpi.token.api.authorizationRequest.ErrorResponseDTO
 import com.zpi.token.api.authorizationRequest.RequestDTO
 import com.zpi.token.domain.TokenService
-import com.zpi.token.domain.WebClient
-import com.zpi.token.domain.WebClientRepository
+import com.zpi.token.domain.Client
+import com.zpi.token.domain.ClientRepository
 import com.zpi.token.domain.authorizationRequest.request.RequestError
 import com.zpi.token.domain.authorizationRequest.request.RequestErrorType
 import org.springframework.http.HttpStatus
@@ -13,7 +13,7 @@ import spock.lang.Specification
 import spock.lang.Subject
 
 class RequestValidationUT extends Specification {
-    def clientRepository = Mock(WebClientRepository)
+    def clientRepository = Mock(ClientRepository)
 
     @Subject
     private TokenService tokenService = new TokenService(clientRepository)
@@ -226,8 +226,8 @@ class RequestValidationUT extends Specification {
                     .build()
         }
 
-        static WebClient clientWithNullRedirectUri() {
-            return WebClient.builder()
+        static Client clientWithNullRedirectUri() {
+            return Client.builder()
                     .id(CommonFixtures.defaultClientId)
                     .availableRedirectUri(null)
                     .build()
