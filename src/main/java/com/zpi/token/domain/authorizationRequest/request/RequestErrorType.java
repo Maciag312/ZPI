@@ -1,4 +1,4 @@
-package com.zpi.token.domain.authorizationRequest;
+package com.zpi.token.domain.authorizationRequest.request;
 
 public enum RequestErrorType {
     UNAUTHORIZED_CLIENT {
@@ -33,6 +33,13 @@ public enum RequestErrorType {
         @Override
         public String toString() {
             return "UNRECOGNIZED_REDIRECT_URI";
+        }
+    },
+
+    ACCESS_DENIED {
+        @Override
+        public String toString() {
+            return "ACCESS_DENIED";
         }
     }
 }

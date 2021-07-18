@@ -3,9 +3,10 @@ package com.zpi.token.authorizationRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jayway.jsonpath.JsonPath
 import com.zpi.token.api.authorizationRequest.RequestDTO
-import com.zpi.token.domain.WebClient
 import com.zpi.token.domain.WebClientRepository
-import com.zpi.token.domain.authorizationRequest.RequestErrorType
+import com.zpi.token.domain.authorizationRequest.request.RequestErrorType
+import com.zpi.user.api.UserDTO
+import com.zpi.utils.BasicAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,17 +22,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class RequestValidationFT extends Specification {
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc
 
     @Autowired
-    private WebClientRepository clientRepository;
+    private WebClientRepository clientRepository
 
     @Autowired
-    private ObjectMapper mapper;
+    private ObjectMapper mapper
 
     def "should return appropriate error on unknown client"() {
         given:
-            def request = Fixtures.correctRequest()
+            def request = Fixtures.unknownClientRequest()
 
         when:
             def result = validateAuthorizationRequest(request)
@@ -90,8 +91,7 @@ class RequestValidationFT extends Specification {
 
     def "should return success on correct request"() {
         given:
-
-            def request = Fixtures.correctRequest()
+            def request = CommonFixtures.correctRequest()
             addClientWithRedirectUri()
 
         when:
@@ -106,6 +106,7 @@ class RequestValidationFT extends Specification {
                 post("/api/token/authorize")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
+                        .header("Authorization", Fixtures.defaultBasicAuth())
         )
     }
 
@@ -115,64 +116,61 @@ class RequestValidationFT extends Specification {
 
         return error.toString()
     }
+
     private void addClientWithRedirectUri() {
-        def client = Fixtures.defaultClient()
+        def client = CommonFixtures.defaultClient()
         clientRepository.save(client.getId(), client)
     }
 
     private class Fixtures {
-        private static final String defaultUri = "uri"
-        private static final String defaultClientId = "client_id"
-
-        private static RequestDTO correctRequest() {
+        private static RequestDTO unknownClientRequest() {
             return RequestDTO.builder()
-                    .clientId(defaultClientId)
-                    .redirectUri(defaultUri)
+                    .clientId(UUID.randomUUID().toString())
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("openid")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
         }
 
         private static RequestDTO unrecognizedRedirectUri() {
             return RequestDTO.builder()
-                    .clientId(defaultClientId)
+                    .clientId(CommonFixtures.defaultClientId)
                     .redirectUri("unrecognized")
                     .responseType("code")
                     .scope("openid")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
         }
 
         private static RequestDTO invalidResponseType() {
             return RequestDTO.builder()
-                    .clientId(defaultClientId)
-                    .redirectUri(defaultUri)
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("NotCode")
                     .scope("openid")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
         }
 
         private static RequestDTO invalidScope() {
             return RequestDTO.builder()
-                    .clientId(defaultClientId)
-                    .redirectUri(defaultUri)
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("invalid scope")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
 
         }
 
-        private static WebClient defaultClient() {
-            def client = WebClient.builder()
-                    .id(defaultClientId)
-                    .availableRedirectUri(new HashSet<String>())
+        private static String defaultBasicAuth() {
+            var user = UserDTO.builder()
+                    .login(CommonFixtures.defaultLogin)
+                    .password(CommonFixtures.defaultPassword)
                     .build()
-            client.addRedirectUri(defaultUri)
 
-            return client
+            return BasicAuth.encodeFrom(user.toHashedDomain())
         }
     }
 }

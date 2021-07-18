@@ -1,6 +1,6 @@
 package com.zpi.token.api.authorizationRequest;
 
-import com.zpi.token.domain.authorizationRequest.Request;
+import com.zpi.token.domain.authorizationRequest.request.Request;
 import lombok.Builder;
 import lombok.Getter;
 

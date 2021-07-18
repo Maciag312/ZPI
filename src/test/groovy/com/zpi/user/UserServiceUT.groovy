@@ -1,18 +1,18 @@
 package com.zpi.user
 
 import com.zpi.user.api.UserDTO
-import com.zpi.user.domain.UserRepository
-import com.zpi.user.domain.UserService
+import com.zpi.user.domain.EndUserRepository
+import com.zpi.user.domain.EndUserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Subject
 
 class UserServiceUT extends Specification {
-    def userRepository = Mock(UserRepository)
+    def userRepository = Mock(EndUserRepository)
 
     @Subject
-    private UserService userService = new UserService(userRepository);
+    private EndUserService userService = new EndUserService(userRepository);
 
     def "should create user"() {
         given:

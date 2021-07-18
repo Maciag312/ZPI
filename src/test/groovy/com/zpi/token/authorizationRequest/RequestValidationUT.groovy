@@ -1,12 +1,13 @@
 package com.zpi.token.authorizationRequest
 
+import com.zpi.token.api.authorizationRequest.ErrorResponseDTO
 import com.zpi.token.api.authorizationRequest.RequestDTO
-import com.zpi.token.api.authorizationRequest.RequestErrorDTO
 import com.zpi.token.domain.TokenService
-import com.zpi.token.domain.WebClient
 import com.zpi.token.domain.WebClientRepository
-import com.zpi.token.domain.authorizationRequest.RequestError
-import com.zpi.token.domain.authorizationRequest.RequestErrorType
+import com.zpi.token.domain.authorizationRequest.request.RequestError
+import com.zpi.token.domain.authorizationRequest.request.RequestErrorType
+import com.zpi.user.api.UserDTO
+import com.zpi.user.domain.EndUserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
@@ -14,34 +15,36 @@ import spock.lang.Subject
 
 class RequestValidationUT extends Specification {
     def clientRepository = Mock(WebClientRepository)
+    def userService = Mock(EndUserService)
 
     @Subject
-    private TokenService tokenService = new TokenService(clientRepository)
+    private TokenService tokenService = new TokenService(clientRepository, userService)
 
     def "should return ok on all parameters correct"() {
         given:
-            def request = Fixtures.correctRequest()
+            def request = CommonFixtures.correctRequest()
 
-            def client = Fixtures.clientWithDefaultUri()
+            def client = CommonFixtures.defaultClient()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            userService.isUserAuthorized(_ as UserDTO) >> true
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            def response = tokenService.validateAuthorizationRequest(request, CommonFixtures.defaultAuth())
 
         then:
-            response == new ResponseEntity<>(HttpStatus.OK)
+            response.getStatusCode() == HttpStatus.OK
     }
 
     def "should return unauthorized_client on non existing client"() {
         given:
-            def request = Fixtures.correctRequest()
+            def request = CommonFixtures.correctRequest()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.empty()
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            def response = tokenService.validateAuthorizationRequest(request, CommonFixtures.defaultAuth())
 
         then:
-            def requestError = new RequestErrorDTO(
+            def requestError = new ErrorResponseDTO(
                     RequestError.builder()
                             .error(RequestErrorType.UNAUTHORIZED_CLIENT)
                             .errorDescription("Unauthorized client id")
@@ -55,14 +58,14 @@ class RequestValidationUT extends Specification {
         given:
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri")
 
-            def client = Fixtures.clientWithDefaultUri()
+            def client = CommonFixtures.defaultClient()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            def response = tokenService.validateAuthorizationRequest(request, CommonFixtures.defaultAuth())
 
         then:
-            def requestError = new RequestErrorDTO(
+            def requestError = new ErrorResponseDTO(
                     RequestError.builder()
                             .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                             .errorDescription("Unrecognized redirect uri")
@@ -73,14 +76,14 @@ class RequestValidationUT extends Specification {
 
     def "should return invalid_request on missing required parameters"() {
         given:
-            def client = Fixtures.clientWithDefaultUri()
+            def client = CommonFixtures.defaultClient()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            def response = tokenService.validateAuthorizationRequest(request, CommonFixtures.defaultAuth())
 
         then:
-            def requestError = new RequestErrorDTO(
+            def requestError = new ErrorResponseDTO(
                     RequestError.builder()
                             .error(RequestErrorType.INVALID_REQUEST)
                             .errorDescription("Missing: " + errorDescription)
@@ -96,14 +99,14 @@ class RequestValidationUT extends Specification {
 
     def "should return unsupported_response_type on wrong responseType"() {
         given:
-            def client = Fixtures.clientWithDefaultUri()
+            def client = CommonFixtures.defaultClient()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            def response = tokenService.validateAuthorizationRequest(request, CommonFixtures.defaultAuth())
 
         then:
-            def requestError = new RequestErrorDTO(
+            def requestError = new ErrorResponseDTO(
                     RequestError.builder()
                             .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
                             .errorDescription(errorDescription)
@@ -118,14 +121,14 @@ class RequestValidationUT extends Specification {
 
     def "should return invalid_scope on invalid scope"() {
         given:
-            def client = Fixtures.clientWithDefaultUri()
+            def client = CommonFixtures.defaultClient()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            def response = tokenService.validateAuthorizationRequest(request, CommonFixtures.defaultAuth())
 
         then:
-            def requestError = new RequestErrorDTO(
+            def requestError = new ErrorResponseDTO(
                     RequestError.builder()
                             .error(RequestErrorType.INVALID_SCOPE)
                             .errorDescription(errorDescription)
@@ -140,42 +143,30 @@ class RequestValidationUT extends Specification {
     }
 
     private class Fixtures {
-        private static final String defaultUri = "uri"
-
-        static RequestDTO correctRequest() {
-            return RequestDTO.builder()
-                    .clientId("client_id")
-                    .redirectUri(defaultUri)
-                    .responseType("code")
-                    .scope("openid")
-                    .state("state")
-                    .build()
-        }
-
         static RequestDTO requestWithCustomUri(String uri) {
             return RequestDTO.builder()
-                    .clientId("client_id")
+                    .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(uri)
                     .responseType("code")
                     .scope("openid")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
         }
 
         static RequestDTO nullClientId() {
             return RequestDTO.builder()
                     .clientId(null)
-                    .redirectUri(defaultUri)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("openid")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
         }
 
         static RequestDTO nullState() {
             return RequestDTO.builder()
-                    .clientId("client_id")
-                    .redirectUri(defaultUri)
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("openid")
                     .state(null)
@@ -184,39 +175,32 @@ class RequestValidationUT extends Specification {
 
         static RequestDTO invalidResponseType() {
             return RequestDTO.builder()
-                    .clientId("client_id")
-                    .redirectUri(defaultUri)
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("invalid")
                     .scope("openid")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
         }
 
         static RequestDTO emptyScope() {
             return RequestDTO.builder()
-                    .clientId("client_id")
-                    .redirectUri(defaultUri)
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("")
-                    .state("state")
+                    .state(CommonFixtures.defaultClientId)
                     .build()
         }
 
         static RequestDTO scopeWithoutOpenId() {
             return RequestDTO.builder()
-                    .clientId("client_id")
-                    .redirectUri(defaultUri)
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("profile phone unknown_value other_unknown")
-                    .state("state")
+                    .state(CommonFixtures.defaultState)
                     .build()
-        }
-
-        static WebClient clientWithDefaultUri() {
-            def client = WebClient.builder().id("id").availableRedirectUri(null).build()
-            client.addRedirectUri(defaultUri)
-
-            return client
         }
     }
 }

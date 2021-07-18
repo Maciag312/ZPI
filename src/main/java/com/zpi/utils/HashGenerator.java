@@ -9,7 +9,6 @@ public class HashGenerator {
 
     private MessageDigest digest;
 
-    // REVIEW ME!
     public HashGenerator() {
         try {
             digest = MessageDigest.getInstance(algorithm);

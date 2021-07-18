@@ -1,4 +1,4 @@
-package com.zpi.token.domain.authorizationRequest;
+package com.zpi.token.domain.authorizationRequest.request;
 
 import lombok.*;
 
