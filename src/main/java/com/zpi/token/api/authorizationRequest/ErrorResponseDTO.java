@@ -12,9 +12,11 @@ import lombok.Setter;
 public class ErrorResponseDTO {
     private final RequestErrorType error;
     private final String error_description;
+    private final String state;
 
-    public ErrorResponseDTO(RequestError error) {
+    public ErrorResponseDTO(RequestError error, String state) {
         this.error = error.getError();
         this.error_description = error.getErrorDescription();
+        this.state = state;
     }
 }

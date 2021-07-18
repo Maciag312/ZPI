@@ -12,13 +12,13 @@ class UserServiceUT extends Specification {
     def userRepository = Mock(EndUserRepository)
 
     @Subject
-    private EndUserService userService = new EndUserService(userRepository);
+    private EndUserService userService = new EndUserService(userRepository)
 
     def "should create user"() {
         given:
             def user = createSampleUser()
 
-            def hashedUser = user.toHashedDomain();
+            def hashedUser = user.toHashedDomain()
 
             userRepository.getByKey(hashedUser.getLogin()) >> Optional.empty()
 
@@ -33,7 +33,7 @@ class UserServiceUT extends Specification {
         given:
             def user = createSampleUser()
 
-            def hashedUser = user.toHashedDomain();
+            def hashedUser = user.toHashedDomain()
             userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser)
 
         when:

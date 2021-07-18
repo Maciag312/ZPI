@@ -5,8 +5,6 @@ import com.jayway.jsonpath.JsonPath
 import com.zpi.token.api.authorizationRequest.RequestDTO
 import com.zpi.token.domain.WebClientRepository
 import com.zpi.token.domain.authorizationRequest.request.RequestErrorType
-import com.zpi.user.api.UserDTO
-import com.zpi.utils.BasicAuth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -41,7 +39,8 @@ class RequestValidationFT extends Specification {
             result.andExpect(status().isBadRequest())
 
         and:
-            errorFromResult(result) == RequestErrorType.UNAUTHORIZED_CLIENT.toString()
+            attributeFromResult("error", result) == RequestErrorType.UNAUTHORIZED_CLIENT.toString()
+            attributeFromResult("state", result) == CommonFixtures.defaultState
     }
 
     def "should return appropriate error on unrecognized redirect_uri"() {
@@ -56,7 +55,8 @@ class RequestValidationFT extends Specification {
             result.andExpect(status().isBadRequest())
 
         and:
-            errorFromResult(result) == RequestErrorType.UNRECOGNIZED_REDIRECT_URI.toString()
+            attributeFromResult("error", result) == RequestErrorType.UNRECOGNIZED_REDIRECT_URI.toString()
+            attributeFromResult("state", result) == CommonFixtures.defaultState
     }
 
     def "should return appropriate error on invalid response_type"() {
@@ -72,7 +72,8 @@ class RequestValidationFT extends Specification {
             result.andExpect(status().isBadRequest())
 
         and:
-            errorFromResult(result) == RequestErrorType.UNSUPPORTED_RESPONSE_TYPE.toString()
+            attributeFromResult("error", result) == RequestErrorType.UNSUPPORTED_RESPONSE_TYPE.toString()
+            attributeFromResult("state", result) == CommonFixtures.defaultState
     }
 
     def "should return appropriate error on invalid scope"() {
@@ -86,19 +87,8 @@ class RequestValidationFT extends Specification {
             result.andExpect(status().isBadRequest())
 
         and:
-            errorFromResult(result) == RequestErrorType.INVALID_SCOPE.toString()
-    }
-
-    def "should return success on correct request"() {
-        given:
-            def request = CommonFixtures.correctRequest()
-            addClientWithRedirectUri()
-
-        when:
-            def result = validateAuthorizationRequest(request)
-
-        then:
-            result.andExpect(status().isOk())
+            attributeFromResult("error", result) == RequestErrorType.INVALID_SCOPE.toString()
+            attributeFromResult("state", result) == CommonFixtures.defaultState
     }
 
     private ResultActions validateAuthorizationRequest(RequestDTO request) {
@@ -106,15 +96,13 @@ class RequestValidationFT extends Specification {
                 post("/api/token/authorize")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
-                        .header("Authorization", Fixtures.defaultBasicAuth())
         )
     }
 
-    private static String errorFromResult(ResultActions result) {
+    private static String attributeFromResult(String attribute, ResultActions result) {
         def response = result.andReturn().getResponse()
-        def error = JsonPath.read(response.getContentAsString(), "\$.error")
-
-        return error.toString()
+        def value = JsonPath.read(response.getContentAsString(), String.format("\$.%s", attribute))
+        return value.toString()
     }
 
     private void addClientWithRedirectUri() {
@@ -124,8 +112,9 @@ class RequestValidationFT extends Specification {
 
     private class Fixtures {
         private static RequestDTO unknownClientRequest() {
+            var clientId = UUID.randomUUID().toString()
             return RequestDTO.builder()
-                    .clientId(UUID.randomUUID().toString())
+                    .clientId(clientId)
                     .redirectUri(CommonFixtures.defaultUri)
                     .responseType("code")
                     .scope("openid")
@@ -162,15 +151,6 @@ class RequestValidationFT extends Specification {
                     .state(CommonFixtures.defaultState)
                     .build()
 
-        }
-
-        private static String defaultBasicAuth() {
-            var user = UserDTO.builder()
-                    .login(CommonFixtures.defaultLogin)
-                    .password(CommonFixtures.defaultPassword)
-                    .build()
-
-            return BasicAuth.encodeFrom(user.toHashedDomain())
         }
     }
 }

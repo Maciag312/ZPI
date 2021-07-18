@@ -1,9 +1,6 @@
 package com.zpi.token.domain.authorizationRequest.request;
 
 import com.zpi.token.domain.WebClient;
-import com.zpi.user.api.UserDTO;
-import com.zpi.user.domain.EndUserService;
-import com.zpi.utils.BasicAuth;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 
@@ -15,15 +12,12 @@ public class RequestValidation {
     private final WebClient client;
     private final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
 
-    private final EndUserService userService;
-
-    public void validate(BasicAuth auth) throws InvalidRequestException {
+    public void validate() throws InvalidRequestException {
         validateClient();
         validateRedirectUri();
         validateResponseType();
         validateScope();
         validateRequiredParameters();
-        validateAuth(auth);
     }
 
     private void validateClient() throws InvalidRequestException {
@@ -119,21 +113,4 @@ public class RequestValidation {
 
         return result;
     }
-
-    private void validateAuth(BasicAuth auth) throws InvalidRequestException {
-        if (unauthorizedUser(auth)) {
-            var error = RequestError.builder()
-                    .error(RequestErrorType.ACCESS_DENIED)
-                    .errorDescription("Access denied")
-                    .build();
-
-            throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
-        }
-    }
-
-    private boolean unauthorizedUser(BasicAuth auth) {
-        var user = UserDTO.builder().login(auth.getLogin()).password(auth.getPassword()).build();
-        return !userService.isUserAuthorized(user);
-    }
-
 }

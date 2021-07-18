@@ -2,7 +2,6 @@ package com.zpi.token.domain.authorizationRequest.request;
 
 import lombok.*;
 
-@EqualsAndHashCode
 @Getter
 @Builder
 public class RequestError {

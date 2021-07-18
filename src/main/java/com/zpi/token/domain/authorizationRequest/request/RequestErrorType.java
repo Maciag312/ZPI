@@ -34,12 +34,5 @@ public enum RequestErrorType {
         public String toString() {
             return "UNRECOGNIZED_REDIRECT_URI";
         }
-    },
-
-    ACCESS_DENIED {
-        @Override
-        public String toString() {
-            return "ACCESS_DENIED";
-        }
     }
 }

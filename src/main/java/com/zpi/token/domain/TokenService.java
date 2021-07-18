@@ -5,9 +5,7 @@ import com.zpi.token.api.authorizationRequest.RequestDTO;
 import com.zpi.token.api.authorizationRequest.ResponseDTO;
 import com.zpi.token.domain.authorizationRequest.request.InvalidRequestException;
 import com.zpi.token.domain.authorizationRequest.request.RequestValidation;
-import com.zpi.token.domain.authorizationRequest.response.ResponseService;
-import com.zpi.user.domain.EndUserService;
-import com.zpi.utils.BasicAuth;
+import com.zpi.token.domain.authorizationRequest.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +15,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
     private final WebClientRepository clientRepository;
-    private final EndUserService userService;
 
-    public ResponseEntity<?> validateAuthorizationRequest(RequestDTO requestDTO, BasicAuth auth) {
+    public ResponseEntity<?> validateAuthorizationRequest(RequestDTO requestDTO) {
         var request = requestDTO.toDomain();
         var client = clientRepository.getByKey(request.getClientId());
 
-        var validator = new RequestValidation(request, client.orElse(null), userService);
+        var validator = new RequestValidation(request, client.orElse(null));
 
         try {
-            validator.validate(auth);
+            validator.validate();
         } catch (InvalidRequestException e) {
-            return new ResponseEntity<>(new ErrorResponseDTO(e.error), e.status);
+            var error = new ErrorResponseDTO(e.error, request.getState());
+            return new ResponseEntity<>(error, e.status);
         }
 
-        var response = ResponseService.response(request);
+        var response = new Response(request);
         return new ResponseEntity<>(new ResponseDTO(response), HttpStatus.OK);
     }
 }

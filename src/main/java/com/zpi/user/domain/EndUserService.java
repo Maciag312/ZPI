@@ -22,8 +22,4 @@ public class EndUserService {
         userRepository.save(login, user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    public boolean isUserAuthorized(UserDTO userDTO) {
-        return true;
-    }
 }

@@ -24,8 +24,7 @@ class UserRegistrationFT extends Specification {
     private EndUserRepository repository
 
     @Autowired
-    private ObjectMapper mapper;
-
+    private ObjectMapper mapper
 
     def "should register new user"() {
         given:
@@ -121,8 +120,8 @@ class UserRegistrationFT extends Specification {
 
     private class Fixtures {
         static UserDTO userWithRandomData() {
-            def login = UUID.randomUUID().toString();
-            def password = UUID.randomUUID().toString();
+            def login = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
 
             return UserDTO.builder()
                     .login(login)
