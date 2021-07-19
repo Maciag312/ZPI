@@ -2,7 +2,7 @@ package com.zpi.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zpi.user.api.UserDTO
-import com.zpi.user.domain.UserRepository
+import com.zpi.user.domain.EndUserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,15 +21,14 @@ class UserRegistrationFT extends Specification {
     private MockMvc mockMvc
 
     @Autowired
-    private UserRepository repository
+    private EndUserRepository repository
 
     @Autowired
-    private ObjectMapper mapper;
-
+    private ObjectMapper mapper
 
     def "should register new user"() {
         given:
-            def user = userWithRandomData()
+            def user = Fixtures.userWithRandomData()
 
         when:
             def request = registerUserRequest(user)
@@ -46,7 +45,7 @@ class UserRegistrationFT extends Specification {
 
     def "should return conflict on existing user"() {
         given:
-            def user = userWithRandomData()
+            def user = Fixtures.userWithRandomData()
 
         when:
             registerUserRequest(user)
@@ -64,7 +63,7 @@ class UserRegistrationFT extends Specification {
 
     def "should return conflict on login crash"() {
         given:
-            def userA = userWithRandomData()
+            def userA = Fixtures.userWithRandomData()
 
             def userB = UserDTO.builder()
                     .login(userA.getLogin())
@@ -119,13 +118,15 @@ class UserRegistrationFT extends Specification {
         )
     }
 
-    private static UserDTO userWithRandomData() {
-        def login = UUID.randomUUID().toString();
-        def password = UUID.randomUUID().toString();
+    private class Fixtures {
+        static UserDTO userWithRandomData() {
+            def login = UUID.randomUUID().toString()
+            def password = UUID.randomUUID().toString()
 
-        return UserDTO.builder()
-                .login(login)
-                .password(password)
-                .build()
+            return UserDTO.builder()
+                    .login(login)
+                    .password(password)
+                    .build()
+        }
     }
 }

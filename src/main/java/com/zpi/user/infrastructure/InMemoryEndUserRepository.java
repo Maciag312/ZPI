@@ -1,14 +1,14 @@
 package com.zpi.user.infrastructure;
 
 import com.zpi.user.domain.User;
-import com.zpi.user.domain.UserRepository;
+import com.zpi.user.domain.EndUserRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Optional;
 
 @Component
-public class InMemoryUserRepository implements UserRepository {
+public class InMemoryEndUserRepository implements EndUserRepository {
     private final HashMap<String, UserTuple> users = new HashMap<>();
 
     @Override

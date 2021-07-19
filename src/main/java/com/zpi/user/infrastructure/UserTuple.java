@@ -2,7 +2,6 @@ package com.zpi.user.infrastructure;
 
 import com.zpi.user.domain.User;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Id;
 

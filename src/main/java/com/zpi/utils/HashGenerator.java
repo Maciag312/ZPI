@@ -5,17 +5,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class HashGenerator {
-    private final String algorithm = "SHA-256";
 
     private MessageDigest digest;
 
-    // REVIEW ME!
     public HashGenerator() {
         try {
+            String algorithm = "SHA-256";
             digest = MessageDigest.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
+        } catch (NoSuchAlgorithmException ignored) {
         }
     }
 

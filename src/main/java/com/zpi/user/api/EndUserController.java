@@ -1,6 +1,6 @@
 package com.zpi.user.api;
 
-import com.zpi.user.domain.UserService;
+import com.zpi.user.domain.EndUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,8 +14,8 @@ import javax.validation.Valid;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
-public class UserController {
-    private final UserService userService;
+public class EndUserController {
+    private final EndUserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO) {

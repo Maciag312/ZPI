@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
-    private final UserRepository userRepository;
+public class EndUserService {
+    private final EndUserRepository userRepository;
 
     public ResponseEntity<?> createUser(UserDTO userDTO) {
         User user = userDTO.toHashedDomain();

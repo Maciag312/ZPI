@@ -14,6 +14,7 @@ ext {
     junitVersion = '5.7.2'
     spockVersion = '2.0-M4-groovy-3.0'
     groovyVersion = '3.0.6'
+    openApiUiVersion = '1.5.9'
 }
 
 configurations {
@@ -31,7 +32,8 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-data-rest')
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.security:spring-security-crypto')
-    implementation ('org.springframework.boot:spring-boot-starter-validation')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
+    implementation("org.springdoc:springdoc-openapi-ui:${openApiUiVersion}")
     compileOnly('org.projectlombok:lombok')
     runtimeOnly('com.h2database:h2')
     annotationProcessor('org.projectlombok:lombok')
