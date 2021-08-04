@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class TokenService {
     private final ClientRepository clientRepository;
+    private final RequestValidation requestValidation;
 
-    public ResponseEntity<?> validateAuthorizationRequest(RequestDTO requestDTO) {
+    public ResponseEntity<?> authorizationRequest(RequestDTO requestDTO) {
         var request = requestDTO.toDomain();
         var client = clientRepository.getByKey(request.getClientId());
 
         try {
-            RequestValidation.validate(request, client.orElse(null));
+            requestValidation.validate(request, client.orElse(null));
         } catch (InvalidRequestException e) {
             var error = new ErrorResponseDTO(e.error, request.getState());
             return new ResponseEntity<>(error, e.status);

@@ -1,106 +1,103 @@
 package com.zpi.token.authorizationRequest
 
-import com.zpi.token.api.authorizationRequest.ErrorResponseDTO
+
 import com.zpi.token.api.authorizationRequest.RequestDTO
-import com.zpi.token.domain.TokenService
 import com.zpi.token.domain.Client
-import com.zpi.token.domain.ClientRepository
+import com.zpi.token.domain.authorizationRequest.request.InvalidRequestException
 import com.zpi.token.domain.authorizationRequest.request.RequestError
 import com.zpi.token.domain.authorizationRequest.request.RequestErrorType
+import com.zpi.token.domain.authorizationRequest.request.RequestValidation
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Subject
 
 class RequestValidationUT extends Specification {
-    def clientRepository = Mock(ClientRepository)
-
     @Subject
-    private TokenService tokenService = new TokenService(clientRepository)
+    private RequestValidation requestValidation = new RequestValidation()
 
-    def "should return ok on all parameters correct"() {
+    def "should not throw when all parameters correct"() {
         given:
-            def request = CommonFixtures.correctRequest()
+            def request = CommonFixtures.correctRequest().toDomain()
             def client = CommonFixtures.defaultClient()
-
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request, client)
 
         then:
-            response.getStatusCode() == HttpStatus.OK
+            noExceptionThrown()
     }
 
-    def "should return unauthorized_client on non existing client"() {
+    def "should throw unauthorized_client on non existing client"() {
         given:
-            def request = CommonFixtures.correctRequest()
+            def request = CommonFixtures.correctRequest().toDomain()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.empty()
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request, null)
 
         then:
-            def error = RequestError.builder()
+            def exception = thrown(InvalidRequestException)
+            def expected = RequestError.builder()
                     .error(RequestErrorType.UNAUTHORIZED_CLIENT)
                     .errorDescription("Unauthorized client id")
                     .build()
-            def requestError = new ErrorResponseDTO(error, request.getState())
 
-            response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
+            exception.error == expected
+            exception.status == HttpStatus.BAD_REQUEST
     }
 
-    def "should return error message when incorrect redirect_uri"() {
+    def "should throw when incorrect redirect_uri"() {
         given:
-            def request = Fixtures.requestWithCustomUri("UnrecognizedUri")
+            def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = CommonFixtures.defaultClient()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request, client)
 
         then:
-            def error = RequestError.builder()
+            def exception = thrown(InvalidRequestException)
+            def expected = RequestError.builder()
                     .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
                     .build()
-            def requestError = new ErrorResponseDTO(error, request.getState())
-            response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
+
+            exception.error == expected
+            exception.status == HttpStatus.BAD_REQUEST
     }
 
     def "should return error message when client has no registered redirect uris"() {
         given:
-            def request = Fixtures.requestWithCustomUri("UnrecognizedUri")
+            def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = Fixtures.clientWithNullRedirectUri()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request, client)
 
         then:
-            def error = RequestError.builder()
+            def exception = thrown(InvalidRequestException)
+            def expected = RequestError.builder()
                     .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
                     .build()
-            def requestError = new ErrorResponseDTO(error, request.getState())
-            response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
+
+            exception.error == expected
+            exception.status == HttpStatus.BAD_REQUEST
     }
 
-    def "should return invalid_request on missing required parameters"() {
+    def "should throw invalid_request on missing required parameters"() {
         given:
             def client = CommonFixtures.defaultClient()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request.toDomain(), client)
 
         then:
-            def error = RequestError.builder()
+            def exception = thrown(InvalidRequestException)
+            def expected = RequestError.builder()
                     .error(RequestErrorType.INVALID_REQUEST)
                     .errorDescription("Missing: " + errorDescription)
                     .build()
 
-            def requestError = new ErrorResponseDTO(error, request.getState())
-            response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
+            exception.error == expected
+            exception.status == HttpStatus.BAD_REQUEST
 
         where:
             request                 | _ || errorDescription
@@ -108,45 +105,44 @@ class RequestValidationUT extends Specification {
             Fixtures.nullState()    | _ || "state"
     }
 
-    def "should return unsupported_response_type on wrong responseType"() {
+    def "should throw unsupported_response_type on wrong responseType"() {
         given:
             def client = CommonFixtures.defaultClient()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request.toDomain(), client)
 
         then:
-            def error = RequestError.builder()
+            def exception = thrown(InvalidRequestException)
+            def expected = RequestError.builder()
                     .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
                     .errorDescription(errorDescription)
                     .build()
-            def requestError = new ErrorResponseDTO(error, request.getState())
-            response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
+
+            exception.error == expected
+            exception.status == HttpStatus.BAD_REQUEST
 
         where:
             request                        | _ || errorDescription
             Fixtures.invalidResponseType() | _ || "Unrecognized response type: invalid"
     }
 
-    def "should return invalid_scope on invalid scope"() {
+    def "should throw invalid_scope on invalid scope"() {
         given:
             def client = CommonFixtures.defaultClient()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
         when:
-            def response = tokenService.validateAuthorizationRequest(request)
+            requestValidation.validate(request.toDomain(), client)
 
         then:
-            def requestError = new ErrorResponseDTO(
-                    RequestError.builder()
-                            .error(RequestErrorType.INVALID_SCOPE)
-                            .errorDescription("Invalid scope")
-                            .build()
-                    ,
-                    request.getState()
-            )
-            response == new ResponseEntity<>(requestError, HttpStatus.BAD_REQUEST)
+            def exception = thrown(InvalidRequestException)
+            def expected = RequestError.builder()
+                    .error(RequestErrorType.INVALID_SCOPE)
+                    .errorDescription("Invalid scope")
+                    .build()
+
+            exception.error == expected
+            exception.status == HttpStatus.BAD_REQUEST
 
         where:
             request                       | _

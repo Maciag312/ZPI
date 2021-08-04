@@ -14,6 +14,6 @@ public class TokenController {
 
     @PostMapping("/authorize")
     public ResponseEntity<?> authorize(@RequestBody RequestDTO requestDTO) {
-        return tokenService.validateAuthorizationRequest(requestDTO);
+        return tokenService.authorizationRequest(requestDTO);
     }
 }
