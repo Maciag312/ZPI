@@ -12,6 +12,7 @@ import java.util.*;
 @Service
 public class RequestValidation {
     private static final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
+    private static final HttpStatus status = HttpStatus.FOUND;
 
     private Request request;
     private Client client;
@@ -33,7 +34,7 @@ public class RequestValidation {
                     .error(RequestErrorType.UNAUTHORIZED_CLIENT)
                     .errorDescription("Unauthorized client id")
                     .build();
-            throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
+            throw new InvalidRequestException(status, error);
         }
     }
 
@@ -47,7 +48,7 @@ public class RequestValidation {
                     .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
                     .build();
-            throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
+            throw new InvalidRequestException(status, error);
         }
     }
 
@@ -61,7 +62,7 @@ public class RequestValidation {
                     .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
                     .errorDescription("Unrecognized response type: " + request.getResponseType())
                     .build();
-            throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
+            throw new InvalidRequestException(status, error);
         }
     }
 
@@ -76,7 +77,7 @@ public class RequestValidation {
                     .error(RequestErrorType.INVALID_SCOPE)
                     .errorDescription("Invalid scope")
                     .build();
-            throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
+            throw new InvalidRequestException(status, error);
         }
     }
 
@@ -99,7 +100,7 @@ public class RequestValidation {
                     .error(RequestErrorType.INVALID_REQUEST)
                     .errorDescription(description)
                     .build();
-            throw new InvalidRequestException(HttpStatus.BAD_REQUEST, error);
+            throw new InvalidRequestException(status, error);
         }
     }
 

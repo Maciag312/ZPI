@@ -1,8 +1,8 @@
 package com.zpi.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zpi.user.api.UserDTO
-import com.zpi.user.domain.EndUserRepository
+import com.zpi.common.api.UserDTO
+import com.zpi.user.domain.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -21,7 +21,7 @@ class UserRegistrationFT extends Specification {
     private MockMvc mockMvc
 
     @Autowired
-    private EndUserRepository repository
+    private UserRepository repository
 
     @Autowired
     private ObjectMapper mapper

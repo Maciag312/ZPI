@@ -41,7 +41,7 @@ class RequestValidationUT extends Specification {
                     .build()
 
             exception.error == expected
-            exception.status == HttpStatus.BAD_REQUEST
+            exception.status == HttpStatus.FOUND
     }
 
     def "should throw when incorrect redirect_uri"() {
@@ -60,7 +60,7 @@ class RequestValidationUT extends Specification {
                     .build()
 
             exception.error == expected
-            exception.status == HttpStatus.BAD_REQUEST
+            exception.status == HttpStatus.FOUND
     }
 
     def "should return error message when client has no registered redirect uris"() {
@@ -79,7 +79,7 @@ class RequestValidationUT extends Specification {
                     .build()
 
             exception.error == expected
-            exception.status == HttpStatus.BAD_REQUEST
+            exception.status == HttpStatus.FOUND
     }
 
     def "should throw invalid_request on missing required parameters"() {
@@ -97,7 +97,7 @@ class RequestValidationUT extends Specification {
                     .build()
 
             exception.error == expected
-            exception.status == HttpStatus.BAD_REQUEST
+            exception.status == HttpStatus.FOUND
 
         where:
             request                 | _ || errorDescription
@@ -120,7 +120,7 @@ class RequestValidationUT extends Specification {
                     .build()
 
             exception.error == expected
-            exception.status == HttpStatus.BAD_REQUEST
+            exception.status == HttpStatus.FOUND
 
         where:
             request                        | _ || errorDescription
@@ -142,7 +142,7 @@ class RequestValidationUT extends Specification {
                     .build()
 
             exception.error == expected
-            exception.status == HttpStatus.BAD_REQUEST
+            exception.status == HttpStatus.FOUND
 
         where:
             request                       | _

@@ -1,11 +1,15 @@
 package com.zpi.token.domain;
 
+import com.zpi.common.api.UserDTO;
 import com.zpi.token.api.authorizationRequest.ErrorResponseDTO;
 import com.zpi.token.api.authorizationRequest.RequestDTO;
 import com.zpi.token.api.authorizationRequest.ResponseDTO;
 import com.zpi.token.domain.authorizationRequest.request.InvalidRequestException;
+import com.zpi.token.domain.authorizationRequest.request.RequestError;
+import com.zpi.token.domain.authorizationRequest.request.RequestErrorType;
 import com.zpi.token.domain.authorizationRequest.request.RequestValidation;
 import com.zpi.token.domain.authorizationRequest.response.Response;
+import com.zpi.user.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +20,11 @@ import org.springframework.stereotype.Service;
 public class TokenService {
     private final ClientRepository clientRepository;
     private final RequestValidation requestValidation;
+    private final UserService userService;
 
-    public ResponseEntity<?> authorizationRequest(RequestDTO requestDTO) {
+    private static final HttpStatus status = HttpStatus.FOUND;
+
+    public ResponseEntity<?> authorizationRequest(UserDTO user, RequestDTO requestDTO) {
         var request = requestDTO.toDomain();
         var client = clientRepository.getByKey(request.getClientId());
 
@@ -28,7 +35,12 @@ public class TokenService {
             return new ResponseEntity<>(error, e.status);
         }
 
-        var response = new Response(request);
-        return new ResponseEntity<>(new ResponseDTO(response), HttpStatus.OK);
+        if (userService.isAuthenticated(user)) {
+            var response = new Response(request);
+            return new ResponseEntity<>(new ResponseDTO(response), status);
+        }
+
+        var error = new ErrorResponseDTO(RequestError.builder().error(RequestErrorType.USER_AUTH_FAILED).errorDescription("User authentication failed").build(), request.getState());
+        return new ResponseEntity<>(error, status);
     }
 }

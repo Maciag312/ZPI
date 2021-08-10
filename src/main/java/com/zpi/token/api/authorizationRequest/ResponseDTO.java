@@ -9,11 +9,11 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public class ResponseDTO {
-    private final String code;
+    private final String ticket;
     private final String state;
 
     public ResponseDTO(Response response) {
-        this.code = response.getCode();
+        this.ticket = response.getTicket();
         this.state = response.getState();
     }
 }

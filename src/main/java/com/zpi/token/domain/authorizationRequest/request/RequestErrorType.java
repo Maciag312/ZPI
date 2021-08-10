@@ -34,5 +34,12 @@ public enum RequestErrorType {
         public String toString() {
             return "UNRECOGNIZED_REDIRECT_URI";
         }
+    },
+
+    USER_AUTH_FAILED {
+        @Override
+        public String toString() {
+            return "USER_AUTH_FAILED";
+        }
     }
 }

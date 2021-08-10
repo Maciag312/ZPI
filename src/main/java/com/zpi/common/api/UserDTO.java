@@ -1,4 +1,4 @@
-package com.zpi.user.api;
+package com.zpi.common.api;
 
 import com.zpi.user.domain.User;
 import com.zpi.utils.HashGenerator;

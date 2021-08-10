@@ -1,22 +1,22 @@
 package com.zpi.user
 
-import com.zpi.user.api.UserDTO
-import com.zpi.user.domain.EndUserRepository
-import com.zpi.user.domain.EndUserService
+import com.zpi.common.api.UserDTO
+import com.zpi.user.domain.UserRepository
+import com.zpi.user.domain.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Subject
 
-class UserServiceUT extends Specification {
-    def userRepository = Mock(EndUserRepository)
+class UserRegistrationUT extends Specification {
+    def userRepository = Mock(UserRepository)
 
     @Subject
-    private EndUserService userService = new EndUserService(userRepository)
+    private UserService userService = new UserService(userRepository)
 
     def "should create user"() {
         given:
-            def user = createSampleUser()
+            def user = sampleUser()
 
             def hashedUser = user.toHashedDomain()
 
@@ -31,7 +31,7 @@ class UserServiceUT extends Specification {
 
     def "should return conflict if user exists"() {
         given:
-            def user = createSampleUser()
+            def user = sampleUser()
 
             def hashedUser = user.toHashedDomain()
             userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser)
@@ -43,7 +43,7 @@ class UserServiceUT extends Specification {
             response == new ResponseEntity<>(HttpStatus.CONFLICT)
     }
 
-    private static UserDTO createSampleUser() {
+    private static sampleUser() {
         return UserDTO.builder()
                 .login("Login")
                 .password("Password")
