@@ -1,7 +1,7 @@
 package com.zpi.user
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zpi.common.api.UserDTO
+import com.zpi.common.api.dto.UserDTO
 import com.zpi.user.domain.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -31,7 +31,7 @@ class UserRegistrationFT extends Specification {
             def user = Fixtures.userWithRandomData()
 
         when:
-            def request = registerUserRequest(user)
+            def request = postRequest(user)
 
         then:
             request.andExpect(status().isCreated())
@@ -48,8 +48,8 @@ class UserRegistrationFT extends Specification {
             def user = Fixtures.userWithRandomData()
 
         when:
-            registerUserRequest(user)
-            def request = registerUserRequest(user)
+            postRequest(user)
+            def request = postRequest(user)
 
         then:
             request.andExpect(status().isConflict())
@@ -71,8 +71,8 @@ class UserRegistrationFT extends Specification {
                     .build()
 
         when:
-            registerUserRequest(userA)
-            def request = registerUserRequest(userB)
+            postRequest(userA)
+            def request = postRequest(userB)
 
         then:
             request.andExpect(status().isConflict())
@@ -89,7 +89,7 @@ class UserRegistrationFT extends Specification {
             def user = null
 
         when:
-            def request = registerUserRequest(user)
+            def request = postRequest(user)
 
         then:
             request.andExpect(status().isBadRequest())
@@ -101,8 +101,8 @@ class UserRegistrationFT extends Specification {
             def userB = UserDTO.builder().login("Login").build()
 
         when:
-            def requestA = registerUserRequest(userA)
-            def requestB = registerUserRequest(userB)
+            def requestA = postRequest(userA)
+            def requestB = postRequest(userB)
 
         then:
             requestA.andExpect(status().isBadRequest())
@@ -110,7 +110,7 @@ class UserRegistrationFT extends Specification {
 
     }
 
-    private ResultActions registerUserRequest(UserDTO user) {
+    private ResultActions postRequest(UserDTO user) {
         return mockMvc.perform(
                 post("/api/user/register")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -1,6 +1,6 @@
 package com.zpi.user.api;
 
-import com.zpi.common.api.UserDTO;
+import com.zpi.common.api.dto.UserDTO;
 import com.zpi.user.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
-package com.zpi.token.infrastructure;
+package com.zpi.client.infrastructure;
 
-import com.zpi.token.domain.Client;
+import com.zpi.client.domain.Client;
 import lombok.Getter;
 
 import javax.persistence.Id;

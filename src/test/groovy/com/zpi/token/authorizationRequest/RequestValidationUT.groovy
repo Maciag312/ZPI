@@ -1,8 +1,8 @@
 package com.zpi.token.authorizationRequest
 
-
+import com.zpi.CommonFixtures
+import com.zpi.client.domain.Client
 import com.zpi.token.api.authorizationRequest.RequestDTO
-import com.zpi.token.domain.Client
 import com.zpi.token.domain.authorizationRequest.request.InvalidRequestException
 import com.zpi.token.domain.authorizationRequest.request.RequestError
 import com.zpi.token.domain.authorizationRequest.request.RequestErrorType
@@ -17,8 +17,8 @@ class RequestValidationUT extends Specification {
 
     def "should not throw when all parameters correct"() {
         given:
-            def request = CommonFixtures.correctRequest().toDomain()
-            def client = CommonFixtures.defaultClient()
+            def request = CommonFixtures.request()
+            def client = CommonFixtures.client()
         when:
             requestValidation.validate(request, client)
 
@@ -28,7 +28,7 @@ class RequestValidationUT extends Specification {
 
     def "should throw unauthorized_client on non existing client"() {
         given:
-            def request = CommonFixtures.correctRequest().toDomain()
+            def request = Fixtures.correctRequest().toDomain()
 
         when:
             requestValidation.validate(request, null)
@@ -47,7 +47,7 @@ class RequestValidationUT extends Specification {
     def "should throw when incorrect redirect_uri"() {
         given:
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
-            def client = CommonFixtures.defaultClient()
+            def client = CommonFixtures.client()
 
         when:
             requestValidation.validate(request, client)
@@ -84,7 +84,7 @@ class RequestValidationUT extends Specification {
 
     def "should throw invalid_request on missing required parameters"() {
         given:
-            def client = CommonFixtures.defaultClient()
+            def client = CommonFixtures.client()
 
         when:
             requestValidation.validate(request.toDomain(), client)
@@ -107,7 +107,7 @@ class RequestValidationUT extends Specification {
 
     def "should throw unsupported_response_type on wrong responseType"() {
         given:
-            def client = CommonFixtures.defaultClient()
+            def client = CommonFixtures.client()
 
         when:
             requestValidation.validate(request.toDomain(), client)
@@ -129,7 +129,7 @@ class RequestValidationUT extends Specification {
 
     def "should throw invalid_scope on invalid scope"() {
         given:
-            def client = CommonFixtures.defaultClient()
+            def client = CommonFixtures.client()
 
         when:
             requestValidation.validate(request.toDomain(), client)
@@ -152,11 +152,21 @@ class RequestValidationUT extends Specification {
     }
 
     private class Fixtures {
+        static RequestDTO correctRequest() {
+            return RequestDTO.builder()
+                    .clientId(CommonFixtures.defaultClientId)
+                    .redirectUri(CommonFixtures.defaultUri)
+                    .responseType(CommonFixtures.defaultResponseType)
+                    .scope("openid%20phone%20photos%20asdf_asdf_asdf")
+                    .state(CommonFixtures.defaultState)
+                    .build()
+        }
+
         static RequestDTO requestWithCustomUri(String uri) {
             return RequestDTO.builder()
                     .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(uri)
-                    .responseType("code")
+                    .responseType(CommonFixtures.defaultResponseType)
                     .scope("openid")
                     .state(CommonFixtures.defaultState)
                     .build()
@@ -166,7 +176,7 @@ class RequestValidationUT extends Specification {
             return RequestDTO.builder()
                     .clientId(null)
                     .redirectUri(CommonFixtures.defaultUri)
-                    .responseType("code")
+                    .responseType(CommonFixtures.defaultResponseType)
                     .scope("openid")
                     .state(CommonFixtures.defaultState)
                     .build()
@@ -176,8 +186,8 @@ class RequestValidationUT extends Specification {
             return RequestDTO.builder()
                     .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(CommonFixtures.defaultUri)
-                    .responseType("code")
-                    .scope("openid")
+                    .responseType(CommonFixtures.defaultResponseType)
+                    .scope(CommonFixtures.defaultScope)
                     .state(null)
                     .build()
         }
@@ -187,7 +197,7 @@ class RequestValidationUT extends Specification {
                     .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(CommonFixtures.defaultUri)
                     .responseType("invalid")
-                    .scope("openid")
+                    .scope(CommonFixtures.defaultScope)
                     .state(CommonFixtures.defaultState)
                     .build()
         }
@@ -196,7 +206,7 @@ class RequestValidationUT extends Specification {
             return RequestDTO.builder()
                     .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(CommonFixtures.defaultUri)
-                    .responseType("code")
+                    .responseType(CommonFixtures.defaultResponseType)
                     .scope("")
                     .state(CommonFixtures.defaultClientId)
                     .build()
@@ -206,7 +216,7 @@ class RequestValidationUT extends Specification {
             return RequestDTO.builder()
                     .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(CommonFixtures.defaultUri)
-                    .responseType("code")
+                    .responseType(CommonFixtures.defaultResponseType)
                     .scope(null)
                     .state(CommonFixtures.defaultClientId)
                     .build()
@@ -216,7 +226,7 @@ class RequestValidationUT extends Specification {
             return RequestDTO.builder()
                     .clientId(CommonFixtures.defaultClientId)
                     .redirectUri(CommonFixtures.defaultUri)
-                    .responseType("code")
+                    .responseType(CommonFixtures.defaultResponseType)
                     .scope("profile phone unknown_value other_unknown")
                     .state(CommonFixtures.defaultState)
                     .build()

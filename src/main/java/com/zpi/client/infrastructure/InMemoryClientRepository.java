@@ -1,7 +1,7 @@
-package com.zpi.token.infrastructure;
+package com.zpi.client.infrastructure;
 
-import com.zpi.token.domain.Client;
-import com.zpi.token.domain.ClientRepository;
+import com.zpi.client.domain.Client;
+import com.zpi.client.domain.ClientRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

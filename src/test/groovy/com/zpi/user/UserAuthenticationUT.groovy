@@ -1,6 +1,7 @@
 package com.zpi.user
 
-import com.zpi.common.api.UserDTO
+import com.zpi.CommonFixtures
+import com.zpi.common.api.dto.UserDTO
 import com.zpi.user.domain.UserRepository
 import com.zpi.user.domain.UserService
 import spock.lang.Specification
@@ -14,7 +15,7 @@ class UserAuthenticationUT extends Specification {
 
     def "should return true when credentials match"() {
         given:
-            def user = Fixtures.sampleUser()
+            def user = CommonFixtures.userDTO()
             def hashedUser = user.toHashedDomain()
             userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser)
 
@@ -27,7 +28,7 @@ class UserAuthenticationUT extends Specification {
 
     def "should return false when user does not exist"() {
         given:
-            def user = Fixtures.sampleUser()
+            def user = CommonFixtures.userDTO()
             def hashedUser = user.toHashedDomain()
             userRepository.getByKey(hashedUser.getLogin()) >> Optional.empty()
 
@@ -40,7 +41,7 @@ class UserAuthenticationUT extends Specification {
 
     def "should return false when credentials does not match"() {
         given:
-            def user = Fixtures.sampleUser()
+            def user = CommonFixtures.userDTO()
             def user2 = UserDTO.builder()
                     .login(user.getLogin())
                     .password(user.getPassword() + "asdf")
@@ -55,14 +56,5 @@ class UserAuthenticationUT extends Specification {
 
         then:
             !isAuthenticated
-    }
-
-    private class Fixtures {
-        static sampleUser() {
-            return UserDTO.builder()
-                    .login("Login")
-                    .password("Password")
-                    .build()
-        }
     }
 }

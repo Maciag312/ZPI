@@ -1,7 +1,6 @@
 package com.zpi.token.domain.authorizationRequest.request;
 
-import com.zpi.token.domain.Client;
-import lombok.AllArgsConstructor;
+import com.zpi.client.domain.Client;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,8 +23,8 @@ public class RequestValidation {
         validateClient();
         validateRedirectUri();
         validateResponseType();
-        validateScope();
         validateRequiredParameters();
+        validateScope();
     }
 
     private void validateClient() throws InvalidRequestException {
@@ -81,14 +80,12 @@ public class RequestValidation {
         }
     }
 
-    private static boolean isScopeInvalid(String scope) {
+    private static boolean isScopeInvalid(List<String> scope) {
         if (scope == null) {
             return true;
         }
 
-        var scopeValues = scope.split(" ");
-
-        return !Arrays.asList(scopeValues).contains("openid");
+        return !scope.contains("openid");
     }
 
     private void validateRequiredParameters() throws InvalidRequestException {
@@ -107,11 +104,11 @@ public class RequestValidation {
     private List<String> missingRequiredParameters() {
         var result = new ArrayList<String>();
 
-        if (request.getState() == null) {
+        if (request.getState() == null || request.getState().equals("")) {
             result.add("state");
         }
 
-        if (request.getClientId() == null) {
+        if (request.getClientId() == null || request.getClientId().equals("")) {
             result.add("client_id");
         }
 

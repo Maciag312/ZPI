@@ -1,4 +1,4 @@
-package com.zpi.token.domain;
+package com.zpi.client.domain;
 
 import org.springframework.stereotype.Repository;
 

@@ -1,12 +1,14 @@
-package com.zpi.token.domain;
+package com.zpi.client.domain;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.HashSet;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 public class Client {
     private HashSet<String> availableRedirectUri;
     private final String id;

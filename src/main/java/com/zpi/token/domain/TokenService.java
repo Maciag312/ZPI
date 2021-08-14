@@ -1,6 +1,7 @@
 package com.zpi.token.domain;
 
-import com.zpi.common.api.UserDTO;
+import com.zpi.client.domain.ClientRepository;
+import com.zpi.common.api.dto.UserDTO;
 import com.zpi.token.api.authorizationRequest.ErrorResponseDTO;
 import com.zpi.token.api.authorizationRequest.RequestDTO;
 import com.zpi.token.api.authorizationRequest.ResponseDTO;

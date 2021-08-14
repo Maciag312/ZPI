@@ -1,12 +1,13 @@
 package com.zpi.token.authorizationRequest
 
+import com.zpi.CommonFixtures
+import com.zpi.client.domain.Client
+import com.zpi.client.domain.ClientRepository
+import com.zpi.common.api.dto.UserDTO
 import com.zpi.token.api.authorizationRequest.ErrorResponseDTO
 import com.zpi.token.api.authorizationRequest.ResponseDTO
-import com.zpi.token.domain.Client
-import com.zpi.token.domain.ClientRepository
 import com.zpi.token.domain.TokenService
 import com.zpi.token.domain.authorizationRequest.request.*
-import com.zpi.common.api.UserDTO
 import com.zpi.user.domain.UserService
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
@@ -22,9 +23,9 @@ class RequestUT extends Specification {
 
     def "should return auth ticket when request is valid"() {
         given:
-            def request = CommonFixtures.correctRequest()
-            def user = CommonFixtures.defaultUser()
-            def client = CommonFixtures.defaultClient()
+            def request = CommonFixtures.requestDTO()
+            def user = CommonFixtures.userDTO()
+            def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
             requestValidation.validate(_ as Request, _ as Client) >> null
@@ -45,9 +46,9 @@ class RequestUT extends Specification {
 
     def "should return error on wrong request"() {
         given:
-            def request = CommonFixtures.correctRequest()
-            def client = CommonFixtures.defaultClient()
-            def user = CommonFixtures.defaultUser()
+            def request = CommonFixtures.requestDTO()
+            def client = CommonFixtures.client()
+            def user = CommonFixtures.userDTO()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
             requestValidation.validate(_ as Request, _ as Client) >> {
@@ -69,9 +70,9 @@ class RequestUT extends Specification {
 
     def "should return error when user not authenticated"() {
         given:
-            def request = CommonFixtures.correctRequest()
-            def client = CommonFixtures.defaultClient()
-            def user = CommonFixtures.defaultUser()
+            def request = CommonFixtures.requestDTO()
+            def client = CommonFixtures.client()
+            def user = CommonFixtures.userDTO()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
             requestValidation.validate(_ as Request, _ as Client) >> null

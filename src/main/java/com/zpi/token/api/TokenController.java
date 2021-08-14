@@ -2,7 +2,7 @@ package com.zpi.token.api;
 
 import com.zpi.token.api.authorizationRequest.RequestDTO;
 import com.zpi.token.domain.TokenService;
-import com.zpi.common.api.UserDTO;
+import com.zpi.common.api.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
