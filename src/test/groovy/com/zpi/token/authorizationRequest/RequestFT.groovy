@@ -26,15 +26,9 @@ class RequestFT extends Specification {
     private UserService userService
 
     @Autowired
-    private ObjectMapper mapper
-
     private CommonHelpers commonHelpers
 
     private static final String baseUri = "/api/token/authorize"
-
-    def setup() {
-        commonHelpers = new CommonHelpers(mapper, mockMvc)
-    }
 
     def "should return success on correct request"() {
         given:
@@ -58,7 +52,7 @@ class RequestFT extends Specification {
     }
 
     private void addUser() {
-        def user = CommonFixtures.userDTO()
+        def user = CommonFixtures.userDTO().toHashedDomain()
         userService.createUser(user)
     }
 }

@@ -26,17 +26,11 @@ class AuthenticationTicketE2E extends Specification {
     private UserRepository userRepository;
 
     @Autowired
-    private ObjectMapper mapper
-
     private CommonHelpers commonHelpers
 
     private static final String clientRegisterUrl = "/api/client/register"
     private static final String userRegisterUrl = "/api/user/register"
     private static final String authRequestUrl = "/api/token/authorize"
-
-    def setup() {
-        commonHelpers = new CommonHelpers(mapper, mockMvc)
-    }
 
     def "should get authentication ticket for newly registered user and client"() {
         given:

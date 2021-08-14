@@ -1,13 +1,13 @@
 package com.zpi.token.api;
 
+import com.zpi.common.api.dto.UserDTO;
+import com.zpi.token.api.authorizationRequest.ErrorResponseException;
 import com.zpi.token.api.authorizationRequest.RequestDTO;
 import com.zpi.token.domain.TokenService;
-import com.zpi.common.api.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,15 +16,29 @@ public class TokenController {
     private final TokenService tokenService;
 
     @PostMapping("/authorize")
-    public ResponseEntity<?> authorize(@RequestBody UserDTO userDto, @RequestParam Map<String, String> params) {
-        var requestDto = RequestDTO.builder()
-                .clientId(params.get("client_id"))
-                .redirectUri(params.get("redirect_uri"))
-                .responseType(params.get("response_type"))
-                .scope(params.get("scope"))
-                .state(params.get("state"))
+    public ResponseEntity<?> authorize(@RequestBody UserDTO userDTO,
+                                       @RequestParam String client_id,
+                                       @RequestParam String redirect_uri,
+                                       @RequestParam String response_type,
+                                       @RequestParam String scope,
+                                       @RequestParam String state) {
+
+        var requestDTO = RequestDTO.builder()
+                .clientId(client_id)
+                .redirectUri(redirect_uri)
+                .responseType(response_type)
+                .scope(scope)
+                .state(state)
                 .build();
 
-        return tokenService.authorizationRequest(userDto, requestDto);
+        var user = userDTO.toHashedDomain();
+        var request = requestDTO.toDomain();
+
+        try {
+            var response = tokenService.authorizationRequest(user, request);
+            return new ResponseEntity<>(response, HttpStatus.FOUND);
+        } catch (ErrorResponseException e) {
+            return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.FOUND);
+        }
     }
 }

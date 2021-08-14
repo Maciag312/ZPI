@@ -3,9 +3,8 @@ package com.zpi.token.authorizationRequest
 import com.zpi.CommonFixtures
 import com.zpi.client.domain.Client
 import com.zpi.client.domain.ClientRepository
-import com.zpi.common.api.dto.UserDTO
 import com.zpi.token.api.authorizationRequest.ErrorResponseDTO
-import com.zpi.token.api.authorizationRequest.ResponseDTO
+import com.zpi.token.api.authorizationRequest.ErrorResponseException
 import com.zpi.token.domain.TokenService
 import com.zpi.token.domain.authorizationRequest.request.*
 import com.zpi.user.domain.UserService
@@ -23,32 +22,27 @@ class RequestUT extends Specification {
 
     def "should return auth ticket when request is valid"() {
         given:
-            def request = CommonFixtures.requestDTO()
-            def user = CommonFixtures.userDTO()
+            def request = CommonFixtures.request()
+            def user = CommonFixtures.userDTO().toHashedDomain()
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
             requestValidation.validate(_ as Request, _ as Client) >> null
-            userService.isAuthenticated(user as UserDTO) >> true
+            userService.isAuthenticated(user) >> true
 
         when:
             def response = tokenService.authorizationRequest(user, request)
 
         then:
-            response.getStatusCode() == HttpStatus.FOUND
-
-        and:
-            def responseBody = response.getBody() as ResponseDTO
-
-            responseBody.getTicket().length() != 0
-            responseBody.getState() == CommonFixtures.defaultState
+            response.getTicket().length() != 0
+            response.getState() == CommonFixtures.defaultState
     }
 
     def "should return error on wrong request"() {
         given:
-            def request = CommonFixtures.requestDTO()
+            def request = CommonFixtures.request()
             def client = CommonFixtures.client()
-            def user = CommonFixtures.userDTO()
+            def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
             requestValidation.validate(_ as Request, _ as Client) >> {
@@ -56,39 +50,33 @@ class RequestUT extends Specification {
             }
 
         when:
-            def response = tokenService.authorizationRequest(user, request)
+            tokenService.authorizationRequest(user, request)
 
         then:
-            response.getStatusCodeValue() == HttpStatus.FOUND.value()
+            def error = new ErrorResponseDTO(Fixtures.unauthorizedClientError(), request.getState())
+            def thrownException = thrown(ErrorResponseException)
 
-        and:
-            def expected = new ErrorResponseDTO(Fixtures.unauthorizedClientError(), request.getState())
-            def responseBody = response.getBody() as ErrorResponseDTO
-
-            responseBody == expected
+            thrownException.errorResponse == error
     }
 
     def "should return error when user not authenticated"() {
         given:
-            def request = CommonFixtures.requestDTO()
+            def request = CommonFixtures.request()
             def client = CommonFixtures.client()
-            def user = CommonFixtures.userDTO()
+            def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
             requestValidation.validate(_ as Request, _ as Client) >> null
-            userService.isAuthenticated(user as UserDTO) >> false
+            userService.isAuthenticated(user) >> false
 
         when:
-            def response = tokenService.authorizationRequest(user, request)
+            tokenService.authorizationRequest(user, request)
 
         then:
-            response.getStatusCodeValue() == HttpStatus.FOUND.value()
+            def error = new ErrorResponseDTO(Fixtures.userAuthenticationFailedError(), request.getState())
+            def thrownException = thrown(ErrorResponseException)
 
-        and:
-            def expected = new ErrorResponseDTO(Fixtures.userAuthenticationFailedError(), request.getState())
-            def responseBody = response.getBody() as ErrorResponseDTO
-
-            responseBody == expected
+            thrownException.errorResponse == error
     }
 
     private class Fixtures {

@@ -15,9 +15,8 @@ class UserAuthenticationUT extends Specification {
 
     def "should return true when credentials match"() {
         given:
-            def user = CommonFixtures.userDTO()
-            def hashedUser = user.toHashedDomain()
-            userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser)
+            def user = CommonFixtures.userDTO().toHashedDomain()
+            userRepository.getByKey(user.getLogin()) >> Optional.of(user)
 
         when:
             def isAuthenticated = userService.isAuthenticated(user)
@@ -28,9 +27,8 @@ class UserAuthenticationUT extends Specification {
 
     def "should return false when user does not exist"() {
         given:
-            def user = CommonFixtures.userDTO()
-            def hashedUser = user.toHashedDomain()
-            userRepository.getByKey(hashedUser.getLogin()) >> Optional.empty()
+            def user = CommonFixtures.userDTO().toHashedDomain()
+            userRepository.getByKey(user.getLogin()) >> Optional.empty()
 
         when:
             def isAuthenticated = userService.isAuthenticated(user)
@@ -41,15 +39,13 @@ class UserAuthenticationUT extends Specification {
 
     def "should return false when credentials does not match"() {
         given:
-            def user = CommonFixtures.userDTO()
-            def user2 = UserDTO.builder()
+            def user = CommonFixtures.userDTO().toHashedDomain()
+            def savedUser = UserDTO.builder()
                     .login(user.getLogin())
                     .password(user.getPassword() + "asdf")
-                    .build()
+                    .build().toHashedDomain()
 
-            def hashedUser = user.toHashedDomain()
-            def hashedUser2 = user2.toHashedDomain()
-            userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser2)
+            userRepository.getByKey(user.getLogin()) >> Optional.of(savedUser)
 
         when:
             def isAuthenticated = userService.isAuthenticated(user)

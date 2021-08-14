@@ -3,7 +3,9 @@ package com.zpi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.zpi.token.api.authorizationRequest.RequestDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -12,12 +14,14 @@ import java.io.UnsupportedEncodingException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+@Component
 public class CommonHelpers {
-    private final ObjectMapper mapper;
     private final MockMvc mockMvc;
 
-    public CommonHelpers(ObjectMapper mapper, MockMvc mockMvc) {
-        this.mapper = mapper;
+    @Autowired
+    private ObjectMapper mapper;
+
+    CommonHelpers(MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 

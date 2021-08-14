@@ -3,8 +3,6 @@ package com.zpi.user
 import com.zpi.CommonFixtures
 import com.zpi.user.domain.UserRepository
 import com.zpi.user.domain.UserService
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -16,30 +14,27 @@ class UserRegistrationUT extends Specification {
 
     def "should create user"() {
         given:
-            def user = CommonFixtures.userDTO()
+            def user = CommonFixtures.userDTO().toHashedDomain()
 
-            def hashedUser = user.toHashedDomain()
-
-            userRepository.getByKey(hashedUser.getLogin()) >> Optional.empty()
+            userRepository.getByKey(user.getLogin()) >> Optional.empty()
 
         when:
-            def response = userService.createUser(user)
+            def isSuccess = userService.createUser(user)
 
         then:
-            response == new ResponseEntity<>(HttpStatus.CREATED)
+            isSuccess
     }
 
     def "should return conflict if user exists"() {
         given:
-            def user = CommonFixtures.userDTO()
+            def user = CommonFixtures.userDTO().toHashedDomain()
 
-            def hashedUser = user.toHashedDomain()
-            userRepository.getByKey(hashedUser.getLogin()) >> Optional.of(hashedUser)
+            userRepository.getByKey(user.getLogin()) >> Optional.of(user)
 
         when:
-            def response = userService.createUser(user)
+            def isSuccess = userService.createUser(user)
 
         then:
-            response == new ResponseEntity<>(HttpStatus.CONFLICT)
+            !isSuccess
     }
 }

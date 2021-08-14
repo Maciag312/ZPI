@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -13,8 +14,11 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class UserDTO {
     @NotNull
+    @NotEmpty
     private final String login;
+
     @NotNull
+    @NotEmpty
     private final String password;
 
     public User toHashedDomain() {

@@ -23,15 +23,9 @@ class ClientRegistrationFT extends Specification {
     private ClientRepository repository;
 
     @Autowired
-    private ObjectMapper mapper
-
     private CommonHelpers commonHelpers
 
     private static final String url = "/api/client/register"
-
-    def setup() {
-        commonHelpers = new CommonHelpers(mapper, mockMvc)
-    }
 
     def "should register new client"() {
         given:

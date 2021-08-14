@@ -1,9 +1,6 @@
 package com.zpi.user.domain;
 
-import com.zpi.common.api.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -11,20 +8,18 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public ResponseEntity<?> createUser(UserDTO userDTO) {
-        User user = userDTO.toHashedDomain();
+    public boolean createUser(User user) {
         var login = user.getLogin();
 
         if (userRepository.getByKey(login).isPresent()) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
+            return false;
         }
 
         userRepository.save(login, user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return true;
     }
 
-    public boolean isAuthenticated(UserDTO userDTO) {
-        User user = userDTO.toHashedDomain();
+    public boolean isAuthenticated(User user) {
         var login = user.getLogin();
 
         var found = userRepository.getByKey(login);
