@@ -1,0 +1,112 @@
+{
+	"info": {
+		"_postman_id": "9c01ea2e-e828-4fc8-bc2e-7cd78f42dfc4",
+		"name": "ZPI-postman",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"string\",\n    \"password\": \"string\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"clientId\",\n  \"availableRedirectUri\": [\n    \"google.com\"\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/client/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"client",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get ticket",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"login\": \"string\",\n  \"password\": \"string\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/token/authorize?client_id=clientId&redirect_uri=google.com&response_type=code&scope=openid&state=asdffdsa",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"token",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "clientId"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "google.com"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "scope",
+							"value": "openid"
+						},
+						{
+							"key": "state",
+							"value": "asdffdsa"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

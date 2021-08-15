@@ -1,10 +1,10 @@
 package com.zpi.e2e
 
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import com.zpi.CommonFixtures
 import com.zpi.CommonHelpers
-import com.zpi.client.domain.ClientRepository
-import com.zpi.user.domain.UserRepository
+import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -31,6 +31,11 @@ class AuthenticationTicketE2E extends Specification {
     private static final String clientRegisterUrl = "/api/client/register"
     private static final String userRegisterUrl = "/api/user/register"
     private static final String authRequestUrl = "/api/token/authorize"
+
+    def setup() {
+        clientRepository.clear()
+        userRepository.clear()
+    }
 
     def "should get authentication ticket for newly registered user and client"() {
         given:

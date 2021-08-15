@@ -1,8 +1,8 @@
 package com.zpi.client
 
 import com.zpi.CommonFixtures
-import com.zpi.client.domain.ClientRepository
-import com.zpi.client.domain.ClientService
+import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.client.ClientService
 import spock.lang.Specification
 import spock.lang.Subject
 

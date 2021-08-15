@@ -1,8 +1,8 @@
 package com.zpi.user
 
 import com.zpi.CommonFixtures
-import com.zpi.user.domain.UserRepository
-import com.zpi.user.domain.UserService
+import com.zpi.domain.user.UserRepository
+import com.zpi.domain.user.UserManager
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -10,7 +10,7 @@ class UserRegistrationUT extends Specification {
     def userRepository = Mock(UserRepository)
 
     @Subject
-    private UserService userService = new UserService(userRepository)
+    private UserManager userService = new UserManager(userRepository)
 
     def "should create user"() {
         given:

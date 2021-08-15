@@ -1,24 +1,28 @@
 package com.zpi.token.authorizationRequest
 
 import com.zpi.CommonFixtures
-import com.zpi.client.domain.Client
-import com.zpi.client.domain.ClientRepository
-import com.zpi.token.api.authorizationRequest.ErrorResponseDTO
-import com.zpi.token.api.authorizationRequest.ErrorResponseException
-import com.zpi.token.domain.TokenService
-import com.zpi.token.domain.authorizationRequest.request.*
-import com.zpi.user.domain.UserService
+import com.zpi.domain.client.Client
+import com.zpi.domain.client.ClientRepository
+import com.zpi.api.token.authorizationRequest.ErrorResponseDTO
+import com.zpi.api.token.authorizationRequest.ErrorResponseException
+import com.zpi.domain.token.TokenService
+import com.zpi.domain.token.ticketRequest.request.InvalidRequestException
+import com.zpi.domain.token.ticketRequest.request.Request
+import com.zpi.domain.token.ticketRequest.request.RequestError
+import com.zpi.domain.token.ticketRequest.request.RequestErrorType
+import com.zpi.domain.token.ticketRequest.request.RequestValidator
+import com.zpi.domain.user.UserAuthenticator
 import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import spock.lang.Subject
 
 class RequestUT extends Specification {
     def clientRepository = Mock(ClientRepository)
-    def requestValidation = Mock(RequestValidation)
-    def userService = Mock(UserService)
+    def requestValidator = Mock(RequestValidator)
+    def authenticator = Mock(UserAuthenticator)
 
     @Subject
-    private TokenService tokenService = new TokenService(clientRepository, requestValidation, userService)
+    private TokenService tokenService = new TokenService(clientRepository, requestValidator, authenticator)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -27,11 +31,11 @@ class RequestUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidation.validate(_ as Request, _ as Client) >> null
-            userService.isAuthenticated(user) >> true
+            requestValidator.validate(_ as Request, _ as Client) >> null
+            authenticator.isAuthenticated(user) >> true
 
         when:
-            def response = tokenService.authorizationRequest(user, request)
+            def response = tokenService.authenticationTicket(user, request)
 
         then:
             response.getTicket().length() != 0
@@ -45,12 +49,12 @@ class RequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidation.validate(_ as Request, _ as Client) >> {
+            requestValidator.validate(_ as Request, _ as Client) >> {
                 throw Fixtures.sampleException()
             }
 
         when:
-            tokenService.authorizationRequest(user, request)
+            tokenService.authenticationTicket(user, request)
 
         then:
             def error = new ErrorResponseDTO(Fixtures.unauthorizedClientError(), request.getState())
@@ -66,11 +70,11 @@ class RequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidation.validate(_ as Request, _ as Client) >> null
-            userService.isAuthenticated(user) >> false
+            requestValidator.validate(_ as Request, _ as Client) >> null
+            authenticator.isAuthenticated(user) >> false
 
         when:
-            tokenService.authorizationRequest(user, request)
+            tokenService.authenticationTicket(user, request)
 
         then:
             def error = new ErrorResponseDTO(Fixtures.userAuthenticationFailedError(), request.getState())

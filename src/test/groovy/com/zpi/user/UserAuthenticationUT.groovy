@@ -1,9 +1,9 @@
 package com.zpi.user
 
 import com.zpi.CommonFixtures
-import com.zpi.common.api.dto.UserDTO
-import com.zpi.user.domain.UserRepository
-import com.zpi.user.domain.UserService
+import com.zpi.api.common.dto.UserDTO
+import com.zpi.domain.user.UserAuthenticator
+import com.zpi.domain.user.UserRepository
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -11,7 +11,7 @@ class UserAuthenticationUT extends Specification {
     def userRepository = Mock(UserRepository)
 
     @Subject
-    private UserService userService = new UserService(userRepository)
+    private UserAuthenticator authenticator = new UserAuthenticator(userRepository)
 
     def "should return true when credentials match"() {
         given:
@@ -19,7 +19,7 @@ class UserAuthenticationUT extends Specification {
             userRepository.getByKey(user.getLogin()) >> Optional.of(user)
 
         when:
-            def isAuthenticated = userService.isAuthenticated(user)
+            def isAuthenticated = authenticator.isAuthenticated(user)
 
         then:
             isAuthenticated
@@ -31,7 +31,7 @@ class UserAuthenticationUT extends Specification {
             userRepository.getByKey(user.getLogin()) >> Optional.empty()
 
         when:
-            def isAuthenticated = userService.isAuthenticated(user)
+            def isAuthenticated = authenticator.isAuthenticated(user)
 
         then:
             !isAuthenticated
@@ -48,7 +48,7 @@ class UserAuthenticationUT extends Specification {
             userRepository.getByKey(user.getLogin()) >> Optional.of(savedUser)
 
         when:
-            def isAuthenticated = userService.isAuthenticated(user)
+            def isAuthenticated = authenticator.isAuthenticated(user)
 
         then:
             !isAuthenticated

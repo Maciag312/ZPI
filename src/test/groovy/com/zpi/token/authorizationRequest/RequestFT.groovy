@@ -1,10 +1,10 @@
 package com.zpi.token.authorizationRequest
 
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import com.zpi.CommonFixtures
 import com.zpi.CommonHelpers
-import com.zpi.client.domain.ClientRepository
-import com.zpi.user.domain.UserService
+import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.user.UserManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -23,12 +23,16 @@ class RequestFT extends Specification {
     private ClientRepository clientRepository
 
     @Autowired
-    private UserService userService
+    private UserManager userManager
 
     @Autowired
     private CommonHelpers commonHelpers
 
     private static final String baseUri = "/api/token/authorize"
+
+    def setup() {
+        clientRepository.clear()
+    }
 
     def "should return success on correct request"() {
         given:
@@ -53,6 +57,6 @@ class RequestFT extends Specification {
 
     private void addUser() {
         def user = CommonFixtures.userDTO().toHashedDomain()
-        userService.createUser(user)
+        userManager.createUser(user)
     }
 }

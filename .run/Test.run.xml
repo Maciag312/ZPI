@@ -1,23 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Test" type="GradleRunConfiguration" factoryName="Gradle" singleton="false">
-    <ExternalSystemSettings>
-      <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
-      <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="" />
-      <option name="taskDescriptions">
-        <list />
-      </option>
-      <option name="taskNames">
-        <list>
-          <option value="test" />
-        </list>
-      </option>
-      <option name="vmOptions" value="" />
-    </ExternalSystemSettings>
-    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-    <DebugAllEnabled>false</DebugAllEnabled>
-    <method v="2" />
+  <configuration default="false" name="Test" type="JUnit" factoryName="JUnit" singleton="false">
+    <module name="ZPI-service.test" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="ALTERNATIVE_JRE_PATH" value="11" />
+    <option name="PACKAGE_NAME" value="" />
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="package" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>

@@ -1,13 +1,12 @@
 package com.zpi.user
 
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import com.zpi.CommonHelpers
-import com.zpi.common.api.dto.UserDTO
-import com.zpi.user.domain.UserRepository
+import com.zpi.api.common.dto.UserDTO
+import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -22,6 +21,10 @@ class UserRegistrationFT extends Specification {
     private CommonHelpers commonHelpers
 
     private static final String url = "/api/user/register"
+
+    def setup() {
+        repository.clear()
+    }
 
     def "should register new user"() {
         given:

@@ -1,10 +1,10 @@
 package com.zpi.client
 
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import com.zpi.CommonFixtures
 import com.zpi.CommonHelpers
-import com.zpi.client.api.ClientDTO
-import com.zpi.client.domain.ClientRepository
+import com.zpi.api.client.ClientDTO
+import com.zpi.domain.client.ClientRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -20,12 +20,16 @@ class ClientRegistrationFT extends Specification {
     private MockMvc mockMvc
 
     @Autowired
-    private ClientRepository repository;
+    private ClientRepository repository
 
     @Autowired
     private CommonHelpers commonHelpers
 
     private static final String url = "/api/client/register"
+
+    def setup() {
+        repository.clear()
+    }
 
     def "should register new client"() {
         given:
@@ -47,11 +51,7 @@ class ClientRegistrationFT extends Specification {
     def "should return conflict on clientId crash"() {
         given:
             def clientA = CommonFixtures.clientDTO()
-
-            def clientB = ClientDTO.builder()
-                    .id(clientA.getId())
-                    .availableRedirectUri(new ArrayList<String>())
-                    .build()
+            def clientB = CommonFixtures.clientDTO()
 
         when:
             commonHelpers.postRequest(clientA, url)
