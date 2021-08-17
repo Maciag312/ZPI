@@ -1,9 +1,12 @@
 package com.zpi.api.token;
 
 import com.zpi.api.common.dto.UserDTO;
-import com.zpi.api.token.authorizationRequest.ErrorResponseException;
-import com.zpi.api.token.authorizationRequest.RequestDTO;
+import com.zpi.api.common.exception.ErrorResponseException;
+import com.zpi.api.token.consentRequest.ConsentRequestDTO;
+import com.zpi.api.token.consentRequest.ConsentResponseDTO;
+import com.zpi.api.token.ticketRequest.RequestDTO;
 import com.zpi.domain.token.TokenService;
+import com.zpi.domain.token.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.token.ticketRequest.request.Request;
 import com.zpi.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +59,18 @@ public class TokenController {
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(body);
         } catch (ErrorResponseException e) {
             return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.FOUND);
+        }
+    }
+
+    @PostMapping("/consent")
+    public ResponseEntity<?> authorize(@RequestBody ConsentRequestDTO requestDTO) {
+        var request = requestDTO.toDomain();
+
+        try {
+            var response = tokenService.consentRequest(request);
+            return ResponseEntity.ok(new ConsentResponseDTO(response));
+        } catch (ErrorConsentResponseException e) {
+            return new ResponseEntity<>(e.getError(), HttpStatus.BAD_REQUEST);
         }
     }
 }

@@ -1,14 +1,16 @@
 package com.zpi.token.authorizationRequest
 
 import com.zpi.CommonFixtures
+import com.zpi.api.common.dto.ErrorResponseDTO
+import com.zpi.api.common.exception.ErrorResponseException
 import com.zpi.domain.client.Client
 import com.zpi.domain.client.ClientRepository
-import com.zpi.api.token.authorizationRequest.ErrorResponseDTO
-import com.zpi.api.token.authorizationRequest.ErrorResponseException
+import com.zpi.domain.common.RequestError
 import com.zpi.domain.token.TokenService
-import com.zpi.domain.token.ticketRequest.request.InvalidRequestException
+import com.zpi.domain.token.consentRequest.ConsentService
+import com.zpi.domain.token.ticketRequest.request.ValidationFailedException
 import com.zpi.domain.token.ticketRequest.request.Request
-import com.zpi.domain.token.ticketRequest.request.RequestError
+
 import com.zpi.domain.token.ticketRequest.request.RequestErrorType
 import com.zpi.domain.token.ticketRequest.request.RequestValidator
 import com.zpi.domain.user.UserAuthenticator
@@ -20,9 +22,10 @@ class RequestUT extends Specification {
     def clientRepository = Mock(ClientRepository)
     def requestValidator = Mock(RequestValidator)
     def authenticator = Mock(UserAuthenticator)
+    def consentService = Mock(ConsentService)
 
     @Subject
-    private TokenService tokenService = new TokenService(clientRepository, requestValidator, authenticator)
+    private TokenService tokenService = new TokenService(clientRepository, requestValidator, authenticator, consentService)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -39,7 +42,7 @@ class RequestUT extends Specification {
 
         then:
             response.getTicket().length() != 0
-            response.getState() == CommonFixtures.defaultState
+            response.getState() == CommonFixtures.state
     }
 
     def "should return error on wrong request"() {
@@ -84,10 +87,8 @@ class RequestUT extends Specification {
     }
 
     private class Fixtures {
-        private static final HttpStatus defaultErrorHttpStatus = HttpStatus.FOUND
-
-        static InvalidRequestException sampleException() {
-            return new InvalidRequestException(defaultErrorHttpStatus, unauthorizedClientError())
+        static ValidationFailedException sampleException() {
+            return new ValidationFailedException(unauthorizedClientError())
         }
 
         static RequestError unauthorizedClientError() {

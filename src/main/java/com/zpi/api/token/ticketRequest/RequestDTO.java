@@ -1,4 +1,4 @@
-package com.zpi.api.token.authorizationRequest;
+package com.zpi.api.token.ticketRequest;
 
 import com.zpi.domain.token.ticketRequest.request.Request;
 import lombok.Builder;

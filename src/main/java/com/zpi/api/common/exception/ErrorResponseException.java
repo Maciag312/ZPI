@@ -1,5 +1,6 @@
-package com.zpi.api.token.authorizationRequest;
+package com.zpi.api.common.exception;
 
+import com.zpi.api.common.dto.ErrorResponseDTO;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

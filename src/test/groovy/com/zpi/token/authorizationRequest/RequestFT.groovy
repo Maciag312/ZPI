@@ -46,7 +46,7 @@ class RequestFT extends Specification {
 
         then:
             result.andExpect(status().isFound())
-            CommonHelpers.attributeFromResult("state", result) == CommonFixtures.defaultState
+            CommonHelpers.attributeFromResult("state", result) == CommonFixtures.state
             CommonHelpers.attributeFromResult("ticket", result).length() != 0
     }
 

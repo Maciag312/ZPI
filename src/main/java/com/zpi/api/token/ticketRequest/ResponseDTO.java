@@ -1,4 +1,4 @@
-package com.zpi.api.token.authorizationRequest;
+package com.zpi.api.token.ticketRequest;
 
 import com.zpi.domain.token.ticketRequest.response.Response;
 import lombok.EqualsAndHashCode;
@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 public class ResponseDTO {
     private final String ticket;
     private final String state;
