@@ -1,37 +1,37 @@
 package com.zpi.user
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.zpi.user.api.UserDTO
-import com.zpi.user.domain.EndUserRepository
+
+import com.zpi.CommonHelpers
+import com.zpi.api.common.dto.UserDTO
+import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActions
 import spock.lang.Specification
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserRegistrationFT extends Specification {
     @Autowired
-    private MockMvc mockMvc
+    private UserRepository repository
 
     @Autowired
-    private EndUserRepository repository
+    private CommonHelpers commonHelpers
 
-    @Autowired
-    private ObjectMapper mapper
+    private static final String url = "/api/user/register"
+
+    def setup() {
+        repository.clear()
+    }
 
     def "should register new user"() {
         given:
             def user = Fixtures.userWithRandomData()
 
         when:
-            def request = registerUserRequest(user)
+            def request = commonHelpers.postRequest(user, url)
 
         then:
             request.andExpect(status().isCreated())
@@ -48,8 +48,8 @@ class UserRegistrationFT extends Specification {
             def user = Fixtures.userWithRandomData()
 
         when:
-            registerUserRequest(user)
-            def request = registerUserRequest(user)
+            commonHelpers.postRequest(user, url)
+            def request = commonHelpers.postRequest(user, url)
 
         then:
             request.andExpect(status().isConflict())
@@ -67,12 +67,12 @@ class UserRegistrationFT extends Specification {
 
             def userB = UserDTO.builder()
                     .login(userA.getLogin())
-                    .password("")
+                    .password("fdsa")
                     .build()
 
         when:
-            registerUserRequest(userA)
-            def request = registerUserRequest(userB)
+            commonHelpers.postRequest(userA, url)
+            def request = commonHelpers.postRequest(userB, url)
 
         then:
             request.andExpect(status().isConflict())
@@ -89,7 +89,7 @@ class UserRegistrationFT extends Specification {
             def user = null
 
         when:
-            def request = registerUserRequest(user)
+            def request = commonHelpers.postRequest(user, url)
 
         then:
             request.andExpect(status().isBadRequest())
@@ -101,21 +101,13 @@ class UserRegistrationFT extends Specification {
             def userB = UserDTO.builder().login("Login").build()
 
         when:
-            def requestA = registerUserRequest(userA)
-            def requestB = registerUserRequest(userB)
+            def requestA = commonHelpers.postRequest(userA, url)
+            def requestB = commonHelpers.postRequest(userB, url)
 
         then:
             requestA.andExpect(status().isBadRequest())
             requestB.andExpect(status().isBadRequest())
 
-    }
-
-    private ResultActions registerUserRequest(UserDTO user) {
-        return mockMvc.perform(
-                post("/api/user/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(user))
-        )
     }
 
     private class Fixtures {

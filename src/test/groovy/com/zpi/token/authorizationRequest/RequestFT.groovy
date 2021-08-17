@@ -1,18 +1,16 @@
 package com.zpi.token.authorizationRequest
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.jayway.jsonpath.JsonPath
-import com.zpi.token.api.authorizationRequest.RequestDTO
-import com.zpi.token.domain.ClientRepository
+
+import com.zpi.CommonFixtures
+import com.zpi.CommonHelpers
+import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.user.UserManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActions
 import spock.lang.Specification
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
@@ -25,38 +23,40 @@ class RequestFT extends Specification {
     private ClientRepository clientRepository
 
     @Autowired
-    private ObjectMapper mapper
+    private UserManager userManager
+
+    @Autowired
+    private CommonHelpers commonHelpers
+
+    private static final String baseUri = "/api/token/authorize"
+
+    def setup() {
+        clientRepository.clear()
+    }
 
     def "should return success on correct request"() {
         given:
-            def request = CommonFixtures.correctRequest()
+            def request = CommonFixtures.requestDTO()
+            def user = CommonFixtures.userDTO()
             addClientWithRedirectUri()
+            addUser()
 
         when:
-            def result = makeAuthRequest(request)
+            def result = commonHelpers.postRequest(user, CommonHelpers.authParametersToUrl(request, baseUri))
 
         then:
-            result.andExpect(status().isOk())
-            attributeFromResult("state", result) == CommonFixtures.defaultState
-            attributeFromResult("code", result).length() != 0
+            result.andExpect(status().isFound())
+            CommonHelpers.attributeFromResult("state", result) == CommonFixtures.defaultState
+            CommonHelpers.attributeFromResult("ticket", result).length() != 0
     }
 
     private void addClientWithRedirectUri() {
-        def client = CommonFixtures.defaultClient()
+        def client = CommonFixtures.client()
         clientRepository.save(client.getId(), client)
     }
 
-    private ResultActions makeAuthRequest(RequestDTO request) {
-        return mockMvc.perform(
-                post("/api/token/authorize")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request))
-        )
-    }
-
-    private static String attributeFromResult(String attribute, ResultActions result) {
-        def response = result.andReturn().getResponse()
-        def value = JsonPath.read(response.getContentAsString(), String.format("\$.%s", attribute))
-        return value.toString()
+    private void addUser() {
+        def user = CommonFixtures.userDTO().toHashedDomain()
+        userManager.createUser(user)
     }
 }
