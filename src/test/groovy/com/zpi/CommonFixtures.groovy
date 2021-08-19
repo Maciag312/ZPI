@@ -1,12 +1,13 @@
 package com.zpi
 
+import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
+import com.zpi.api.authCode.ticketRequest.RequestDTO
 import com.zpi.api.client.ClientDTO
 import com.zpi.api.common.dto.UserDTO
-import com.zpi.api.token.consentRequest.ConsentRequestDTO
-import com.zpi.api.token.ticketRequest.RequestDTO
+import com.zpi.domain.authCode.authenticationRequest.Request
+import com.zpi.domain.authCode.consentRequest.ConsentRequest
+import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.client.Client
-import com.zpi.domain.token.consentRequest.ConsentRequest
-import com.zpi.domain.token.ticketRequest.request.Request
 
 class CommonFixtures {
     public static final String clientId = "id"
@@ -19,6 +20,7 @@ class CommonFixtures {
     public static final String password = "Password"
 
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
+    public static final String authPageUrl = "/signin"
 
     static RequestDTO requestDTO() {
         return RequestDTO.builder()
@@ -71,10 +73,16 @@ class CommonFixtures {
                 .build()
     }
 
-    static ConsentRequestDTO consentRequestDTO() {
+    static ConsentRequestDTO consentRequestDTO(String ticket) {
         return ConsentRequestDTO.builder()
-            .ticket(ticket)
-            .state(state)
-            .build()
+                .ticket(ticket)
+                .state(state)
+                .build()
+    }
+
+    static TicketData ticketData() {
+        return TicketData.builder()
+                .redirectUri(redirectUri)
+                .build();
     }
 }

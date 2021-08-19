@@ -1,7 +1,7 @@
 package com.zpi.api.common.dto;
 
 import com.zpi.domain.common.RequestError;
-import com.zpi.domain.token.ticketRequest.request.RequestErrorType;
+import com.zpi.domain.authCode.authenticationRequest.RequestErrorType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
