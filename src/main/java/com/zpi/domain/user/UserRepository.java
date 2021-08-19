@@ -1,14 +1,8 @@
 package com.zpi.domain.user;
 
+import com.zpi.domain.common.EntityRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
-public interface UserRepository {
-    void save(String key, User user);
-
-    Optional<User> getByKey(String key);
-
-    void clear();
+public interface UserRepository extends EntityRepository<User> {
 }

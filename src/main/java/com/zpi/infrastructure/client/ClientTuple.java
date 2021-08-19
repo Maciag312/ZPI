@@ -1,24 +1,29 @@
 package com.zpi.infrastructure.client;
 
 import com.zpi.domain.client.Client;
+import com.zpi.infrastructure.common.EntityTuple;
 import lombok.Getter;
 
 import javax.persistence.Id;
 import java.util.HashSet;
 
 @Getter
-public class ClientTuple {
+class ClientTuple implements EntityTuple<Client> {
     @Id
     private final String id;
 
     private final HashSet<String> availableRedirectUri;
 
-    public static Client toDomain(ClientTuple clientTuple) {
-        return Client.builder().id(clientTuple.getId()).availableRedirectUri(clientTuple.getAvailableRedirectUri()).build();
-    }
-
-    public ClientTuple(Client client) {
+    ClientTuple(Client client) {
         this.id = client.getId();
         this.availableRedirectUri = client.getAvailableRedirectUri();
+    }
+
+    @Override
+    public Client toDomain() {
+        return Client.builder()
+                .id(id)
+                .availableRedirectUri(availableRedirectUri)
+                .build();
     }
 }

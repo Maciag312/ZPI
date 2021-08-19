@@ -2,7 +2,7 @@ package com.zpi
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jayway.jsonpath.JsonPath
-import com.zpi.api.token.authorizationRequest.RequestDTO
+import com.zpi.api.authCode.ticketRequest.RequestDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
