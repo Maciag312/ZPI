@@ -58,3 +58,9 @@ test {
 pitest {
     junit5PluginVersion = '0.12'
 }
+
+task buildUI(type: Exec) {
+    commandLine './buildUI.sh'
+}
+
+tasks.getByName('buildUI')
