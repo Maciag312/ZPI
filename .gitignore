@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-### statc client page
+### static client page
 src/main/resources/static/
