@@ -154,8 +154,6 @@ class RequestValidatorUT extends Specification {
 
         where:
             request                       | _
-            Fixtures.emptyScope()         | _
-            Fixtures.nullScope()          | _
             Fixtures.scopeWithoutOpenId() | _
     }
 
@@ -207,26 +205,6 @@ class RequestValidatorUT extends Specification {
                     .responseType("invalid")
                     .scope(CommonFixtures.scope)
                     .state(CommonFixtures.state)
-                    .build()
-        }
-
-        static RequestDTO emptyScope() {
-            return RequestDTO.builder()
-                    .clientId(CommonFixtures.clientId)
-                    .redirectUri(CommonFixtures.redirectUri)
-                    .responseType(CommonFixtures.responseType)
-                    .scope("")
-                    .state(CommonFixtures.clientId)
-                    .build()
-        }
-
-        static RequestDTO nullScope() {
-            return RequestDTO.builder()
-                    .clientId(CommonFixtures.clientId)
-                    .redirectUri(CommonFixtures.redirectUri)
-                    .responseType(CommonFixtures.responseType)
-                    .scope(null)
-                    .state(CommonFixtures.clientId)
                     .build()
         }
 
