@@ -35,12 +35,12 @@ public class AuthCodeController {
     }
 
     private ResponseEntity<?> getRedirectInfo(Request request) {
-        String params;
+        String location;
 
         try {
             authCodeService.validateRequest(request);
 
-            params = UriComponentsBuilder.fromUriString(AUTH_PAGE_URL)
+            location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URL)
                     .queryParam("client_id", request.getClientId())
                     .queryParam("redirect_uri", request.getRedirectUri())
                     .queryParam("response_type", request.getResponseType())
@@ -50,13 +50,12 @@ public class AuthCodeController {
         } catch (ErrorResponseException e) {
             var response = e.getErrorResponse();
 
-            params = UriComponentsBuilder.fromUriString(AUTH_PAGE_URL)
+            location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URL)
                     .queryParam("error", response.getError())
                     .queryParam("error_description", response.getError_description())
                     .toUriString();
         }
 
-        var location = AUTH_PAGE_URL + params;
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
     }
 
