@@ -3,9 +3,9 @@ package com.zpi.infrastructure.authCode.consentRequest;
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.domain.authCode.consentRequest.TicketRepository;
 import com.zpi.infrastructure.common.InMemoryEntityRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public class InMemoryTicketRepository extends InMemoryEntityRepository<TicketData, TicketDataTuple> implements TicketRepository {
     @Override
     public void save(String key, TicketData data) {

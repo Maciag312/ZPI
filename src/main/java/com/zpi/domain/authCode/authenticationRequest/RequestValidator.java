@@ -87,7 +87,7 @@ public class RequestValidator {
 
     private static boolean isScopeInvalid(List<String> scope) {
         if (scope == null) {
-            return true;
+            return false;
         }
 
         return !scope.contains("openid");

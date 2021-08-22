@@ -2,12 +2,14 @@ package com.zpi.infrastructure.client;
 
 import com.zpi.domain.client.Client;
 import com.zpi.infrastructure.common.EntityTuple;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.persistence.Id;
 import java.util.HashSet;
 
 @Getter
+@Data
 class ClientTuple implements EntityTuple<Client> {
     @Id
     private final String id;

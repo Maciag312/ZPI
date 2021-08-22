@@ -5,8 +5,8 @@ import com.zpi.api.authCode.ticketRequest.RequestDTO;
 import com.zpi.api.common.dto.UserDTO;
 import com.zpi.api.common.exception.ErrorResponseException;
 import com.zpi.domain.authCode.AuthCodeService;
-import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.authCode.authenticationRequest.Request;
+import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,26 +21,26 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class AuthCodeController {
     private final AuthCodeService authCodeService;
 
-    private static final String AUTH_PAGE_URL = "/signin";
+    private static final String AUTH_PAGE_URI = "/signin";
 
     @PostMapping("/authorize")
     public ResponseEntity<?> authorize(@RequestParam String client_id,
                                        @RequestParam String redirect_uri,
                                        @RequestParam String response_type,
-                                       @RequestParam String scope,
-                                       @RequestParam String state) {
+                                       @RequestParam(required = false) String scope,
+                                       @RequestParam(required = false) String state) {
 
         var request = requestToDomain(client_id, redirect_uri, response_type, scope, state);
         return getRedirectInfo(request);
     }
 
     private ResponseEntity<?> getRedirectInfo(Request request) {
-        String params;
+        String location;
 
         try {
             authCodeService.validateRequest(request);
 
-            params = UriComponentsBuilder.fromUriString(AUTH_PAGE_URL)
+            location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
                     .queryParam("client_id", request.getClientId())
                     .queryParam("redirect_uri", request.getRedirectUri())
                     .queryParam("response_type", request.getResponseType())
@@ -50,13 +50,12 @@ public class AuthCodeController {
         } catch (ErrorResponseException e) {
             var response = e.getErrorResponse();
 
-            params = UriComponentsBuilder.fromUriString(AUTH_PAGE_URL)
+            location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
                     .queryParam("error", response.getError())
                     .queryParam("error_description", response.getError_description())
                     .toUriString();
         }
 
-        var location = AUTH_PAGE_URL + params;
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
     }
 
@@ -65,8 +64,8 @@ public class AuthCodeController {
                                           @RequestParam String client_id,
                                           @RequestParam String redirect_uri,
                                           @RequestParam String response_type,
-                                          @RequestParam String scope,
-                                          @RequestParam String state) {
+                                          @RequestParam(required = false) String scope,
+                                          @RequestParam(required = false) String state) {
 
         var request = requestToDomain(client_id, redirect_uri, response_type, scope, state);
         var user = userToDomain(userDTO);
@@ -108,7 +107,7 @@ public class AuthCodeController {
             var location = response.toUrl(response.getRedirectUri());
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
         } catch (ErrorConsentResponseException e) {
-            var location = e.toUrl(AUTH_PAGE_URL, request.getState());
+            var location = e.toUrl(AUTH_PAGE_URI, request.getState());
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
         }
     }
