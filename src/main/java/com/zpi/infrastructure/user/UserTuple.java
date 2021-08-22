@@ -2,11 +2,13 @@ package com.zpi.infrastructure.user;
 
 import com.zpi.domain.user.User;
 import com.zpi.infrastructure.common.EntityTuple;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.persistence.Id;
 
 @Getter
+@Data
 class UserTuple implements EntityTuple<User> {
     @Id
     private final String login;

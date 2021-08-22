@@ -2,11 +2,13 @@ package com.zpi.infrastructure.authCode.consentRequest;
 
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.infrastructure.common.EntityTuple;
+import lombok.Data;
 import lombok.Getter;
 
 import javax.persistence.Id;
 
 @Getter
+@Data
 class TicketDataTuple implements EntityTuple<TicketData> {
     @Id
     private final String id;
