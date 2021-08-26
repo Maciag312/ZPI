@@ -26,9 +26,9 @@ public class AuthCodeServiceImpl implements AuthCodeService {
     private final ConsentService consentService;
     private final AuthorizationService authorizationService;
 
-    public void validateRequest(Request request) throws ErrorResponseException {
+    public Request validateAndFillRequest(Request request) throws ErrorResponseException {
         try {
-            requestValidator.validate(request);
+            return requestValidator.validateAndFillMissingFields(request);
         } catch (ValidationFailedException e) {
             var error = new ErrorResponseDTO(e.getError(), request.getState());
             throw new ErrorResponseException(error);
@@ -36,7 +36,7 @@ public class AuthCodeServiceImpl implements AuthCodeService {
     }
 
     public ResponseDTO authenticationTicket(User user, Request request) throws ErrorResponseException {
-        validateRequest(request);
+        validateAndFillRequest(request);
         validateUser(user, request);
 
         var response = authorizationService.createTicket(request);

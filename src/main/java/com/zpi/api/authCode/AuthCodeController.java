@@ -23,10 +23,10 @@ public class AuthCodeController {
 
     private static final String AUTH_PAGE_URI = "/signin";
 
-    @PostMapping("/authorize")
-    public ResponseEntity<?> authorize(@RequestParam String client_id,
-                                       @RequestParam String redirect_uri,
-                                       @RequestParam String response_type,
+    @GetMapping("/authorize")
+    public ResponseEntity<?> authorize(@RequestParam(required = false) String client_id,
+                                       @RequestParam(required = false) String redirect_uri,
+                                       @RequestParam(required = false) String response_type,
                                        @RequestParam(required = false) String scope,
                                        @RequestParam(required = false) String state) {
 
@@ -38,7 +38,7 @@ public class AuthCodeController {
         String location;
 
         try {
-            authCodeService.validateRequest(request);
+            request = authCodeService.validateAndFillRequest(request);
 
             location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
                     .queryParam("client_id", request.getClientId())
@@ -53,6 +53,7 @@ public class AuthCodeController {
             location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
                     .queryParam("error", response.getError())
                     .queryParam("error_description", response.getError_description())
+                    .queryParam("state", response.getState())
                     .toUriString();
         }
 
@@ -62,10 +63,10 @@ public class AuthCodeController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO,
                                           @RequestParam String client_id,
-                                          @RequestParam String redirect_uri,
+                                          @RequestParam(required = false) String redirect_uri,
                                           @RequestParam String response_type,
                                           @RequestParam(required = false) String scope,
-                                          @RequestParam(required = false) String state) {
+                                          @RequestParam String state) {
 
         var request = requestToDomain(client_id, redirect_uri, response_type, scope, state);
         var user = userToDomain(userDTO);

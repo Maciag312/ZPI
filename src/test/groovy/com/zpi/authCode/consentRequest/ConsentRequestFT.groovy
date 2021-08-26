@@ -1,7 +1,7 @@
 package com.zpi.authCode.consentRequest
 
 import com.zpi.CommonFixtures
-import com.zpi.CommonHelpers
+import com.zpi.MvcRequestHelpers
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -22,9 +22,9 @@ class ConsentRequestFT extends Specification {
     private TicketRepository repository
 
     @Autowired
-    private CommonHelpers commonHelpers
+    private MvcRequestHelpers commonHelpers
 
-    private static final String baseUri = "/api/consent"
+    private static final String baseUrl = "/api/consent"
 
     def setup() {
         repository.clear()
@@ -38,7 +38,7 @@ class ConsentRequestFT extends Specification {
             repository.save(request.getTicket(), CommonFixtures.ticketData())
 
         when:
-            def response = commonHelpers.postRequest(request, baseUri)
+            def response = commonHelpers.postRequest(request, baseUrl)
 
         then:
             response.andExpect(status().isFound())
@@ -65,7 +65,7 @@ class ConsentRequestFT extends Specification {
             def request = CommonFixtures.consentRequestDTO()
 
         when:
-            def response = commonHelpers.postRequest(request, baseUri)
+            def response = commonHelpers.postRequest(request, baseUrl)
 
         then:
             response.andExpect(status().isFound())

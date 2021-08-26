@@ -2,7 +2,8 @@ package com.zpi.e2e
 
 
 import com.zpi.CommonFixtures
-import com.zpi.CommonHelpers
+import com.zpi.MvcRequestHelpers
+import com.zpi.ResultHelpers
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import com.zpi.domain.client.ClientRepository
 import com.zpi.domain.user.UserRepository
@@ -32,7 +33,7 @@ class AuthenticationTicketE2E extends Specification {
     private TicketRepository ticketRepository
 
     @Autowired
-    private CommonHelpers commonHelpers
+    private MvcRequestHelpers commonHelpers
 
     private static final String clientRegisterUrl = "/api/client/register"
     private static final String userRegisterUrl = "/api/user/register"
@@ -57,22 +58,22 @@ class AuthenticationTicketE2E extends Specification {
             commonHelpers.postRequest(user, userRegisterUrl)
 
         and:
-            def authorizeResponse = commonHelpers.postRequest(null, CommonHelpers.authParametersToUrl(request, authorizeRequestUrl))
+            def authorizeResponse = commonHelpers.getRequest(ResultHelpers.authParametersToUrl(request, authorizeRequestUrl))
 
         then:
             authorizeResponse.andExpect(status().isFound())
             authorizeResponse.andExpect(header().exists("Location"))
 
         when:
-            def authenticateResponse = commonHelpers.postRequest(user, CommonHelpers.authParametersToUrl(request, authenticateRequestUrl))
+            def authenticateResponse = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, authenticateRequestUrl))
 
         then:
             authenticateResponse.andExpect(status().isOk())
-            def ticket = CommonHelpers.attributeFromResult("ticket", authenticateResponse)
+            def ticket = ResultHelpers.attributeFromResult("ticket", authenticateResponse)
 
         when:
             def consentRequest = CommonFixtures.consentRequestDTO(ticket)
-            def consentResponse = commonHelpers.postRequest(consentRequest, CommonHelpers.authParametersToUrl(request, consentRequestUrl))
+            def consentResponse = commonHelpers.postRequest(consentRequest, ResultHelpers.authParametersToUrl(request, consentRequestUrl))
 
         then:
             consentResponse.andExpect(status().isFound())

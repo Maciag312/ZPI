@@ -14,6 +14,9 @@ class CommonFixtures {
     public static final String redirectUri = "uri"
     public static final String responseType = "code"
     public static final String scope = "openid profile photos asdf_asdf_asdf"
+    public static final List<String> scopeList = List.of(scope.split(" "))
+    public static final String hardcodedScope = "openid profile"
+    public static final List<String> hardcodedScopeList = List.of(hardcodedScope.split(" "))
     public static final String state = "statesdsdr"
 
     public static final String login = "Login"
@@ -32,12 +35,20 @@ class CommonFixtures {
                 .build()
     }
 
+    static RequestDTO requestOnlyRequiredDTO() {
+        return RequestDTO.builder()
+                .clientId(clientId)
+                .responseType(responseType)
+                .state(state)
+                .build()
+    }
+
     static Request request() {
         return Request.builder()
                 .clientId(clientId)
                 .redirectUri(redirectUri)
                 .responseType(responseType)
-                .scope(List.of(scope.split(" ")))
+                .scope(scopeList)
                 .state(state)
                 .build()
     }

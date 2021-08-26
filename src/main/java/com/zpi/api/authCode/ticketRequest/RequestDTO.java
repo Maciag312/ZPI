@@ -2,12 +2,14 @@ package com.zpi.api.authCode.ticketRequest;
 
 import com.zpi.domain.authCode.authenticationRequest.Request;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 public class RequestDTO {
     private final String clientId;
     private final String redirectUri;

@@ -34,7 +34,7 @@ class TicketRequestUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidator.validate(_ as Request) >> null
+            requestValidator.validateAndFillMissingFields(_ as Request) >> null
             authenticator.isAuthenticated(user) >> true
             authorizationService.createTicket(request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
 
@@ -53,7 +53,7 @@ class TicketRequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidator.validate(_ as Request) >> {
+            requestValidator.validateAndFillMissingFields(_ as Request) >> {
                 throw Fixtures.sampleException()
             }
 
@@ -74,7 +74,7 @@ class TicketRequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidator.validate(_ as Request) >> null
+            requestValidator.validateAndFillMissingFields(_ as Request) >> null
             authenticator.isAuthenticated(user) >> false
 
         when:

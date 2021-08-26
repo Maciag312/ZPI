@@ -15,21 +15,27 @@ import java.util.List;
 @Component
 public class RequestValidator {
     private final ClientRepository clientRepository;
+    private final OptionalParamsFiller filler;
 
     private static final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
 
     private Request request;
     private Client client;
 
-    public void validate(Request request) throws ValidationFailedException {
+    public Request validateAndFillMissingFields(Request request) throws ValidationFailedException {
         this.request = request;
         this.client = clientRepository.getByKey(request.getClientId()).orElse(null);
 
         validateClient();
+
+        this.request = filler.fill(request);
+
         validateRedirectUri();
         validateResponseType();
         validateRequiredParameters();
         validateScope();
+
+        return this.request;
     }
 
     private void validateClient() throws ValidationFailedException {
@@ -37,6 +43,7 @@ public class RequestValidator {
             var error = RequestError.<RequestErrorType>builder()
                     .error(RequestErrorType.UNAUTHORIZED_CLIENT)
                     .errorDescription("Unauthorized client id")
+                    .state(request.getState())
                     .build();
             throw new ValidationFailedException(error);
         }
@@ -51,6 +58,7 @@ public class RequestValidator {
             var error = RequestError.<RequestErrorType>builder()
                     .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
+                    .state(request.getState())
                     .build();
             throw new ValidationFailedException(error);
         }
@@ -65,6 +73,7 @@ public class RequestValidator {
             var error = RequestError.<RequestErrorType>builder()
                     .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
                     .errorDescription("Unrecognized response type: " + request.getResponseType())
+                    .state(request.getState())
                     .build();
             throw new ValidationFailedException(error);
         }
@@ -80,6 +89,7 @@ public class RequestValidator {
             var error = RequestError.<RequestErrorType>builder()
                     .error(RequestErrorType.INVALID_SCOPE)
                     .errorDescription("Invalid scope")
+                    .state(request.getState())
                     .build();
             throw new ValidationFailedException(error);
         }
@@ -101,6 +111,7 @@ public class RequestValidator {
             var error = RequestError.<RequestErrorType>builder()
                     .error(RequestErrorType.INVALID_REQUEST)
                     .errorDescription(description)
+                    .state(request.getState())
                     .build();
             throw new ValidationFailedException(error);
         }
