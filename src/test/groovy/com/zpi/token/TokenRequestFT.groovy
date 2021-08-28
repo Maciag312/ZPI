@@ -34,7 +34,6 @@ class TokenRequestFT extends Specification {
             def authCode = CommonFixtures.hardcodedCode
             def redirectUri = CommonFixtures.redirectUri
             def client = CommonFixtures.client()
-            def token = "dafgahdflkjd"
 
             def request = TokenRequestDTO.builder()
                     .grant_type(CommonFixtures.grantType)
@@ -44,7 +43,7 @@ class TokenRequestFT extends Specification {
                     .build()
 
         and:
-           clientRepository.save(client.getId(), client)
+            clientRepository.save(client.getId(), client)
 
         when:
             def response = mvcRequestHelpers.postRequest(request, baseUrl)
@@ -74,5 +73,6 @@ class TokenRequestFT extends Specification {
 
         then:
             !ResultHelpers.attributeFromResult("error", response).isEmpty()
+            !ResultHelpers.attributeFromResult("error_description", response).isEmpty()
     }
 }

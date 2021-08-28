@@ -33,7 +33,7 @@ class AuthenticationTicketE2E extends Specification {
     private TicketRepository ticketRepository
 
     @Autowired
-    private MvcRequestHelpers commonHelpers
+    private MvcRequestHelpers mvcHelpers
 
     private static final String clientRegisterUrl = "/api/client/register"
     private static final String userRegisterUrl = "/api/user/register"
@@ -54,18 +54,18 @@ class AuthenticationTicketE2E extends Specification {
             def request = CommonFixtures.requestDTO()
 
         when:
-            commonHelpers.postRequest(client, clientRegisterUrl)
-            commonHelpers.postRequest(user, userRegisterUrl)
+            mvcHelpers.postRequest(client, clientRegisterUrl)
+            mvcHelpers.postRequest(user, userRegisterUrl)
 
         and:
-            def authorizeResponse = commonHelpers.getRequest(ResultHelpers.authParametersToUrl(request, authorizeRequestUrl))
+            def authorizeResponse = mvcHelpers.getRequest(ResultHelpers.authParametersToUrl(request, authorizeRequestUrl))
 
         then:
             authorizeResponse.andExpect(status().isFound())
             authorizeResponse.andExpect(header().exists("Location"))
 
         when:
-            def authenticateResponse = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, authenticateRequestUrl))
+            def authenticateResponse = mvcHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, authenticateRequestUrl))
 
         then:
             authenticateResponse.andExpect(status().isOk())
@@ -73,7 +73,7 @@ class AuthenticationTicketE2E extends Specification {
 
         when:
             def consentRequest = CommonFixtures.consentRequestDTO(ticket)
-            def consentResponse = commonHelpers.postRequest(consentRequest, ResultHelpers.authParametersToUrl(request, consentRequestUrl))
+            def consentResponse = mvcHelpers.postRequest(consentRequest, ResultHelpers.authParametersToUrl(request, consentRequestUrl))
 
         then:
             consentResponse.andExpect(status().isFound())

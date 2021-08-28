@@ -19,11 +19,10 @@ public class TokenController {
     @PostMapping("")
     public ResponseEntity<?> tokenRequest(@RequestBody TokenRequestDTO request) {
         try {
-            service.getToken(request.toDomain());
+            var token = service.getToken(request.toDomain());
+            return ResponseEntity.ok(TokenResponseDTO.builder().access_token(token.getValue()).build());
         } catch(TokenErrorResponseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TokenErrorResponseDTO(e.getResponse()));
         }
-
-        return ResponseEntity.ok(TokenResponseDTO.builder().access_token("dafgahdflkjd").build());
     }
 }

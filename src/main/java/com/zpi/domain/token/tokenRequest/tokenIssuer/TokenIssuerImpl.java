@@ -8,6 +8,6 @@ import org.springframework.stereotype.Component;
 public class TokenIssuerImpl implements TokenIssuer {
     @Override
     public Token issue(TokenRequest tokenRequest) throws TokenIssuerFailedException {
-        return null;
+        return new Token("asdf");
     }
 }
