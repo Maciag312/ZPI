@@ -1,0 +1,25 @@
+POST http://localhost:8080/api/client/register
+accept: */*
+Content-Type: application/json
+
+{
+  "id": "1",
+  "availableRedirectUri": [
+    "file:///Users/bartekmaciag/Documents/PWR/ZPI/zpi-ui/client_integration/client.html"
+  ]
+}
+
+
+###
+
+POST http://localhost:8080/api/user/register
+accept: */*
+Content-Type: application/json
+
+{
+  "login": "s",
+  "password": "s"
+}
+
+###
+
