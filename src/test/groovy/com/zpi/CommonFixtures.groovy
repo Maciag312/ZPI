@@ -24,6 +24,8 @@ class CommonFixtures {
 
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
     public static final String authPageUrl = "/signin"
+    public static final String grantType = "authorization_code"
+    public static final String hardcodedCode = "asdf"
 
     static TicketRequestDTO requestDTO() {
         return TicketRequestDTO.builder()
