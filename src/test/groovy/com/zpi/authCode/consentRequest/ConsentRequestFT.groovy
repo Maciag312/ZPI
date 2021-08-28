@@ -2,12 +2,12 @@ package com.zpi.authCode.consentRequest
 
 import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
+import com.zpi.UriParamsResult
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.web.util.UriComponentsBuilder
 import spock.lang.Specification
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -44,17 +44,10 @@ class ConsentRequestFT extends Specification {
             response.andExpect(status().isFound())
 
         and:
-            var uri = response.andReturn().getResponse().getHeader("Location")
-            var uriComponents = UriComponentsBuilder.fromUriString(uri).build()
-            var path = uriComponents.getPath()
-            var params = uriComponents.getQueryParams()
-
-            var code = (params.get("code") as String)
-            var state = params.get("state") as String
-
-            code.length() != 0
-            state.contains(request.getState())
-            path == CommonFixtures.redirectUri
+            def actual = new UriParamsResult(response)
+            actual.getParam("code").length() != 0
+            actual.getParam("state") == request.getState()
+            actual.getPath() == CommonFixtures.redirectUri
 
         and:
             repository.getByKey(request.getTicket()).isEmpty()
@@ -71,18 +64,10 @@ class ConsentRequestFT extends Specification {
             response.andExpect(status().isFound())
 
         and:
-            var uri = response.andReturn().getResponse().getHeader("Location")
-            var uriComponents = UriComponentsBuilder.fromUriString(uri).build()
-            var path = uriComponents.getPath()
-            var params = uriComponents.getQueryParams()
-
-            var error = params.get("error") as String
-            var errorDescription = params.get("error_description") as String
-            var state = params.get("state") as String
-
-            error.contains("TICKET_EXPIRED")
-            errorDescription.replace("%20", " ").contains("Ticket expired")
-            state.contains(request.getState())
-            path == CommonFixtures.authPageUrl
+            def actual = new UriParamsResult(response)
+            actual.getParam("error") == "TICKET_EXPIRED"
+            actual.getParam("error_description").replace("%20", " ") == "Ticket expired"
+            actual.getParam("state") == request.getState()
+            actual.getPath() == CommonFixtures.authPageUrl
     }
 }

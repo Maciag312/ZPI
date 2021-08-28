@@ -2,7 +2,7 @@ package com.zpi.authCode.authorizationRequest
 
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
-import com.zpi.domain.authCode.authenticationRequest.Request
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.client.Client
 import com.zpi.domain.client.ClientRepository
 import spock.lang.Specification
@@ -16,7 +16,7 @@ class OptionalParamsFillerUT extends Specification {
 
     def "should fill missing redirect_uri"() {
         given:
-            def request = Request.builder()
+            def request = AuthenticationRequest.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(null)
                     .responseType(CommonFixtures.responseType)
@@ -36,7 +36,7 @@ class OptionalParamsFillerUT extends Specification {
             def filled = filler.fill(request)
 
         then:
-            def expected = Request.builder()
+            def expected = AuthenticationRequest.builder()
                     .clientId(request.getClientId())
                     .redirectUri(defaultRedirectUri)
                     .responseType(request.getResponseType())
@@ -49,7 +49,7 @@ class OptionalParamsFillerUT extends Specification {
 
     def "should fill missing scope"() {
         given:
-            def request = Request.builder()
+            def request = AuthenticationRequest.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
@@ -66,7 +66,7 @@ class OptionalParamsFillerUT extends Specification {
             def filled = filler.fill(request)
 
         then:
-            def expected = Request.builder()
+            def expected = AuthenticationRequest.builder()
                     .clientId(request.getClientId())
                     .redirectUri(request.getRedirectUri())
                     .responseType(request.getResponseType())

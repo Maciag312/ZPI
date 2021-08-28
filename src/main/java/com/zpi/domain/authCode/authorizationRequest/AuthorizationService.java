@@ -1,7 +1,7 @@
 package com.zpi.domain.authCode.authorizationRequest;
 
-import com.zpi.domain.authCode.authenticationRequest.Request;
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 
 public interface AuthorizationService {
-    AuthorizationResponse createTicket(Request request);
+    AuthorizationResponse createTicket(AuthenticationRequest request);
 }

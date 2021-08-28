@@ -1,12 +1,12 @@
 package com.zpi
 
 import com.jayway.jsonpath.JsonPath
-import com.zpi.api.authCode.ticketRequest.RequestDTO
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.web.util.UriComponentsBuilder
 
 class ResultHelpers {
-    static String authParametersToUrl(RequestDTO request, String uri) {
+    static String authParametersToUrl(TicketRequestDTO request, String uri) {
         return UriComponentsBuilder.fromUriString(uri)
                 .queryParam("client_id", request.getClientId())
                 .queryParam("redirect_uri", request.getRedirectUri())

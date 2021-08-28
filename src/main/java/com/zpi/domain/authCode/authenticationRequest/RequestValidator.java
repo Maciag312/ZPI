@@ -19,10 +19,10 @@ public class RequestValidator {
 
     private static final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
 
-    private Request request;
+    private AuthenticationRequest request;
     private Client client;
 
-    public Request validateAndFillMissingFields(Request request) throws ValidationFailedException {
+    public AuthenticationRequest validateAndFillMissingFields(AuthenticationRequest request) throws ValidationFailedException {
         this.request = request;
         this.client = clientRepository.getByKey(request.getClientId()).orElse(null);
 
@@ -40,8 +40,8 @@ public class RequestValidator {
 
     private void validateClient() throws ValidationFailedException {
         if (isUnauthorizedClient()) {
-            var error = RequestError.<RequestErrorType>builder()
-                    .error(RequestErrorType.UNAUTHORIZED_CLIENT)
+            var error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.UNAUTHORIZED_CLIENT)
                     .errorDescription("Unauthorized client id")
                     .state(request.getState())
                     .build();
@@ -55,8 +55,8 @@ public class RequestValidator {
 
     private void validateRedirectUri() throws ValidationFailedException {
         if (isInvalidRedirectUri()) {
-            var error = RequestError.<RequestErrorType>builder()
-                    .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
+            var error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
                     .state(request.getState())
                     .build();
@@ -70,8 +70,8 @@ public class RequestValidator {
 
     private void validateResponseType() throws ValidationFailedException {
         if (isUnsupportedResponseType()) {
-            var error = RequestError.<RequestErrorType>builder()
-                    .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
+            var error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
                     .errorDescription("Unrecognized response type: " + request.getResponseType())
                     .state(request.getState())
                     .build();
@@ -86,8 +86,8 @@ public class RequestValidator {
 
     private void validateScope() throws ValidationFailedException {
         if (isScopeInvalid(request.getScope())) {
-            var error = RequestError.<RequestErrorType>builder()
-                    .error(RequestErrorType.INVALID_SCOPE)
+            var error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.INVALID_SCOPE)
                     .errorDescription("Invalid scope")
                     .state(request.getState())
                     .build();
@@ -108,8 +108,8 @@ public class RequestValidator {
 
         if (missing.size() != 0) {
             var description = missingRequiredParametersDescription(missing);
-            var error = RequestError.<RequestErrorType>builder()
-                    .error(RequestErrorType.INVALID_REQUEST)
+            var error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.INVALID_REQUEST)
                     .errorDescription(description)
                     .state(request.getState())
                     .build();

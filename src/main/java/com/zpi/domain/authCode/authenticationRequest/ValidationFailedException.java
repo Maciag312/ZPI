@@ -7,5 +7,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class ValidationFailedException extends Exception {
-    private final RequestError<RequestErrorType> error;
+    private final RequestError<AuthenticationRequestErrorType> error;
 }

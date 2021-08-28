@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @EqualsAndHashCode
-public class Request {
+public class AuthenticationRequest {
     private final String clientId;
     private final String redirectUri;
     private final String responseType;

@@ -1,6 +1,6 @@
 package com.zpi
 
-import com.zpi.api.authCode.ticketRequest.RequestDTO
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.util.MultiValueMap
 import org.springframework.web.util.UriComponents
@@ -9,10 +9,13 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.util.stream.Collectors
 
 class UriParamsResult {
-    private MultiValueMap<String, String> queryParams
+    private final MultiValueMap<String, String> queryParams
+    private final String path;
 
     UriParamsResult(ResultActions result) {
-        queryParams = uriComponentsFromResult(result).getQueryParams()
+        def components = uriComponentsFromResult(result)
+        queryParams = components.getQueryParams()
+        path = components.getPath()
     }
 
     private static UriComponents uriComponentsFromResult(ResultActions result) {
@@ -31,13 +34,17 @@ class UriParamsResult {
                 .trim()
     }
 
-    RequestDTO getRequest() {
-        return RequestDTO.builder()
+    TicketRequestDTO getRequest() {
+        return TicketRequestDTO.builder()
                 .clientId(getParam("client_id"))
                 .redirectUri(getParam("redirect_uri"))
                 .responseType(getParam("response_type"))
                 .scope(getParam("scope"))
                 .state(getParam("state"))
                 .build()
+    }
+
+    String getPath() {
+        return path;
     }
 }

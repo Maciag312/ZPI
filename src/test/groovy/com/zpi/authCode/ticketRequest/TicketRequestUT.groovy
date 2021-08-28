@@ -3,9 +3,10 @@ package com.zpi.authCode.ticketRequest
 import com.zpi.CommonFixtures
 import com.zpi.api.common.dto.ErrorResponseDTO
 import com.zpi.api.common.exception.ErrorResponseException
+import com.zpi.domain.authCode.AuthCodeService
 import com.zpi.domain.authCode.AuthCodeServiceImpl
-import com.zpi.domain.authCode.authenticationRequest.Request
-import com.zpi.domain.authCode.authenticationRequest.RequestErrorType
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
@@ -25,7 +26,7 @@ class TicketRequestUT extends Specification {
     def authorizationService = Mock(AuthorizationService)
 
     @Subject
-    private AuthCodeServiceImpl tokenService = new AuthCodeServiceImpl(requestValidator, authenticator, consentService, authorizationService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, authenticator, consentService, authorizationService)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -34,7 +35,7 @@ class TicketRequestUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidator.validateAndFillMissingFields(_ as Request) >> null
+            requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> true
             authorizationService.createTicket(request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
 
@@ -53,7 +54,7 @@ class TicketRequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidator.validateAndFillMissingFields(_ as Request) >> {
+            requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
             }
 
@@ -74,7 +75,7 @@ class TicketRequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            requestValidator.validateAndFillMissingFields(_ as Request) >> null
+            requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> false
 
         when:
@@ -93,7 +94,7 @@ class TicketRequestUT extends Specification {
         }
 
         static RequestError unauthorizedClientError() {
-            final RequestErrorType errorType = RequestErrorType.UNAUTHORIZED_CLIENT
+            final AuthenticationRequestErrorType errorType = AuthenticationRequestErrorType.UNAUTHORIZED_CLIENT
             final String description = "Unauthorized client id"
 
             return RequestError.builder()
@@ -103,7 +104,7 @@ class TicketRequestUT extends Specification {
         }
 
         static RequestError userAuthenticationFailedError() {
-            final RequestErrorType errorType = RequestErrorType.USER_AUTH_FAILED
+            final AuthenticationRequestErrorType errorType = AuthenticationRequestErrorType.USER_AUTH_FAILED
             final String description = "User authentication failed"
 
             return RequestError.builder()

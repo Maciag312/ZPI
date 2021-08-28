@@ -15,7 +15,7 @@ class OptionalParamsFiller {
 
     private Client client;
 
-    public Request fill(Request request) {
+    public AuthenticationRequest fill(AuthenticationRequest request) {
         var clientId = request.getClientId();
 
         this.client = repository.getByKey(clientId).orElse(null);
@@ -25,7 +25,7 @@ class OptionalParamsFiller {
         var scope = fillScope(request);
         var state = request.getState();
 
-        return Request.builder()
+        return AuthenticationRequest.builder()
                 .clientId(clientId)
                 .redirectUri(redirectUri)
                 .responseType(responseType)
@@ -34,7 +34,7 @@ class OptionalParamsFiller {
                 .build();
     }
 
-    private String fillRedirectUri(Request request) {
+    private String fillRedirectUri(AuthenticationRequest request) {
         if (request.getRedirectUri() == null) {
             var availableRedirectUri = client.getAvailableRedirectUri();
 
@@ -44,7 +44,7 @@ class OptionalParamsFiller {
         return request.getRedirectUri();
     }
 
-    private List<String> fillScope(Request request) {
+    private List<String> fillScope(AuthenticationRequest request) {
         if (request.getScope() == null) {
             return client.getHardcodedDefaultScope();
         }

@@ -1,10 +1,10 @@
 package com.zpi
 
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
-import com.zpi.api.authCode.ticketRequest.RequestDTO
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.client.ClientDTO
 import com.zpi.api.common.dto.UserDTO
-import com.zpi.domain.authCode.authenticationRequest.Request
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.client.Client
@@ -25,8 +25,8 @@ class CommonFixtures {
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
     public static final String authPageUrl = "/signin"
 
-    static RequestDTO requestDTO() {
-        return RequestDTO.builder()
+    static TicketRequestDTO requestDTO() {
+        return TicketRequestDTO.builder()
                 .clientId(clientId)
                 .redirectUri(redirectUri)
                 .responseType(responseType)
@@ -35,16 +35,16 @@ class CommonFixtures {
                 .build()
     }
 
-    static RequestDTO requestOnlyRequiredDTO() {
-        return RequestDTO.builder()
+    static TicketRequestDTO requestOnlyRequiredDTO() {
+        return TicketRequestDTO.builder()
                 .clientId(clientId)
                 .responseType(responseType)
                 .state(state)
                 .build()
     }
 
-    static Request request() {
-        return Request.builder()
+    static AuthenticationRequest request() {
+        return AuthenticationRequest.builder()
                 .clientId(clientId)
                 .redirectUri(redirectUri)
                 .responseType(responseType)

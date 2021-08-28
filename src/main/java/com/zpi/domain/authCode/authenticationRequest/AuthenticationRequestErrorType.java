@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum RequestErrorType {
+public enum AuthenticationRequestErrorType {
     UNAUTHORIZED_CLIENT("UNAUTHORIZED_CLIENT"),
     INVALID_REQUEST("INVALID_REQUEST"),
     UNSUPPORTED_RESPONSE_TYPE("UNSUPPORTED_RESPONSE_TYPE"),

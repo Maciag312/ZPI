@@ -1,4 +1,4 @@
-package com.zpi.utils;
+package com.zpi.api.common.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
