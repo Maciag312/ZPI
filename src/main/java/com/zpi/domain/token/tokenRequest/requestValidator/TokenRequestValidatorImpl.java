@@ -1,6 +1,6 @@
 package com.zpi.domain.token.tokenRequest.requestValidator;
 
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository;
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
 import com.zpi.domain.client.ClientRepository;
 import com.zpi.domain.common.RequestError;
 import com.zpi.domain.token.tokenRequest.TokenRequest;

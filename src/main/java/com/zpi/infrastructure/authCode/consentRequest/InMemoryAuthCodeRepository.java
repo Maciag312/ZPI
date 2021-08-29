@@ -1,7 +1,7 @@
 package com.zpi.infrastructure.authCode.consentRequest;
 
 import com.zpi.domain.authCode.consentRequest.AuthCode;
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository;
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
 import com.zpi.infrastructure.common.InMemoryEntityRepository;
 import org.springframework.stereotype.Repository;
 

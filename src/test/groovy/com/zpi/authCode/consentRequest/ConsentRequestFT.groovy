@@ -4,7 +4,7 @@ import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.UriParamsResult
 import com.zpi.domain.authCode.consentRequest.TicketRepository
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -30,7 +30,7 @@ class ConsentRequestFT extends Specification {
 
     private static final String baseUrl = "/api/consent"
 
-    def setup() {
+    def cleanup() {
         ticketRepository.clear()
         authCodeRepository.clear()
     }

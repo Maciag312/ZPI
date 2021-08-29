@@ -5,7 +5,7 @@ import com.zpi.MvcRequestHelpers
 import com.zpi.ResultHelpers
 import com.zpi.api.token.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.AuthCode
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.client.ClientRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -30,7 +30,7 @@ class TokenRequestFT extends Specification {
 
     private static final String baseUrl = "/api/token"
 
-    def setup() {
+    def cleanup() {
         clientRepository.clear()
         authCodeRepository.clear()
     }

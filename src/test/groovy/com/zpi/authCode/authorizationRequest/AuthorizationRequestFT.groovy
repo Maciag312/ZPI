@@ -31,11 +31,13 @@ class AuthorizationRequestFT extends Specification {
     private static final String baseUrl = "/api/authorize"
 
     def setup() {
-        ticketRepository.clear()
-        clientRepository.clear()
-
         def client = CommonFixtures.client()
         clientRepository.save(client.getId(), client)
+    }
+
+    def cleanup() {
+        ticketRepository.clear()
+        clientRepository.clear()
     }
 
     def "should redirect with success with all correct parameters"() {

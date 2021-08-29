@@ -21,7 +21,7 @@ class TicketRequestFT extends Specification {
     private MockMvc mockMvc
 
     @Autowired
-    private ClientRepository clientRepository
+    private ClientRepository repository
 
     @Autowired
     private UserManager userManager
@@ -31,8 +31,8 @@ class TicketRequestFT extends Specification {
 
     private static final String baseUri = "/api/authenticate"
 
-    def setup() {
-        clientRepository.clear()
+    def cleanup() {
+        repository.clear()
     }
 
     def "should return success on correct request"() {
@@ -53,7 +53,7 @@ class TicketRequestFT extends Specification {
 
     private void addClientWithRedirectUri() {
         def client = CommonFixtures.client()
-        clientRepository.save(client.getId(), client)
+        repository.save(client.getId(), client)
     }
 
     private void addUser() {

@@ -1,6 +1,6 @@
 package com.zpi.domain.authCode.consentRequest;
 
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeIssuer;
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersister;
 import com.zpi.domain.common.RequestError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ConsentServiceImpl implements ConsentService {
     private final TicketRepository ticketRepository;
-    private final AuthCodeIssuer authCodeIssuer;
+    private final AuthCodePersister authCodeIssuer;
 
     public ConsentResponse consent(ConsentRequest request) throws ErrorConsentResponseException {
         var ticket = request.getTicket();
@@ -27,7 +27,7 @@ public class ConsentServiceImpl implements ConsentService {
 
         ticketRepository.remove(ticket);
 
-        var authCode = authCodeIssuer.issue();
+        var authCode = authCodeIssuer.persist();
         return new ConsentResponse(authCode, request.getState(), authData.get().getRedirectUri());
     }
 }

@@ -2,7 +2,7 @@ package com.zpi.token
 
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.AuthCode
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.client.ClientRepository
 import com.zpi.domain.token.tokenRequest.TokenRequest
 import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestErrorType

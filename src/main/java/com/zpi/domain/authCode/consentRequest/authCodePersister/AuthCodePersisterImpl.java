@@ -1,4 +1,4 @@
-package com.zpi.domain.authCode.consentRequest.authCodeIssuer;
+package com.zpi.domain.authCode.consentRequest.authCodePersister;
 
 import com.zpi.domain.authCode.consentRequest.AuthCode;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +8,11 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class AuthCodeIssuerImpl implements AuthCodeIssuer {
+public class AuthCodePersisterImpl implements AuthCodePersister {
     private final AuthCodeRepository repository;
 
     @Override
-    public AuthCode issue() {
+    public AuthCode persist() {
         var code = new AuthCode(generateAuthCode());
         repository.save(code.getValue(), code);
 

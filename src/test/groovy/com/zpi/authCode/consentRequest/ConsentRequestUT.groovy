@@ -2,17 +2,17 @@ package com.zpi.authCode.consentRequest
 
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.*
-import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeIssuer
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersister
 import com.zpi.domain.common.RequestError
 import spock.lang.Specification
 import spock.lang.Subject
 
 class ConsentRequestUT extends Specification {
     def ticketRepository = Mock(TicketRepository)
-    def authCodeIssuer = Mock(AuthCodeIssuer)
+    def authCodePersister = Mock(AuthCodePersister)
 
     @Subject
-    private ConsentService service = new ConsentServiceImpl(ticketRepository, authCodeIssuer)
+    private ConsentService service = new ConsentServiceImpl(ticketRepository, authCodePersister)
 
     def "should return authentication code when ticket is in database"() {
         given:
@@ -27,7 +27,7 @@ class ConsentRequestUT extends Specification {
         and:
             ticketRepository.getByKey(ticket) >> Optional.of(authData)
             ticketRepository.remove(ticket) >> null
-            authCodeIssuer.issue() >> authCode
+            authCodePersister.persist() >> authCode
         when:
             def response = service.consent(request)
 
@@ -45,7 +45,7 @@ class ConsentRequestUT extends Specification {
             def request = CommonFixtures.consentRequest()
 
             ticketRepository.getByKey(request.getTicket()) >> Optional.empty()
-            authCodeIssuer.issue() >> null
+            authCodePersister.persist() >> null
 
         when:
             service.consent(request)
