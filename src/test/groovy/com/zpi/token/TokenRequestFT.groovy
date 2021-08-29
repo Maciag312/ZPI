@@ -4,6 +4,8 @@ import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.ResultHelpers
 import com.zpi.api.token.TokenRequestDTO
+import com.zpi.domain.authCode.consentRequest.AuthCode
+import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository
 import com.zpi.domain.client.ClientRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -23,15 +25,19 @@ class TokenRequestFT extends Specification {
     @Autowired
     private ClientRepository clientRepository
 
+    @Autowired
+    private AuthCodeRepository authCodeRepository
+
     private static final String baseUrl = "/api/token"
 
     def setup() {
         clientRepository.clear()
+        authCodeRepository.clear()
     }
 
     def "should return token when provided data is correct"() {
         given:
-            def authCode = CommonFixtures.hardcodedCode
+            def authCode = UUID.randomUUID().toString()
             def redirectUri = CommonFixtures.redirectUri
             def client = CommonFixtures.client()
 
@@ -44,6 +50,7 @@ class TokenRequestFT extends Specification {
 
         and:
             clientRepository.save(client.getId(), client)
+            authCodeRepository.save(authCode, new AuthCode(authCode))
 
         when:
             def response = mvcRequestHelpers.postRequest(request, baseUrl)

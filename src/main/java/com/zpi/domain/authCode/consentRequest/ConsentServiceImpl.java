@@ -1,15 +1,15 @@
 package com.zpi.domain.authCode.consentRequest;
 
+import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeIssuer;
 import com.zpi.domain.common.RequestError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class ConsentServiceImpl implements ConsentService {
     private final TicketRepository ticketRepository;
+    private final AuthCodeIssuer authCodeIssuer;
 
     public ConsentResponse consent(ConsentRequest request) throws ErrorConsentResponseException {
         var ticket = request.getTicket();
@@ -27,11 +27,7 @@ public class ConsentServiceImpl implements ConsentService {
 
         ticketRepository.remove(ticket);
 
-        var authCode = new AuthCode(generateAuthCode());
+        var authCode = authCodeIssuer.issue();
         return new ConsentResponse(authCode, request.getState(), authData.get().getRedirectUri());
-    }
-
-    private String generateAuthCode() {
-        return UUID.randomUUID().toString();
     }
 }
