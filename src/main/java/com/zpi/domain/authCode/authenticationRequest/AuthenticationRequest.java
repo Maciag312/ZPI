@@ -1,13 +1,15 @@
 package com.zpi.domain.authCode.authenticationRequest;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
 @Builder
-public class Request {
+@EqualsAndHashCode
+public class AuthenticationRequest {
     private final String clientId;
     private final String redirectUri;
     private final String responseType;

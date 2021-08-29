@@ -1,5 +1,6 @@
 package com.zpi.utils
 
+import com.zpi.api.common.utils.HashGenerator
 import spock.lang.Specification
 import spock.lang.Subject
 

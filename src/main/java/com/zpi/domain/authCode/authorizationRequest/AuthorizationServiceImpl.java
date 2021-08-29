@@ -1,6 +1,6 @@
 package com.zpi.domain.authCode.authorizationRequest;
 
-import com.zpi.domain.authCode.authenticationRequest.Request;
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.domain.authCode.consentRequest.TicketRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final TicketRepository repository;
 
     @Override
-    public AuthorizationResponse createTicket(Request request) {
+    public AuthorizationResponse createTicket(AuthenticationRequest request) {
         var ticket = generateTicket();
         var authData = getAuthData(request);
         repository.save(ticket, authData);
@@ -25,7 +25,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return UUID.randomUUID().toString();
     }
 
-    private TicketData getAuthData(Request request) {
+    private TicketData getAuthData(AuthenticationRequest request) {
         return TicketData.builder()
                 .redirectUri(request.getRedirectUri())
                 .build();

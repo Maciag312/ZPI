@@ -2,7 +2,7 @@ package com.zpi.client
 
 
 import com.zpi.CommonFixtures
-import com.zpi.CommonHelpers
+import com.zpi.MvcRequestHelpers
 import com.zpi.api.client.ClientDTO
 import com.zpi.domain.client.ClientRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,7 +23,7 @@ class ClientRegistrationFT extends Specification {
     private ClientRepository repository
 
     @Autowired
-    private CommonHelpers commonHelpers
+    private MvcRequestHelpers commonHelpers
 
     private static final String url = "/api/client/register"
 

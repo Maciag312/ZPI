@@ -1,10 +1,10 @@
 package com.zpi.domain.authCode;
 
-import com.zpi.api.authCode.ticketRequest.ResponseDTO;
+import com.zpi.api.authCode.ticketRequest.TicketResponseDTO;
 import com.zpi.api.common.dto.ErrorResponseDTO;
 import com.zpi.api.common.exception.ErrorResponseException;
-import com.zpi.domain.authCode.authenticationRequest.Request;
-import com.zpi.domain.authCode.authenticationRequest.RequestErrorType;
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType;
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator;
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException;
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService;
@@ -26,31 +26,31 @@ public class AuthCodeServiceImpl implements AuthCodeService {
     private final ConsentService consentService;
     private final AuthorizationService authorizationService;
 
-    public void validateRequest(Request request) throws ErrorResponseException {
+    public AuthenticationRequest validateAndFillRequest(AuthenticationRequest request) throws ErrorResponseException {
         try {
-            requestValidator.validate(request);
+            return requestValidator.validateAndFillMissingFields(request);
         } catch (ValidationFailedException e) {
-            var error = new ErrorResponseDTO(e.getError(), request.getState());
+            var error = new ErrorResponseDTO<>(e.getError(), request.getState());
             throw new ErrorResponseException(error);
         }
     }
 
-    public ResponseDTO authenticationTicket(User user, Request request) throws ErrorResponseException {
-        validateRequest(request);
+    public TicketResponseDTO authenticationTicket(User user, AuthenticationRequest request) throws ErrorResponseException {
+        validateAndFillRequest(request);
         validateUser(user, request);
 
         var response = authorizationService.createTicket(request);
-        return new ResponseDTO(response);
+        return new TicketResponseDTO(response);
     }
 
-    private void validateUser(User user, Request request) throws ErrorResponseException {
+    private void validateUser(User user, AuthenticationRequest request) throws ErrorResponseException {
         if (!userAuthenticator.isAuthenticated(user)) {
-            var error = RequestError.<RequestErrorType>builder()
-                    .error(RequestErrorType.USER_AUTH_FAILED)
+            var error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.USER_AUTH_FAILED)
                     .errorDescription("User authentication failed")
                     .build();
 
-            var errorResponse = new ErrorResponseDTO(error, request.getState());
+            var errorResponse = new ErrorResponseDTO<>(error, request.getState());
 
             throw new ErrorResponseException(errorResponse);
         }

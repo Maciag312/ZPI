@@ -6,11 +6,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResponseDTO {
+public class TicketResponseDTO {
     private final String ticket;
     private final String state;
 
-    public ResponseDTO(AuthorizationResponse response) {
+    public TicketResponseDTO(AuthorizationResponse response) {
         this.ticket = response.getTicket();
         this.state = response.getState();
     }

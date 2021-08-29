@@ -1,11 +1,12 @@
 package com.zpi.api.authCode;
 
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO;
-import com.zpi.api.authCode.ticketRequest.RequestDTO;
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO;
+import com.zpi.api.common.dto.ErrorResponseDTO;
 import com.zpi.api.common.dto.UserDTO;
 import com.zpi.api.common.exception.ErrorResponseException;
 import com.zpi.domain.authCode.AuthCodeService;
-import com.zpi.domain.authCode.authenticationRequest.Request;
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -23,51 +24,75 @@ public class AuthCodeController {
 
     private static final String AUTH_PAGE_URI = "/signin";
 
-    @PostMapping("/authorize")
-    public ResponseEntity<?> authorize(@RequestParam String client_id,
-                                       @RequestParam String redirect_uri,
-                                       @RequestParam String response_type,
+    @GetMapping("/authorize")
+    public ResponseEntity<?> authorize(@RequestParam(required = false) String client_id,
+                                       @RequestParam(required = false) String redirect_uri,
+                                       @RequestParam(required = false) String response_type,
                                        @RequestParam(required = false) String scope,
                                        @RequestParam(required = false) String state) {
 
-        var request = requestToDomain(client_id, redirect_uri, response_type, scope, state);
+        var requestDTO = new TicketRequestDTO(client_id,
+                redirect_uri,
+                response_type,
+                scope,
+                state);
+        var request = requestDTO.toDomain();
         return getRedirectInfo(request);
     }
 
-    private ResponseEntity<?> getRedirectInfo(Request request) {
+    private ResponseEntity<?> getRedirectInfo(AuthenticationRequest request) {
         String location;
 
         try {
-            authCodeService.validateRequest(request);
+            request = authCodeService.validateAndFillRequest(request);
 
-            location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
-                    .queryParam("client_id", request.getClientId())
-                    .queryParam("redirect_uri", request.getRedirectUri())
-                    .queryParam("response_type", request.getResponseType())
-                    .queryParam("scope", request.getScope())
-                    .queryParam("state", request.getState())
-                    .toUriString();
+            location = createLocation(request);
         } catch (ErrorResponseException e) {
             var response = e.getErrorResponse();
 
-            location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
-                    .queryParam("error", response.getError())
-                    .queryParam("error_description", response.getError_description())
-                    .toUriString();
+            location = createErrorLocation(response);
         }
 
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
     }
 
+    private String createErrorLocation(ErrorResponseDTO response) {
+        String location;
+        location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
+                .queryParam("error", response.getError())
+                .queryParam("error_description", response.getError_description())
+                .queryParam("state", response.getState())
+                .toUriString();
+        return location;
+    }
+
+    private String createLocation(AuthenticationRequest request) {
+        String location;
+        location = UriComponentsBuilder.fromUriString(AUTH_PAGE_URI)
+                .queryParam("client_id", request.getClientId())
+                .queryParam("redirect_uri", request.getRedirectUri())
+                .queryParam("response_type", request.getResponseType())
+                .queryParam("scope", request.getScope())
+                .queryParam("state", request.getState())
+                .toUriString();
+        return location;
+    }
+
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO,
                                           @RequestParam String client_id,
-                                          @RequestParam String redirect_uri,
+                                          @RequestParam(required = false) String redirect_uri,
                                           @RequestParam String response_type,
                                           @RequestParam(required = false) String scope,
-                                          @RequestParam(required = false) String state) {
+                                          @RequestParam String state) {
 
-        var request = requestToDomain(client_id, redirect_uri, response_type, scope, state);
+        var requestDTO = new TicketRequestDTO(client_id,
+                redirect_uri,
+                response_type,
+                scope,
+                state);
+        var request = requestDTO.toDomain();
+
         var user = userToDomain(userDTO);
 
         return getAuthenticationTicket(request, user);
@@ -77,19 +102,7 @@ public class AuthCodeController {
         return userDTO.toHashedDomain();
     }
 
-    private Request requestToDomain(String client_id, String redirect_uri, String response_type, String scope, String state) {
-        var requestDTO = RequestDTO.builder()
-                .clientId(client_id)
-                .redirectUri(redirect_uri)
-                .responseType(response_type)
-                .scope(scope)
-                .state(state)
-                .build();
-
-        return requestDTO.toDomain();
-    }
-
-    private ResponseEntity<?> getAuthenticationTicket(Request request, User user) {
+    private ResponseEntity<?> getAuthenticationTicket(AuthenticationRequest request, User user) {
         try {
             var body = authCodeService.authenticationTicket(user, request);
             return ResponseEntity.ok(body);

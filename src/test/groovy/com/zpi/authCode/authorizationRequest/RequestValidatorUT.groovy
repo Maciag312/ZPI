@@ -1,8 +1,9 @@
 package com.zpi.authCode.authorizationRequest
 
 import com.zpi.CommonFixtures
-import com.zpi.api.authCode.ticketRequest.RequestDTO
-import com.zpi.domain.authCode.authenticationRequest.RequestErrorType
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
+import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
 import com.zpi.domain.client.Client
@@ -13,9 +14,10 @@ import spock.lang.Subject
 
 class RequestValidatorUT extends Specification {
     def clientRepository = Mock(ClientRepository)
+    def filler = Mock(OptionalParamsFiller)
 
     @Subject
-    private RequestValidator requestValidation = new RequestValidator(clientRepository)
+    private RequestValidator requestValidation = new RequestValidator(clientRepository, filler)
 
     def "should not throw when all parameters correct"() {
         given:
@@ -23,9 +25,10 @@ class RequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            filler.fill(request) >> request
 
         when:
-            requestValidation.validate(request)
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             noExceptionThrown()
@@ -36,15 +39,17 @@ class RequestValidatorUT extends Specification {
             def request = Fixtures.correctRequest().toDomain()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.empty()
+            filler.fill(request) >> request
 
         when:
-            requestValidation.validate(request)
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             def exception = thrown(ValidationFailedException)
             def expected = RequestError.builder()
-                    .error(RequestErrorType.UNAUTHORIZED_CLIENT)
+                    .error(AuthenticationRequestErrorType.UNAUTHORIZED_CLIENT)
                     .errorDescription("Unauthorized client id")
+                    .state(request.getState())
                     .build()
 
             exception.error == expected
@@ -56,14 +61,17 @@ class RequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            filler.fill(request) >> request
+
         when:
-            requestValidation.validate(request)
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             def exception = thrown(ValidationFailedException)
             def expected = RequestError.builder()
-                    .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
+                    .error(AuthenticationRequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
+                    .state(request.getState())
                     .build()
 
             exception.error == expected
@@ -75,14 +83,17 @@ class RequestValidatorUT extends Specification {
             def client = Fixtures.clientWithNullRedirectUri()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            filler.fill(request) >> request
+
         when:
-            requestValidation.validate(request)
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             def exception = thrown(ValidationFailedException)
             def expected = RequestError.builder()
-                    .error(RequestErrorType.UNRECOGNIZED_REDIRECT_URI)
+                    .error(AuthenticationRequestErrorType.UNRECOGNIZED_REDIRECT_URI)
                     .errorDescription("Unrecognized redirect uri")
+                    .state(request.getState())
                     .build()
 
             exception.error == expected
@@ -93,22 +104,25 @@ class RequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            filler.fill(request) >> request
+
         when:
-            requestValidation.validate(request.toDomain())
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             def exception = thrown(ValidationFailedException)
             def expected = RequestError.builder()
-                    .error(RequestErrorType.INVALID_REQUEST)
+                    .error(AuthenticationRequestErrorType.INVALID_REQUEST)
                     .errorDescription("Missing: " + errorDescription)
+                    .state(request.getState())
                     .build()
 
             exception.error == expected
 
         where:
-            request                 | _ || errorDescription
-            Fixtures.nullClientId() | _ || "client_id"
-            Fixtures.nullState()    | _ || "state"
+            request                            | _ || errorDescription
+            Fixtures.nullClientId().toDomain() | _ || "client_id"
+            Fixtures.nullState().toDomain()    | _ || "state"
     }
 
     def "should throw unsupported_response_type on wrong responseType"() {
@@ -116,22 +130,24 @@ class RequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            filler.fill(request) >> request
 
         when:
-            requestValidation.validate(request.toDomain())
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             def exception = thrown(ValidationFailedException)
             def expected = RequestError.builder()
-                    .error(RequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
+                    .error(AuthenticationRequestErrorType.UNSUPPORTED_RESPONSE_TYPE)
                     .errorDescription(errorDescription)
+                    .state(request.getState())
                     .build()
 
             exception.error == expected
 
         where:
-            request                        | _ || errorDescription
-            Fixtures.invalidResponseType() | _ || "Unrecognized response type: invalid"
+            request                                   | _ || errorDescription
+            Fixtures.invalidResponseType().toDomain() | _ || "Unrecognized response type: invalid"
     }
 
     def "should throw invalid_scope on invalid scope"() {
@@ -139,27 +155,29 @@ class RequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            filler.fill(request) >> request
 
         when:
-            requestValidation.validate(request.toDomain())
+            requestValidation.validateAndFillMissingFields(request)
 
         then:
             def exception = thrown(ValidationFailedException)
             def expected = RequestError.builder()
-                    .error(RequestErrorType.INVALID_SCOPE)
+                    .error(AuthenticationRequestErrorType.INVALID_SCOPE)
                     .errorDescription("Invalid scope")
+                    .state(request.getState())
                     .build()
 
             exception.error == expected
 
         where:
-            request                       | _
-            Fixtures.scopeWithoutOpenId() | _
+            request                                  | _
+            Fixtures.scopeWithoutOpenId().toDomain() | _
     }
 
     private class Fixtures {
-        static RequestDTO correctRequest() {
-            return RequestDTO.builder()
+        static TicketRequestDTO correctRequest() {
+            return TicketRequestDTO.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
@@ -168,8 +186,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static RequestDTO requestWithCustomUri(String uri) {
-            return RequestDTO.builder()
+        static TicketRequestDTO requestWithCustomUri(String uri) {
+            return TicketRequestDTO.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(uri)
                     .responseType(CommonFixtures.responseType)
@@ -178,8 +196,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static RequestDTO nullClientId() {
-            return RequestDTO.builder()
+        static TicketRequestDTO nullClientId() {
+            return TicketRequestDTO.builder()
                     .clientId(null)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
@@ -188,8 +206,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static RequestDTO nullState() {
-            return RequestDTO.builder()
+        static TicketRequestDTO nullState() {
+            return TicketRequestDTO.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
@@ -198,8 +216,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static RequestDTO invalidResponseType() {
-            return RequestDTO.builder()
+        static TicketRequestDTO invalidResponseType() {
+            return TicketRequestDTO.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType("invalid")
@@ -208,8 +226,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static RequestDTO scopeWithoutOpenId() {
-            return RequestDTO.builder()
+        static TicketRequestDTO scopeWithoutOpenId() {
+            return TicketRequestDTO.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)

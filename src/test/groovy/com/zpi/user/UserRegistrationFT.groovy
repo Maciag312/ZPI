@@ -1,7 +1,7 @@
 package com.zpi.user
 
 
-import com.zpi.CommonHelpers
+import com.zpi.MvcRequestHelpers
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ class UserRegistrationFT extends Specification {
     private UserRepository repository
 
     @Autowired
-    private CommonHelpers commonHelpers
+    private MvcRequestHelpers commonHelpers
 
     private static final String url = "/api/user/register"
 

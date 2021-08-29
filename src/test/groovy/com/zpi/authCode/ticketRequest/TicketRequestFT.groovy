@@ -2,7 +2,8 @@ package com.zpi.authCode.ticketRequest
 
 
 import com.zpi.CommonFixtures
-import com.zpi.CommonHelpers
+import com.zpi.MvcRequestHelpers
+import com.zpi.ResultHelpers
 import com.zpi.domain.client.ClientRepository
 import com.zpi.domain.user.UserManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +27,7 @@ class TicketRequestFT extends Specification {
     private UserManager userManager
 
     @Autowired
-    private CommonHelpers commonHelpers
+    private MvcRequestHelpers commonHelpers
 
     private static final String baseUri = "/api/authenticate"
 
@@ -42,12 +43,12 @@ class TicketRequestFT extends Specification {
             addUser()
 
         when:
-            def result = commonHelpers.postRequest(user, CommonHelpers.authParametersToUrl(request, baseUri))
+            def result = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, baseUri))
 
         then:
             result.andExpect(status().isOk())
-            CommonHelpers.attributeFromResult("state", result) == CommonFixtures.state
-            CommonHelpers.attributeFromResult("ticket", result).length() != 0
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            ResultHelpers.attributeFromResult("ticket", result).length() != 0
     }
 
     private void addClientWithRedirectUri() {

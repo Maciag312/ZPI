@@ -1,10 +1,10 @@
 package com.zpi
 
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
-import com.zpi.api.authCode.ticketRequest.RequestDTO
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.client.ClientDTO
 import com.zpi.api.common.dto.UserDTO
-import com.zpi.domain.authCode.authenticationRequest.Request
+import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.client.Client
@@ -14,6 +14,9 @@ class CommonFixtures {
     public static final String redirectUri = "uri"
     public static final String responseType = "code"
     public static final String scope = "openid profile photos asdf_asdf_asdf"
+    public static final List<String> scopeList = List.of(scope.split(" "))
+    public static final String hardcodedScope = "openid profile"
+    public static final List<String> hardcodedScopeList = List.of(hardcodedScope.split(" "))
     public static final String state = "statesdsdr"
 
     public static final String login = "Login"
@@ -21,9 +24,11 @@ class CommonFixtures {
 
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
     public static final String authPageUrl = "/signin"
+    public static final String grantType = "authorization_code"
+    public static final String hardcodedCode = "asdf"
 
-    static RequestDTO requestDTO() {
-        return RequestDTO.builder()
+    static TicketRequestDTO requestDTO() {
+        return TicketRequestDTO.builder()
                 .clientId(clientId)
                 .redirectUri(redirectUri)
                 .responseType(responseType)
@@ -32,12 +37,20 @@ class CommonFixtures {
                 .build()
     }
 
-    static Request request() {
-        return Request.builder()
+    static TicketRequestDTO requestOnlyRequiredDTO() {
+        return TicketRequestDTO.builder()
+                .clientId(clientId)
+                .responseType(responseType)
+                .state(state)
+                .build()
+    }
+
+    static AuthenticationRequest request() {
+        return AuthenticationRequest.builder()
                 .clientId(clientId)
                 .redirectUri(redirectUri)
                 .responseType(responseType)
-                .scope(List.of(scope.split(" ")))
+                .scope(scopeList)
                 .state(state)
                 .build()
     }
