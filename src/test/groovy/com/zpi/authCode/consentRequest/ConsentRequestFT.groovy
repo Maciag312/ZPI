@@ -4,6 +4,7 @@ import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.UriParamsResult
 import com.zpi.domain.authCode.consentRequest.TicketRepository
+import com.zpi.domain.authCode.consentRequest.authCodeIssuer.AuthCodeRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -19,15 +20,19 @@ class ConsentRequestFT extends Specification {
     private MockMvc mockMvc
 
     @Autowired
-    private TicketRepository repository
+    private MvcRequestHelpers mvcHelpers
 
     @Autowired
-    private MvcRequestHelpers commonHelpers
+    private TicketRepository ticketRepository
+
+    @Autowired
+    private AuthCodeRepository authCodeRepository
 
     private static final String baseUrl = "/api/consent"
 
     def setup() {
-        repository.clear()
+        ticketRepository.clear()
+        authCodeRepository.clear()
     }
 
     def "should return authentication code when ticket is up to date"() {
@@ -35,22 +40,26 @@ class ConsentRequestFT extends Specification {
             def request = CommonFixtures.consentRequestDTO()
 
         and:
-            repository.save(request.getTicket(), CommonFixtures.ticketData())
+            ticketRepository.save(request.getTicket(), CommonFixtures.ticketData())
 
         when:
-            def response = commonHelpers.postRequest(request, baseUrl)
+            def response = mvcHelpers.postRequest(request, baseUrl)
 
         then:
             response.andExpect(status().isFound())
 
         and:
             def actual = new UriParamsResult(response)
-            actual.getParam("code").length() != 0
+
             actual.getParam("state") == request.getState()
             actual.getPath() == CommonFixtures.redirectUri
 
         and:
-            repository.getByKey(request.getTicket()).isEmpty()
+            ticketRepository.getByKey(request.getTicket()).isEmpty()
+
+        and:
+            def code = actual.getParam("code")
+            authCodeRepository.getByKey(code).isPresent()
     }
 
     def "should return error when ticket is outdated"() {
@@ -58,7 +67,7 @@ class ConsentRequestFT extends Specification {
             def request = CommonFixtures.consentRequestDTO()
 
         when:
-            def response = commonHelpers.postRequest(request, baseUrl)
+            def response = mvcHelpers.postRequest(request, baseUrl)
 
         then:
             response.andExpect(status().isFound())
