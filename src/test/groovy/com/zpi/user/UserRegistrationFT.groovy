@@ -22,7 +22,7 @@ class UserRegistrationFT extends Specification {
 
     private static final String url = "/api/user/register"
 
-    def setup() {
+    def cleanup() {
         repository.clear()
     }
 

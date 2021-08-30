@@ -1,5 +1,6 @@
 package com.zpi.domain.token.tokenRequest.requestValidator;
 
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
 import com.zpi.domain.client.ClientRepository;
 import com.zpi.domain.common.RequestError;
 import com.zpi.domain.token.tokenRequest.TokenRequest;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TokenRequestValidatorImpl implements TokenRequestValidator {
     private final ClientRepository clientRepository;
+    private final AuthCodeRepository authCodeRepository;
 
     @Override
     public void validate(TokenRequest request) throws ValidationFailedException {
@@ -54,10 +56,8 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
     }
 
     private boolean isInvalidCode(TokenRequest request) {
-        final String HARDCODED_CODE = "asdf";
-
-        var code = request.getCode();
-        return code == null || !code.equals(HARDCODED_CODE);
+        var saved = authCodeRepository.getByKey(request.getCode());
+        return saved.isEmpty();
     }
 
 

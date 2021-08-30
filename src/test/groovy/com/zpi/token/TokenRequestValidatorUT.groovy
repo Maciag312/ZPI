@@ -1,6 +1,8 @@
 package com.zpi.token
 
 import com.zpi.CommonFixtures
+import com.zpi.domain.authCode.consentRequest.AuthCode
+import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.client.ClientRepository
 import com.zpi.domain.token.tokenRequest.TokenRequest
 import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestErrorType
@@ -12,9 +14,10 @@ import spock.lang.Subject
 
 class TokenRequestValidatorUT extends Specification {
     def clientRepository = Mock(ClientRepository)
+    def authCodeRepository = Mock(AuthCodeRepository)
 
     @Subject
-    private TokenRequestValidator validator = new TokenRequestValidatorImpl(clientRepository)
+    private TokenRequestValidator validator = new TokenRequestValidatorImpl(clientRepository, authCodeRepository)
 
     def "should not throw on correct data"() {
         given:
@@ -23,6 +26,7 @@ class TokenRequestValidatorUT extends Specification {
 
         and:
             clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            authCodeRepository.getByKey(request.getCode()) >> Optional.of(new AuthCode())
 
         when:
             validator.validate(request)
@@ -61,6 +65,8 @@ class TokenRequestValidatorUT extends Specification {
                     .grantType(CommonFixtures.grantType)
                     .code(code)
                     .build()
+        and:
+            authCodeRepository.getByKey(request.getCode()) >> Optional.empty()
 
         when:
             validator.validate(request)
@@ -91,6 +97,7 @@ class TokenRequestValidatorUT extends Specification {
                     .build()
         and:
             clientRepository.getByKey(client.getId()) >> Optional.of(client)
+            authCodeRepository.getByKey(request.getCode()) >> Optional.of(new AuthCode())
 
         when:
             validator.validate(request)
@@ -119,6 +126,7 @@ class TokenRequestValidatorUT extends Specification {
 
         and:
             clientRepository.getByKey(clientId) >> Optional.empty()
+            authCodeRepository.getByKey(request.getCode()) >> Optional.of(new AuthCode())
 
         when:
             validator.validate(request)
@@ -138,10 +146,12 @@ class TokenRequestValidatorUT extends Specification {
     }
 
     private class Fixtures {
+        final static String code = "asdfasdf"
+
         static TokenRequest correctRequest() {
             return TokenRequest.builder()
                     .grantType(CommonFixtures.grantType)
-                    .code(CommonFixtures.hardcodedCode)
+                    .code(code)
                     .redirectUri(CommonFixtures.redirectUri)
                     .clientId(CommonFixtures.clientId)
                     .build()
