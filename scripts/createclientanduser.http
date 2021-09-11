@@ -1,4 +1,10 @@
-POST http://localhost:8080/api/client/register
+POST http://localhost:8080/api/organization/register/pizza-house?code=funny-code
+accept: */*
+Content-Type: application/json
+
+###
+
+POST http://localhost:8080/api/organization/pizza-house/client/register
 accept: */*
 Content-Type: application/json
 

@@ -12,7 +12,7 @@ import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.common.RequestError
 import com.zpi.domain.user.UserAuthenticator
 import spock.lang.Specification
@@ -34,7 +34,7 @@ class TicketRequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> true
             authorizationService.createTicket(request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
@@ -43,8 +43,8 @@ class TicketRequestUT extends Specification {
             def response = tokenService.authenticationTicket(user, request)
 
         then:
-            response.getTicket().length() != 0
-            response.getState() == CommonFixtures.state
+            response.getTicket().isPresent()
+            response.getState().get() == CommonFixtures.state
     }
 
     def "should return error on wrong request"() {
@@ -53,7 +53,7 @@ class TicketRequestUT extends Specification {
             def client = CommonFixtures.client()
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
             }
@@ -74,7 +74,7 @@ class TicketRequestUT extends Specification {
             def client = CommonFixtures.client()
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> false
 

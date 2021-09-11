@@ -25,7 +25,7 @@ class ConsentRequestUT extends Specification {
             def authCode = new AuthCode("asdf")
 
         and:
-            ticketRepository.getByKey(ticket) >> Optional.of(authData)
+            ticketRepository.findByKey(ticket) >> Optional.of(authData)
             ticketRepository.remove(ticket) >> null
             authCodePersister.persist() >> authCode
         when:
@@ -44,7 +44,7 @@ class ConsentRequestUT extends Specification {
         given:
             def request = CommonFixtures.consentRequest()
 
-            ticketRepository.getByKey(request.getTicket()) >> Optional.empty()
+            ticketRepository.findByKey(request.getTicket()) >> Optional.empty()
             authCodePersister.persist() >> null
 
         when:

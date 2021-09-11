@@ -1,7 +1,7 @@
 package com.zpi.domain.token.tokenRequest.requestValidator;
 
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
-import com.zpi.domain.client.ClientRepository;
+import com.zpi.domain.organization.client.ClientRepository;
 import com.zpi.domain.common.RequestError;
 import com.zpi.domain.token.tokenRequest.TokenRequest;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,7 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
     }
 
     private boolean isInvalidCode(TokenRequest request) {
-        var saved = authCodeRepository.getByKey(request.getCode());
+        var saved = authCodeRepository.findByKey(request.getCode());
         return saved.isEmpty();
     }
 
@@ -78,7 +78,7 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
             return true;
         }
 
-        return clientRepository.getByKey(request.getClientId()).isEmpty();
+        return clientRepository.findByKey(request.getClientId()).isEmpty();
     }
 
     private void validateRedirectUri(TokenRequest request) throws ValidationFailedException {
@@ -98,7 +98,7 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
             return true;
         }
 
-        var client = clientRepository.getByKey(request.getClientId());
+        var client = clientRepository.findByKey(request.getClientId());
 
         if (client.isPresent()) {
             var uri = request.getRedirectUri();

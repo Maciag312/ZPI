@@ -1,8 +1,8 @@
 package com.zpi.api.common.exception;
 
-import com.zpi.api.client.ClientController;
+import com.zpi.api.organization.client.ClientController;
 import com.zpi.api.authCode.AuthCodeController;
-import com.zpi.api.user.UserController;
+import com.zpi.api.organization.user.UserController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

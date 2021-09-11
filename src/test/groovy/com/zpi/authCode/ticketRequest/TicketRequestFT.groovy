@@ -4,7 +4,7 @@ package com.zpi.authCode.ticketRequest
 import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.ResultHelpers
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.UserManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

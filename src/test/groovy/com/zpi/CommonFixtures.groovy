@@ -1,13 +1,13 @@
 package com.zpi
 
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
+import com.zpi.api.organization.client.ClientDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
-import com.zpi.api.client.ClientDTO
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
-import com.zpi.domain.client.Client
+import com.zpi.domain.organization.client.Client
 
 class CommonFixtures {
     public static final String clientId = "id"
@@ -56,7 +56,7 @@ class CommonFixtures {
     }
 
     static Client client() {
-        var client = Client.builder()
+        def client = Client.builder()
                 .id(clientId)
                 .availableRedirectUri(null)
                 .build()
@@ -73,10 +73,7 @@ class CommonFixtures {
     }
 
     static UserDTO userDTO() {
-        return UserDTO.builder()
-                .login(login)
-                .password(password)
-                .build()
+        return new UserDTO(login, password);
     }
 
     static ConsentRequest consentRequest() {

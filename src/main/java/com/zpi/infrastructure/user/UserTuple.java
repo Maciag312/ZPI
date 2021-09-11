@@ -6,17 +6,21 @@ import lombok.Data;
 import lombok.Getter;
 
 import javax.persistence.Id;
+import java.util.Optional;
 
 @Getter
 @Data
 class UserTuple implements EntityTuple<User> {
-    @Id
+
     private final String login;
     private final String password;
+    private final String organization;
+
 
     UserTuple(User user) {
         login = user.getLogin();
         password = user.getPassword();
+        organization = user.getOrganization();
     }
 
     @Override
@@ -24,6 +28,7 @@ class UserTuple implements EntityTuple<User> {
         return User.builder()
                 .login(login)
                 .password(password)
+                .organization(organization)
                 .build();
     }
 }

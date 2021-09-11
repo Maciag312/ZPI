@@ -6,7 +6,7 @@ import com.zpi.ResultHelpers
 import com.zpi.api.token.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.ClientRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -41,12 +41,7 @@ class TokenRequestFT extends Specification {
             def redirectUri = CommonFixtures.redirectUri
             def client = CommonFixtures.client()
 
-            def request = TokenRequestDTO.builder()
-                    .grant_type(CommonFixtures.grantType)
-                    .code(authCode)
-                    .redirect_uri(redirectUri)
-                    .client_id(client.getId())
-                    .build()
+            def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, redirectUri, client.getId())
 
         and:
             clientRepository.save(client.getId(), client)
@@ -65,12 +60,7 @@ class TokenRequestFT extends Specification {
             def redirectUri = "asdgsdfgasdfalk"
 
             def client = CommonFixtures.client()
-            def request = TokenRequestDTO.builder()
-                    .grant_type(null)
-                    .code(authCode)
-                    .redirect_uri(redirectUri)
-                    .client_id(client.getId())
-                    .build()
+            def request = new TokenRequestDTO(null, authCode, redirectUri, client.getId())
 
         and:
             clientRepository.save(client.getId(), client)

@@ -20,7 +20,12 @@ class UserRegistrationFT extends Specification {
     @Autowired
     private MvcRequestHelpers commonHelpers
 
-    private static final String url = "/api/user/register"
+    private static final String url(String organizationName){
+        return "/api/organization/" + organizationName + "/user/register"
+    }
+
+    private static organizationName = "pizzaHouse"
+
 
     def cleanup() {
         repository.clear()
@@ -31,34 +36,36 @@ class UserRegistrationFT extends Specification {
             def user = Fixtures.userWithRandomData()
 
         when:
-            def request = commonHelpers.postRequest(user, url)
+            def request = commonHelpers.postRequest(user, url(organizationName))
 
         then:
             request.andExpect(status().isCreated())
 
         and:
             def hashedDomain = user.toHashedDomain()
-            def result = repository.getByKey(hashedDomain.getLogin()).get()
+            def result = repository.findByKey(hashedDomain.getLogin()).get()
 
-            result == hashedDomain
+            result.login == hashedDomain.login
+            result.password == hashedDomain.password
     }
 
     def "should return conflict on existing user"() {
         given:
-            def user = Fixtures.userWithRandomData()
+        def user = Fixtures.userWithRandomData()
 
         when:
-            commonHelpers.postRequest(user, url)
-            def request = commonHelpers.postRequest(user, url)
+            commonHelpers.postRequest(user, url(organizationName))
+            def request = commonHelpers.postRequest(user, url(organizationName))
 
         then:
             request.andExpect(status().isConflict())
 
         and:
             def hashedDomain = user.toHashedDomain()
-            def result = repository.getByKey(hashedDomain.getLogin()).get()
+            def result = repository.findByKey(hashedDomain.getLogin()).get()
 
-            result == hashedDomain
+            result.login == hashedDomain.login
+            result.password == hashedDomain.password
     }
 
     def "should return conflict on login crash"() {
@@ -71,17 +78,18 @@ class UserRegistrationFT extends Specification {
                     .build()
 
         when:
-            commonHelpers.postRequest(userA, url)
-            def request = commonHelpers.postRequest(userB, url)
+            commonHelpers.postRequest(userA, url(organizationName))
+            def request = commonHelpers.postRequest(userB, url(organizationName))
 
         then:
             request.andExpect(status().isConflict())
 
         and:
             def hashedDomain = userA.toHashedDomain()
-            def result = repository.getByKey(hashedDomain.getLogin()).get()
+            def result = repository.findByKey(hashedDomain.getLogin()).get()
 
-            result == hashedDomain
+            result.login == hashedDomain.login
+            result.password == hashedDomain.password
     }
 
     def "should return bad request on null user"() {
@@ -89,20 +97,22 @@ class UserRegistrationFT extends Specification {
             def user = null
 
         when:
-            def request = commonHelpers.postRequest(user, url)
+            def request = commonHelpers.postRequest(user, url(organizationName))
 
         then:
             request.andExpect(status().isBadRequest())
+
     }
 
     def "should return bad request on malformed user"() {
         given:
+            def organizationName = "pizzaHouse"
             def userA = UserDTO.builder().build()
             def userB = UserDTO.builder().login("Login").build()
 
         when:
-            def requestA = commonHelpers.postRequest(userA, url)
-            def requestB = commonHelpers.postRequest(userB, url)
+            def requestA = commonHelpers.postRequest(userA, url(organizationName))
+            def requestB = commonHelpers.postRequest(userB, url(organizationName))
 
         then:
             requestA.andExpect(status().isBadRequest())
@@ -118,6 +128,7 @@ class UserRegistrationFT extends Specification {
             return UserDTO.builder()
                     .login(login)
                     .password(password)
+
                     .build()
         }
     }

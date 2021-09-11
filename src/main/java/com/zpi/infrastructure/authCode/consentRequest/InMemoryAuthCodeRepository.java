@@ -2,13 +2,17 @@ package com.zpi.infrastructure.authCode.consentRequest;
 
 import com.zpi.domain.authCode.consentRequest.AuthCode;
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
-import com.zpi.infrastructure.common.InMemoryEntityRepository;
+import com.zpi.infrastructure.common.EntityTuple;
+import com.zpi.infrastructure.common.InMemoryRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public class InMemoryAuthCodeRepository extends InMemoryEntityRepository<AuthCode, AuthCodeTuple> implements AuthCodeRepository {
+public class InMemoryAuthCodeRepository extends InMemoryRepository<String, AuthCode> implements AuthCodeRepository {
+
     @Override
-    public void save(String key, AuthCode item) {
-        super.getItems().put(key, new AuthCodeTuple(key, item));
+    public EntityTuple<AuthCode> fromDomain(AuthCode code) {
+        return new AuthCodeTuple(code.getValue(), code);
     }
 }

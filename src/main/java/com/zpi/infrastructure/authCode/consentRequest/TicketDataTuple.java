@@ -10,13 +10,10 @@ import javax.persistence.Id;
 @Getter
 @Data
 class TicketDataTuple implements EntityTuple<TicketData> {
-    @Id
-    private final String id;
 
     private final String redirectUri;
 
-    TicketDataTuple(String key, TicketData data) {
-        this.id = key;
+    TicketDataTuple(TicketData data) {
         this.redirectUri = data.getRedirectUri();
     }
 

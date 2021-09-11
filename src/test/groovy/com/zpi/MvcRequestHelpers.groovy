@@ -22,10 +22,11 @@ class MvcRequestHelpers {
     }
 
     def <T> ResultActions postRequest(T payload, String url) throws Exception {
+        def object = mapper.writeValueAsString(payload);
         return mockMvc.perform(
                 post(url)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(payload))
+                        .content(object)
         )
     }
 

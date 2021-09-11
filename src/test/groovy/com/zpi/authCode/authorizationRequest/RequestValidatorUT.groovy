@@ -6,8 +6,8 @@ import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
-import com.zpi.domain.client.Client
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.Client
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.common.RequestError
 import spock.lang.Specification
 import spock.lang.Subject
@@ -24,7 +24,7 @@ class RequestValidatorUT extends Specification {
             def request = CommonFixtures.request()
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -38,7 +38,7 @@ class RequestValidatorUT extends Specification {
         given:
             def request = Fixtures.correctRequest().toDomain()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.empty()
+            clientRepository.findByKey(request.getClientId()) >> Optional.empty()
             filler.fill(request) >> request
 
         when:
@@ -60,7 +60,7 @@ class RequestValidatorUT extends Specification {
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -82,7 +82,7 @@ class RequestValidatorUT extends Specification {
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = Fixtures.clientWithNullRedirectUri()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -103,7 +103,7 @@ class RequestValidatorUT extends Specification {
         given:
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -129,7 +129,7 @@ class RequestValidatorUT extends Specification {
         given:
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -148,31 +148,6 @@ class RequestValidatorUT extends Specification {
         where:
             request                                   | _ || errorDescription
             Fixtures.invalidResponseType().toDomain() | _ || "Unrecognized response type: invalid"
-    }
-
-    def "should throw invalid_scope on invalid scope"() {
-        given:
-            def client = CommonFixtures.client()
-
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            filler.fill(request) >> request
-
-        when:
-            requestValidation.validateAndFillMissingFields(request)
-
-        then:
-            def exception = thrown(ValidationFailedException)
-            def expected = RequestError.builder()
-                    .error(AuthenticationRequestErrorType.INVALID_SCOPE)
-                    .errorDescription("Invalid scope")
-                    .state(request.getState())
-                    .build()
-
-            exception.error == expected
-
-        where:
-            request                                  | _
-            Fixtures.scopeWithoutOpenId().toDomain() | _
     }
 
     private class Fixtures {
