@@ -65,7 +65,8 @@ public class RequestValidator {
     }
 
     private boolean isInvalidRedirectUri() {
-        return !client.containsRedirectUri(request.getRedirectUri());
+        return !client.getAvailableRedirectUri()
+                .contains(request.getRedirectUri());
     }
 
     private void validateResponseType() throws ValidationFailedException {

@@ -14,21 +14,8 @@ public class OrganizationController {
     private final OrganizationService organizationService;
 
     @PostMapping("/register/{name}")
-    public ResponseEntity<?> register(@PathVariable String name, @RequestParam String code) {
-        if(hasAdminRights(code)) {
-            organizationService.register(name);
-            return new ResponseEntity(HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> register(@PathVariable String name) {
+        organizationService.register(name);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
-    boolean hasAdminRights(String code) {
-        //TODO refactor
-        if (code.equals("funny-code")) {
-            return true;
-        }
-        return false;
-    }
-
 }

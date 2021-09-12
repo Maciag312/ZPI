@@ -26,10 +26,8 @@ class OptionalParamsFillerUT extends Specification {
 
         and:
             def defaultRedirectUri = "asdfasdfsadfasdfasdf"
-            def client = Client.builder()
-                    .availableRedirectUri(new HashSet<String>(List.of(defaultRedirectUri)))
-                    .build()
-
+            def client = new Client("1")
+            client.getAvailableRedirectUri().addAll(List.of(defaultRedirectUri));
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
 
         when:
@@ -58,7 +56,7 @@ class OptionalParamsFillerUT extends Specification {
                     .build()
 
         and:
-            def client = Client.builder().build()
+            def client = new Client('1')
 
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
 

@@ -21,7 +21,7 @@ class OrganizationServiceImpl implements OrganizationService {
         if (organizationRepository.findByName(name).isPresent()) {
            throw new NonUniqueObjectException("Organization with such name already exists", -1, name);
         }
-        Manager manager = new Manager("admin", "admin", name, List.of(Role.ADMIN));
+        Manager manager = new Manager("admin", "admin", name, List.of(Role.MANAGER));
         var organization = new Organization(name);
         managerRepository.save(manager);
         organizationRepository.save(organization);

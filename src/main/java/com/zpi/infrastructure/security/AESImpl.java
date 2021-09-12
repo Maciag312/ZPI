@@ -47,7 +47,7 @@ public class AESImpl implements AES {
     }
 
     private Key generateKey(){
-        String secretKey = "z@bEzP13cZen1@-5@-5uPeR-HE_HE_HE";
+        String secretKey = "shSHs321ecuredsadD51HdsaACQLOA33sharedsadD51HdsaACQLOA33ACO3482JJ12SHs321ecudsaredaredsadD51HdsaACQLOA33ACO3482JJ12sadD51HdsaACQLOA33ACO3482JJ123DEF1LONGA0AENUGH4dDSAACO348shSHs321ecuredsadD51HdsaACQLOA33ACO3482JJ123DEF1LONGA0AENUGH4dDSA2JJ123DEF1LONGA0AENUGH4dDSA-dA58i1A123FAHFh";
         return new SecretKeySpec(secretKey.getBytes(), ALGO);
     }
 }

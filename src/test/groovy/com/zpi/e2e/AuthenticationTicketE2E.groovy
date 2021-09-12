@@ -4,6 +4,7 @@ package com.zpi.e2e
 import com.zpi.CommonFixtures
 import com.zpi.CommonHelpers
 import com.zpi.domain.authCode.consentRequest.TicketRepository
+import com.zpi.domain.organization.OrganizationRepository
 import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,9 +33,12 @@ class AuthenticationTicketE2E extends Specification {
     private TicketRepository ticketRepository
 
     @Autowired
+    private OrganizationRepository organizationRepository
+
+
+    @Autowired
     private CommonHelpers commonHelpers
 
-    private static final String accessCode = "funny-code"
     private static final String organizationURI = '/api/organization/';
     private static final String clientRegisterUrl(String organizationName){
         return organizationURI + organizationName + '/client/register';
@@ -50,17 +54,18 @@ class AuthenticationTicketE2E extends Specification {
         clientRepository.clear()
         userRepository.clear()
         ticketRepository.clear()
+        organizationRepository.clear()
     }
 
     def "should get authentication ticket for newly registered user and client"() {
         given:
-            def organizationName = "pizzaHouse"
+            def organizationName = "pizza-house-231"
             def client = CommonFixtures.clientDTO()
             def user = CommonFixtures.userDTO()
             def request = CommonFixtures.requestDTO()
 
         when:
-            commonHelpers.postRequest( '/api/organization/register/' + organizationName + '?code=' + accessCode)
+            commonHelpers.postRequest( '/api/organization/register/' + organizationName)
             commonHelpers.postRequest(client, clientRegisterUrl(organizationName))
             commonHelpers.postRequest(user, userRegisterUrl(organizationName))
 

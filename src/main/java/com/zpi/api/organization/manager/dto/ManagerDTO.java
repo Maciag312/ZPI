@@ -1,9 +1,14 @@
 package com.zpi.api.organization.manager.dto;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Value
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ManagerDTO {
-    String username;
-    String password;
+    private String username;
+    private String password;
+    private String role;
 }

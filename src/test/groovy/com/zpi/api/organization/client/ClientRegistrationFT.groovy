@@ -44,7 +44,7 @@ class ClientRegistrationFT extends Specification {
             def client = CommonFixtures.clientDTO()
 
         when:
-            commonHelpers.postRequest( '/api/organization/register/' + organizationName + '?code=' + accessCode)
+            commonHelpers.postRequest( '/api/organization/register/' + organizationName)
             def request = commonHelpers.postRequest(client, url)
 
         then:
@@ -63,7 +63,7 @@ class ClientRegistrationFT extends Specification {
             def clientB = CommonFixtures.clientDTO()
 
         when:
-            commonHelpers.postRequest( '/api/organization/register/' + organizationName + '?code=' + accessCode)
+            commonHelpers.postRequest( '/api/organization/register/' + organizationName)
             commonHelpers.postRequest(clientA, url)
             def request = commonHelpers.postRequest(clientB, url)
 
@@ -82,7 +82,7 @@ class ClientRegistrationFT extends Specification {
             def client = null
 
         when:
-            commonHelpers.postRequest( '/api/organization/register/' + organizationName + '?code=' + accessCode)
+            commonHelpers.postRequest( '/api/organization/register/' + organizationName)
             def request = commonHelpers.postRequest(client, url)
 
         then:
@@ -94,7 +94,7 @@ class ClientRegistrationFT extends Specification {
             def client = ClientDTO.builder().id("").build()
 
         when:
-            commonHelpers.postRequest( '/api/organization/register/' + organizationName + '?code=' + accessCode)
+            commonHelpers.postRequest( '/api/organization/register/' + organizationName)
             def request = commonHelpers.postRequest(client, url)
 
         then:

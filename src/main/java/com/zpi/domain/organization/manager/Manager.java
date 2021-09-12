@@ -1,13 +1,18 @@
 package com.zpi.domain.organization.manager;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Value;
 
 import java.util.List;
 
-@Value
+@AllArgsConstructor
+@Getter
 public class Manager {
-    String username;
+    final String username;
+    @Setter
     String password;
-    String organizationName;
-    List<Role> roles;
+    final String organizationName;
+    final List<Role> roles;
 }

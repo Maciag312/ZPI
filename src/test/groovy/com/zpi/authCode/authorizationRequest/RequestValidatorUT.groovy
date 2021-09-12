@@ -80,7 +80,7 @@ class RequestValidatorUT extends Specification {
     def "should return error message when client has no registered redirect uris"() {
         given:
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
-            def client = Fixtures.clientWithNullRedirectUri()
+            def client = Fixtures.clientWithEmptyRedirectURIs()
 
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
@@ -211,11 +211,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static Client clientWithNullRedirectUri() {
-            return Client.builder()
-                    .id(CommonFixtures.clientId)
-                    .availableRedirectUri(null)
-                    .build()
+        static Client clientWithEmptyRedirectURIs() {
+            return new Client(CommonFixtures.clientId);
         }
     }
 }

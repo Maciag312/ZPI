@@ -1,4 +1,28 @@
-POST http://localhost:8080/api/organization/register/pizza-house?code=funny-code
+POST http://localhost:8080/api/organization/master/manager/signin
+accept: */*
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin",
+  "role": "SUPER_ADMIN"
+}
+
+###
+
+POST http://localhost:8080/api/organization/master/manager/signin
+accept: */*
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin",
+  "role": "MANAGER"
+}
+
+###
+
+POST http://localhost:8080/api/organization/register/pizza-house
 accept: */*
 Content-Type: application/json
 

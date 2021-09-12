@@ -3,12 +3,14 @@ package com.zpi.infrastructure.organization.manager;
 
 import com.zpi.domain.organization.manager.Manager;
 import com.zpi.domain.organization.manager.ManagerRepository;
+import com.zpi.domain.organization.manager.Role;
 import com.zpi.infrastructure.common.CompositeKey;
 import com.zpi.infrastructure.common.EntityTuple;
 import com.zpi.infrastructure.common.InMemoryRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryManagerRepository extends InMemoryRepository<CompositeKey<String, String>, Manager> implements ManagerRepository {
@@ -32,6 +34,13 @@ public class InMemoryManagerRepository extends InMemoryRepository<CompositeKey<S
                 .filter( entry->entry.getKey().left.equals(username))
                 .findFirst()
                 .map(Map.Entry::getValue);
+    }
+
+    @Override
+    public List<Manager> findAllByRole(Role role) {
+        return managers.values().stream()
+                .filter(m->m.getRoles().contains(role))
+                .collect(Collectors.toList());
     }
 
     @Override

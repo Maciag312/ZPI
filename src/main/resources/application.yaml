@@ -20,3 +20,8 @@ springdoc:
 server:
   error:
     include-message: always
+
+security:
+  jwt:
+    token:
+      secret-key: "DJASFDNUS812DAMNXMANSDHQHW83183JD18JJ1HFG8JXJ12JSH1XCHBUJ28X2JH12J182XJH1F3H1JS81G7RESHD13H71"

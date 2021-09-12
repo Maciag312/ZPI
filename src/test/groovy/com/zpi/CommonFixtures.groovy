@@ -56,11 +56,8 @@ class CommonFixtures {
     }
 
     static Client client() {
-        def client = Client.builder()
-                .id(clientId)
-                .availableRedirectUri(null)
-                .build()
-        client.addRedirectUri(redirectUri)
+        def client = new Client(clientId)
+        client.getAvailableRedirectUri().add(redirectUri)
 
         return client
     }

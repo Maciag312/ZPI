@@ -3,8 +3,11 @@ package com.zpi.api.organization.manager;
 import com.zpi.api.organization.manager.dto.ManagerDTO;
 import com.zpi.domain.organization.OrganizationService;
 import com.zpi.domain.organization.manager.ManagerAccountManager;
+import com.zpi.domain.organization.manager.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,16 +18,17 @@ public class ManagerController {
     private final OrganizationService organizationService;
 
     @PostMapping("/signin")
-    public void signIn(@RequestBody ManagerDTO signInDTO, @PathVariable String name) {
+    public String signIn(@RequestBody ManagerDTO signInDTO, @PathVariable String name) {
         if(!organizationService.exists(name)){
             throw new IllegalArgumentException("Organization with such name doesn't exists");
         }
-        accountManager.signIn(name, signInDTO.getUsername(),
+        return accountManager.signIn(name, signInDTO.getUsername(),
                                 signInDTO.getPassword());
     }
 
     @PostMapping("/signup")
     public void signUp(@RequestBody ManagerDTO signUpDTO, @PathVariable String name) {
-        //TODO
+
     }
+
 }
