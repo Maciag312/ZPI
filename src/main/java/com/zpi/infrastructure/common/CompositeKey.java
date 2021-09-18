@@ -1,6 +1,5 @@
 package com.zpi.infrastructure.common;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 public class CompositeKey<T, U> extends MutablePair<T, U> {

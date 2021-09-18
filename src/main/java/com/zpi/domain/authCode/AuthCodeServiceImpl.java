@@ -1,6 +1,6 @@
 package com.zpi.domain.authCode;
 
-import com.zpi.api.authCode.ticketRequest.TicketResponseDto;
+import com.zpi.api.authCode.ticketRequest.TicketResponseDTO;
 import com.zpi.api.common.dto.ErrorResponseDTO;
 import com.zpi.api.common.exception.ErrorResponseException;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
@@ -35,12 +35,12 @@ public class AuthCodeServiceImpl implements AuthCodeService {
         }
     }
 
-    public TicketResponseDto authenticationTicket(User user, AuthenticationRequest request) throws ErrorResponseException {
+    public TicketResponseDTO authenticationTicket(User user, AuthenticationRequest request) throws ErrorResponseException {
         validateAndFillRequest(request);
         validateUser(user, request);
 
         var response = authorizationService.createTicket(request);
-        return new TicketResponseDto(response);
+        return new TicketResponseDTO(response);
     }
 
     private void validateUser(User user, AuthenticationRequest request) throws ErrorResponseException {

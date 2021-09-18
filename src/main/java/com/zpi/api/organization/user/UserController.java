@@ -20,15 +20,14 @@ public class UserController {
     private final UserManager userService;
     private final OrganizationService organizationService;
 
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO, @PathVariable String name) {
-        if(!organizationService.exists(name)){
+        if (!organizationService.exists(name)) {
             throw new IllegalArgumentException("Organization with such name doesn't exists");
         }
         var user = userDTO.toHashedDomain();
         user.setOrganization(name);
-        if(userService.createUser(user)) {
+        if (userService.createUser(user)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
 
