@@ -22,9 +22,10 @@ public class ClientDTO {
     @NotNull
     private List<String> availableRedirectUri;
 
-    public Client toDomain() {
+    public Client toDomain(String organizationName) {
         var client = new Client(id);
         client.getAvailableRedirectUri().addAll(availableRedirectUri);
+        client.setOrganizationName(organizationName);
         return client;
     }
 }

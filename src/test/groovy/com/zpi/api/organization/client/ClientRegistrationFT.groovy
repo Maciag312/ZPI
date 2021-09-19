@@ -31,7 +31,6 @@ class ClientRegistrationFT extends Specification {
     private CommonHelpers commonHelpers
 
     private static final String organizationName = "pizzaHouse"
-    private static final String accessCode = "funny-code"
     private static final String url = '/api/organization/' + organizationName + '/client/register'
 
     def setup() {
@@ -51,7 +50,7 @@ class ClientRegistrationFT extends Specification {
             request.andExpect(status().isCreated())
 
         and:
-            def domainClient = client.toDomain()
+            def domainClient = client.toDomain(organizationName)
             def result = repository.findByKey(domainClient.getId()).get()
 
             result == domainClient
@@ -71,7 +70,7 @@ class ClientRegistrationFT extends Specification {
             request.andExpect(status().isConflict())
 
         and:
-            def domainClientA = clientA.toDomain()
+            def domainClientA = clientA.toDomain(organizationName)
             def result = repository.findByKey(domainClientA.getId()).get()
 
             result == domainClientA

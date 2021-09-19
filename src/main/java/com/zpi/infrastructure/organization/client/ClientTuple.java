@@ -14,17 +14,20 @@ class ClientTuple implements EntityTuple<Client> {
     @Id
     private final String id;
 
+    private final String organizationName;
     private final HashSet<String> availableRedirectUri;
 
     ClientTuple(Client client) {
         this.id = client.getId();
         this.availableRedirectUri = new HashSet<>(client.getAvailableRedirectUri());
+        this.organizationName = client.getOrganizationName();
     }
 
     @Override
     public Client toDomain() {
         var client = new Client(id);
         client.getAvailableRedirectUri().addAll(availableRedirectUri);
+        client.setOrganizationName(organizationName);
         return client;
     }
 }

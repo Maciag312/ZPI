@@ -16,7 +16,7 @@ class ClientRegistrationUT extends Specification {
 
             clientRepository.findByKey(client.getId()) >> Optional.empty()
         when:
-            def isSuccess = clientService.saveClient(client)
+            def isSuccess = clientService.saveClient(client, organization_name)
 
         then:
             isSuccess
@@ -32,7 +32,7 @@ class ClientRegistrationUT extends Specification {
 
             clientRepository.findByKey(client.getId()) >> Optional.of(client)
         when:
-            def isSuccess = clientService.saveClient(client)
+            def isSuccess = clientService.saveClient(client, organization_name)
 
         then:
             !isSuccess
