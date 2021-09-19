@@ -16,7 +16,7 @@ class UserRegistrationUT extends Specification {
         given:
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            userRepository.getByKey(user.getLogin()) >> Optional.empty()
+            userRepository.findByKey(user.getLogin()) >> Optional.empty()
 
         when:
             def isSuccess = userService.createUser(user)
@@ -29,7 +29,7 @@ class UserRegistrationUT extends Specification {
         given:
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            userRepository.getByKey(user.getLogin()) >> Optional.of(user)
+            userRepository.findByKey(user.getLogin()) >> Optional.of(user)
 
         when:
             def isSuccess = userService.createUser(user)

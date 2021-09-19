@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
     private final TokenService service;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<?> tokenRequest(@RequestBody TokenRequestDTO request) {
         try {
             var token = service.getToken(request.toDomain());

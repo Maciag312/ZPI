@@ -2,10 +2,10 @@ package com.zpi.e2e
 
 
 import com.zpi.CommonFixtures
-import com.zpi.MvcRequestHelpers
-import com.zpi.ResultHelpers
+import com.zpi.CommonHelpers
 import com.zpi.domain.authCode.consentRequest.TicketRepository
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.OrganizationRepository
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -33,10 +33,19 @@ class AuthenticationTicketE2E extends Specification {
     private TicketRepository ticketRepository
 
     @Autowired
-    private MvcRequestHelpers mvcHelpers
+    private OrganizationRepository organizationRepository
 
-    private static final String clientRegisterUrl = "/api/client/register"
-    private static final String userRegisterUrl = "/api/user/register"
+
+    @Autowired
+    private CommonHelpers commonHelpers
+
+    private static final String organizationURI = '/api/organization/';
+    private static final String clientRegisterUrl(String organizationName){
+        return organizationURI + organizationName + '/client/register';
+    }
+    private static final String userRegisterUrl(String organizationName){
+        return organizationURI + organizationName + '/user/register'
+    }
     private static final String authorizeRequestUrl = "/api/authorize"
     private static final String authenticateRequestUrl = "/api/authenticate"
     private static final String consentRequestUrl = "/api/consent"
@@ -45,41 +54,44 @@ class AuthenticationTicketE2E extends Specification {
         clientRepository.clear()
         userRepository.clear()
         ticketRepository.clear()
+        organizationRepository.clear()
     }
 
     def "should get authentication ticket for newly registered user and client"() {
         given:
+            def organizationName = "pizza-house-231"
             def client = CommonFixtures.clientDTO()
             def user = CommonFixtures.userDTO()
             def request = CommonFixtures.requestDTO()
 
         when:
-            mvcHelpers.postRequest(client, clientRegisterUrl)
-            mvcHelpers.postRequest(user, userRegisterUrl)
+            commonHelpers.postRequest( '/api/organization/register/' + organizationName)
+            commonHelpers.postRequest(client, clientRegisterUrl(organizationName))
+            commonHelpers.postRequest(user, userRegisterUrl(organizationName))
 
         and:
-            def authorizeResponse = mvcHelpers.getRequest(ResultHelpers.authParametersToUrl(request, authorizeRequestUrl))
+            def authorizeResponse = commonHelpers.getRequest(CommonHelpers.authParametersToUrl(request, authorizeRequestUrl))
 
         then:
             authorizeResponse.andExpect(status().isFound())
             authorizeResponse.andExpect(header().exists("Location"))
 
         when:
-            def authenticateResponse = mvcHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, authenticateRequestUrl))
+            def authenticateResponse = commonHelpers.postRequest(user, CommonHelpers.authParametersToUrl(request, authenticateRequestUrl))
 
         then:
             authenticateResponse.andExpect(status().isOk())
-            def ticket = ResultHelpers.attributeFromResult("ticket", authenticateResponse)
+            def ticket = CommonHelpers.attributeFromResult("ticket", authenticateResponse)
 
         when:
             def consentRequest = CommonFixtures.consentRequestDTO(ticket)
-            def consentResponse = mvcHelpers.postRequest(consentRequest, ResultHelpers.authParametersToUrl(request, consentRequestUrl))
+            def consentResponse = commonHelpers.postRequest(consentRequest, CommonHelpers.authParametersToUrl(request, consentRequestUrl))
 
         then:
             consentResponse.andExpect(status().isFound())
         and:
-            var uri = consentResponse.andReturn().getResponse().getHeader("Location")
-            var path = UriComponentsBuilder.fromUriString(uri).build().getPath()
+            def uri = consentResponse.andReturn().getResponse().getHeader("Location")
+            def path = UriComponentsBuilder.fromUriString(uri).build().getPath()
             path == CommonFixtures.redirectUri
     }
 }

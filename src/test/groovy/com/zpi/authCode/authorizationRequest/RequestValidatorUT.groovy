@@ -6,8 +6,8 @@ import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
-import com.zpi.domain.client.Client
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.Client
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.common.RequestError
 import spock.lang.Specification
 import spock.lang.Subject
@@ -24,7 +24,7 @@ class RequestValidatorUT extends Specification {
             def request = CommonFixtures.request()
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -38,7 +38,7 @@ class RequestValidatorUT extends Specification {
         given:
             def request = Fixtures.correctRequest().toDomain()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.empty()
+            clientRepository.findByKey(request.getClientId()) >> Optional.empty()
             filler.fill(request) >> request
 
         when:
@@ -60,7 +60,7 @@ class RequestValidatorUT extends Specification {
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -80,9 +80,9 @@ class RequestValidatorUT extends Specification {
     def "should return error message when client has no registered redirect uris"() {
         given:
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
-            def client = Fixtures.clientWithNullRedirectUri()
+            def client = Fixtures.clientWithEmptyRedirectURIs()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -103,7 +103,7 @@ class RequestValidatorUT extends Specification {
         given:
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -129,7 +129,7 @@ class RequestValidatorUT extends Specification {
         given:
             def client = CommonFixtures.client()
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -150,38 +150,13 @@ class RequestValidatorUT extends Specification {
             Fixtures.invalidResponseType().toDomain() | _ || "Unrecognized response type: invalid"
     }
 
-    def "should throw invalid_scope on invalid scope"() {
-        given:
-            def client = CommonFixtures.client()
-
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            filler.fill(request) >> request
-
-        when:
-            requestValidation.validateAndFillMissingFields(request)
-
-        then:
-            def exception = thrown(ValidationFailedException)
-            def expected = RequestError.builder()
-                    .error(AuthenticationRequestErrorType.INVALID_SCOPE)
-                    .errorDescription("Invalid scope")
-                    .state(request.getState())
-                    .build()
-
-            exception.error == expected
-
-        where:
-            request                                  | _
-            Fixtures.scopeWithoutOpenId().toDomain() | _
-    }
-
     private class Fixtures {
         static TicketRequestDTO correctRequest() {
             return TicketRequestDTO.builder()
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
-                    .scope("openid%20phone%20photos%20asdf_asdf_asdf")
+                    .scope("phone%20photos%20asdf_asdf_asdf")
                     .state(CommonFixtures.state)
                     .build()
         }
@@ -191,7 +166,7 @@ class RequestValidatorUT extends Specification {
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(uri)
                     .responseType(CommonFixtures.responseType)
-                    .scope("openid")
+                    .scope("profile")
                     .state(CommonFixtures.state)
                     .build()
         }
@@ -201,7 +176,7 @@ class RequestValidatorUT extends Specification {
                     .clientId(null)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
-                    .scope("openid")
+                    .scope("profile")
                     .state(CommonFixtures.state)
                     .build()
         }
@@ -226,21 +201,8 @@ class RequestValidatorUT extends Specification {
                     .build()
         }
 
-        static TicketRequestDTO scopeWithoutOpenId() {
-            return TicketRequestDTO.builder()
-                    .clientId(CommonFixtures.clientId)
-                    .redirectUri(CommonFixtures.redirectUri)
-                    .responseType(CommonFixtures.responseType)
-                    .scope("profile phone unknown_value other_unknown")
-                    .state(CommonFixtures.state)
-                    .build()
-        }
-
-        static Client clientWithNullRedirectUri() {
-            return Client.builder()
-                    .id(CommonFixtures.clientId)
-                    .availableRedirectUri(null)
-                    .build()
+        static Client clientWithEmptyRedirectURIs() {
+            return new Client(CommonFixtures.clientId);
         }
     }
 }

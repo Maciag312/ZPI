@@ -16,6 +16,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -23,11 +27,12 @@ public class AuthCodeController {
     private final AuthCodeService authCodeService;
 
     private static final String AUTH_PAGE_URI = "/signin";
+    private static final String ALLOW_PAGE_URI = "/allow";
 
     @GetMapping("/authorize")
-    public ResponseEntity<?> authorize(@RequestParam(required = false) String client_id,
+    public ResponseEntity<?> authorize(@RequestParam String client_id,
                                        @RequestParam(required = false) String redirect_uri,
-                                       @RequestParam(required = false) String response_type,
+                                       @RequestParam String response_type,
                                        @RequestParam(required = false) String scope,
                                        @RequestParam(required = false) String state) {
 

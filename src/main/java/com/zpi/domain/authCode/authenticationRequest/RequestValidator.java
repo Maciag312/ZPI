@@ -1,7 +1,7 @@
 package com.zpi.domain.authCode.authenticationRequest;
 
-import com.zpi.domain.client.Client;
-import com.zpi.domain.client.ClientRepository;
+import com.zpi.domain.organization.client.Client;
+import com.zpi.domain.organization.client.ClientRepository;
 import com.zpi.domain.common.RequestError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ public class RequestValidator {
 
     public AuthenticationRequest validateAndFillMissingFields(AuthenticationRequest request) throws ValidationFailedException {
         this.request = request;
-        this.client = clientRepository.getByKey(request.getClientId()).orElse(null);
+        this.client = clientRepository.findByKey(request.getClientId()).orElse(null);
 
         validateClient();
 
@@ -65,7 +65,8 @@ public class RequestValidator {
     }
 
     private boolean isInvalidRedirectUri() {
-        return !client.containsRedirectUri(request.getRedirectUri());
+        return !client.getAvailableRedirectUri()
+                .contains(request.getRedirectUri());
     }
 
     private void validateResponseType() throws ValidationFailedException {
@@ -96,11 +97,7 @@ public class RequestValidator {
     }
 
     private static boolean isScopeInvalid(List<String> scope) {
-        if (scope == null) {
-            return false;
-        }
-
-        return !scope.contains("openid");
+        return false;
     }
 
     private void validateRequiredParameters() throws ValidationFailedException {

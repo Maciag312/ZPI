@@ -3,8 +3,8 @@ package com.zpi.authCode.authorizationRequest
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
-import com.zpi.domain.client.Client
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.Client
+import com.zpi.domain.organization.client.ClientRepository
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -26,11 +26,9 @@ class OptionalParamsFillerUT extends Specification {
 
         and:
             def defaultRedirectUri = "asdfasdfsadfasdfasdf"
-            def client = Client.builder()
-                    .availableRedirectUri(new HashSet<String>(List.of(defaultRedirectUri)))
-                    .build()
-
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            def client = new Client("1")
+            client.getAvailableRedirectUri().addAll(List.of(defaultRedirectUri));
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
 
         when:
             def filled = filler.fill(request)
@@ -58,9 +56,9 @@ class OptionalParamsFillerUT extends Specification {
                     .build()
 
         and:
-            def client = Client.builder().build()
+            def client = new Client('1')
 
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
 
         when:
             def filled = filler.fill(request)

@@ -1,21 +1,21 @@
 package com.zpi
 
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
+import com.zpi.api.organization.client.ClientDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
-import com.zpi.api.client.ClientDTO
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
-import com.zpi.domain.client.Client
+import com.zpi.domain.organization.client.Client
 
 class CommonFixtures {
     public static final String clientId = "id"
     public static final String redirectUri = "uri"
     public static final String responseType = "code"
-    public static final String scope = "openid profile photos asdf_asdf_asdf"
+    public static final String scope = "profile photos asdf_asdf_asdf"
     public static final List<String> scopeList = List.of(scope.split(" "))
-    public static final String hardcodedScope = "openid profile"
+    public static final String hardcodedScope = "profile"
     public static final List<String> hardcodedScopeList = List.of(hardcodedScope.split(" "))
     public static final String state = "statesdsdr"
 
@@ -56,11 +56,8 @@ class CommonFixtures {
     }
 
     static Client client() {
-        var client = Client.builder()
-                .id(clientId)
-                .availableRedirectUri(null)
-                .build()
-        client.addRedirectUri(redirectUri)
+        def client = new Client(clientId)
+        client.getAvailableRedirectUri().add(redirectUri)
 
         return client
     }
@@ -73,10 +70,7 @@ class CommonFixtures {
     }
 
     static UserDTO userDTO() {
-        return UserDTO.builder()
-                .login(login)
-                .password(password)
-                .build()
+        return new UserDTO(login, password);
     }
 
     static ConsentRequest consentRequest() {

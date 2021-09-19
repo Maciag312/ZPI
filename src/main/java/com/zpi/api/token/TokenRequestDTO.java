@@ -1,23 +1,30 @@
 package com.zpi.api.token;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.zpi.domain.token.tokenRequest.TokenRequest;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TokenRequestDTO {
-    private final String grant_type;
-    private final String code;
-    private final String redirect_uri;
-    private final String client_id;
+
+    private String grantType;
+    private String code;
+    private String redirectUri;
+    private String clientId;
 
     public TokenRequest toDomain() {
         return TokenRequest.builder()
-                .grantType(grant_type)
+                .grantType(grantType)
                 .code(code)
-                .redirectUri(redirect_uri)
-                .clientId(client_id)
+                .redirectUri(redirectUri)
+                .clientId(clientId)
                 .build();
     }
 }

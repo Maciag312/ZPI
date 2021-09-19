@@ -1,17 +1,17 @@
 package com.zpi.api.authCode.ticketRequest;
 
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 
-@Getter
-@Setter
+import java.util.Optional;
+
+@Value
 public class TicketResponseDTO {
-    private final String ticket;
-    private final String state;
+    Optional<String> ticket;
+    Optional<String> state;
 
     public TicketResponseDTO(AuthorizationResponse response) {
-        this.ticket = response.getTicket();
-        this.state = response.getState();
+        this.ticket = Optional.ofNullable(response.getTicket());
+        this.state = Optional.ofNullable(response.getState());
     }
 }

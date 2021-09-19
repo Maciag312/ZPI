@@ -11,7 +11,7 @@ public class UserManager {
     public boolean createUser(User user) {
         var login = user.getLogin();
 
-        if (userRepository.getByKey(login).isPresent()) {
+        if (userRepository.findByKey(login).isPresent()) {
             return false;
         }
 

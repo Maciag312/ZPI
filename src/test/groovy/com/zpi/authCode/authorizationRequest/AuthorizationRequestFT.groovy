@@ -6,7 +6,7 @@ import com.zpi.ResultHelpers
 import com.zpi.UriParamsResult
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.domain.authCode.consentRequest.TicketRepository
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.ClientRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -61,7 +61,7 @@ class AuthorizationRequestFT extends Specification {
             def response = mvcRequestHelpers.getRequest(ResultHelpers.authParametersToUrl(request, baseUrl))
 
         then:
-            def redirectUri = clientRepository.getByKey(request.getClientId()).get().getAvailableRedirectUri().stream().findFirst().orElse(null)
+            def redirectUri = clientRepository.findByKey(request.getClientId()).get().getAvailableRedirectUri().stream().findFirst().orElse(null)
 
         and:
             def expected = TicketRequestDTO.builder()
@@ -78,7 +78,11 @@ class AuthorizationRequestFT extends Specification {
 
     def "should redirect with error when incorrect parameters"() {
         given:
-            def request = TicketRequestDTO.builder().build()
+            def request = TicketRequestDTO.builder()
+                    .clientId('123')
+                    .responseType('oops-wrong-code')
+                    .scope(CommonFixtures.hardcodedScope)
+                    .build()
 
         when:
             def response = mvcRequestHelpers.getRequest(ResultHelpers.authParametersToUrl(request, baseUrl))

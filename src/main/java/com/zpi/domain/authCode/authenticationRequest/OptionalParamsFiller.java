@@ -1,7 +1,7 @@
 package com.zpi.domain.authCode.authenticationRequest;
 
-import com.zpi.domain.client.Client;
-import com.zpi.domain.client.ClientRepository;
+import com.zpi.domain.organization.client.Client;
+import com.zpi.domain.organization.client.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ class OptionalParamsFiller {
     public AuthenticationRequest fill(AuthenticationRequest request) {
         var clientId = request.getClientId();
 
-        this.client = repository.getByKey(clientId).orElse(null);
+        this.client = repository.findByKey(clientId).orElse(null);
 
         var redirectUri = fillRedirectUri(request);
         var responseType = request.getResponseType();

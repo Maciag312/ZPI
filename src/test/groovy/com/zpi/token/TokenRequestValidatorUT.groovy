@@ -3,7 +3,7 @@ package com.zpi.token
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.client.ClientRepository
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.token.tokenRequest.TokenRequest
 import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestErrorType
 import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestValidator
@@ -25,8 +25,8 @@ class TokenRequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
         and:
-            clientRepository.getByKey(request.getClientId()) >> Optional.of(client)
-            authCodeRepository.getByKey(request.getCode()) >> Optional.of(new AuthCode())
+            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode())
 
         when:
             validator.validate(request)
@@ -66,7 +66,7 @@ class TokenRequestValidatorUT extends Specification {
                     .code(code)
                     .build()
         and:
-            authCodeRepository.getByKey(request.getCode()) >> Optional.empty()
+            authCodeRepository.findByKey(request.getCode()) >> Optional.empty()
 
         when:
             validator.validate(request)
@@ -96,8 +96,8 @@ class TokenRequestValidatorUT extends Specification {
                     .clientId(client.getId())
                     .build()
         and:
-            clientRepository.getByKey(client.getId()) >> Optional.of(client)
-            authCodeRepository.getByKey(request.getCode()) >> Optional.of(new AuthCode())
+            clientRepository.findByKey(client.getId()) >> Optional.of(client)
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode())
 
         when:
             validator.validate(request)
@@ -125,8 +125,8 @@ class TokenRequestValidatorUT extends Specification {
                     .build()
 
         and:
-            clientRepository.getByKey(clientId) >> Optional.empty()
-            authCodeRepository.getByKey(request.getCode()) >> Optional.of(new AuthCode())
+            clientRepository.findByKey(clientId) >> Optional.empty()
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode())
 
         when:
             validator.validate(request)

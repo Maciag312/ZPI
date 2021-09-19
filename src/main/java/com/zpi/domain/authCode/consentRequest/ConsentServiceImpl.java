@@ -14,7 +14,7 @@ public class ConsentServiceImpl implements ConsentService {
     public ConsentResponse consent(ConsentRequest request) throws ErrorConsentResponseException {
         var ticket = request.getTicket();
 
-        var authData = ticketRepository.getByKey(ticket);
+        var authData = ticketRepository.findByKey(ticket);
         if (authData.isEmpty()) {
             var error = RequestError.<ConsentErrorType>builder()
                     .error(ConsentErrorType.TICKET_EXPIRED)

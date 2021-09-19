@@ -3,6 +3,9 @@ package com.zpi.domain.user;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -10,4 +13,7 @@ import lombok.Getter;
 public class User {
     private final String login;
     private final String password;
+
+    @Setter
+    private String organization;
 }

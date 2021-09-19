@@ -11,7 +11,7 @@ public class UserAuthenticator {
     public boolean isAuthenticated(User user) {
         var login = user.getLogin();
 
-        var found = userRepository.getByKey(login);
+        var found = userRepository.findByKey(login);
 
         if (found.isEmpty()) {
             return false;

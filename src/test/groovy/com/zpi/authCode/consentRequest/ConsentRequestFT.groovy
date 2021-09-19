@@ -55,11 +55,11 @@ class ConsentRequestFT extends Specification {
             actual.getPath() == CommonFixtures.redirectUri
 
         and:
-            ticketRepository.getByKey(request.getTicket()).isEmpty()
+            ticketRepository.findByKey(request.getTicket()).isEmpty()
 
         and:
             def code = actual.getParam("code")
-            authCodeRepository.getByKey(code).isPresent()
+            authCodeRepository.findByKey(code).isPresent()
     }
 
     def "should return error when ticket is outdated"() {

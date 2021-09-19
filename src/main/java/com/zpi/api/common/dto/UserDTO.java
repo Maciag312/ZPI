@@ -5,6 +5,7 @@ import com.zpi.api.common.utils.HashGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -12,14 +13,15 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
     @NotNull
     @NotEmpty
-    private final String login;
+    private String login;
 
     @NotNull
     @NotEmpty
-    private final String password;
+    private String password;
 
     public User toHashedDomain() {
         var generator = new HashGenerator();
