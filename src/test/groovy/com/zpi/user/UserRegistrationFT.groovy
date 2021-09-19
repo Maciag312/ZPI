@@ -3,6 +3,8 @@ package com.zpi.user
 
 import com.zpi.MvcRequestHelpers
 import com.zpi.api.common.dto.UserDTO
+import com.zpi.domain.organization.Organization
+import com.zpi.domain.organization.OrganizationRepository
 import com.zpi.domain.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -18,14 +20,21 @@ class UserRegistrationFT extends Specification {
     private UserRepository repository
 
     @Autowired
+    private OrganizationRepository organizationRepository;
+
+    @Autowired
     private MvcRequestHelpers commonHelpers
 
-    private static final String url(String organizationName){
+    private static final String url(String organizationName) {
         return "/api/organization/" + organizationName + "/user/register"
     }
 
     private static organizationName = "pizzaHouse"
 
+
+    def setup() {
+        organizationRepository.save(new Organization(organizationName));
+    }
 
     def cleanup() {
         repository.clear()
@@ -51,7 +60,7 @@ class UserRegistrationFT extends Specification {
 
     def "should return conflict on existing user"() {
         given:
-        def user = Fixtures.userWithRandomData()
+            def user = Fixtures.userWithRandomData()
 
         when:
             commonHelpers.postRequest(user, url(organizationName))
