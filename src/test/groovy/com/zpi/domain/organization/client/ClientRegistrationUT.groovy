@@ -13,10 +13,11 @@ class ClientRegistrationUT extends Specification {
     def "should return true for new client"() {
         given:
             def client = CommonFixtures.client()
+            def organizationName = "asdf"
 
             clientRepository.findByKey(client.getId()) >> Optional.empty()
         when:
-            def isSuccess = clientService.saveClient(client, organization_name)
+            def isSuccess = clientService.saveClient(client, organizationName)
 
         then:
             isSuccess
@@ -29,10 +30,11 @@ class ClientRegistrationUT extends Specification {
     def "should return false when registering existing client"() {
         given:
             def client = CommonFixtures.client()
+            def organizationName = "asdf"
 
             clientRepository.findByKey(client.getId()) >> Optional.of(client)
         when:
-            def isSuccess = clientService.saveClient(client, organization_name)
+            def isSuccess = clientService.saveClient(client, organizationName)
 
         then:
             !isSuccess

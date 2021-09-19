@@ -13,9 +13,9 @@ class CommonFixtures {
     public static final String clientId = "id"
     public static final String redirectUri = "uri"
     public static final String responseType = "code"
-    public static final String scope = "openid profile photos asdf_asdf_asdf"
+    public static final String scope = "profile photos asdf_asdf_asdf"
     public static final List<String> scopeList = List.of(scope.split(" "))
-    public static final String hardcodedScope = "openid profile"
+    public static final String hardcodedScope = "profile"
     public static final List<String> hardcodedScopeList = List.of(hardcodedScope.split(" "))
     public static final String state = "statesdsdr"
 

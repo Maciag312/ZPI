@@ -11,7 +11,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class Client {
     private final Set<String> availableRedirectUri = new HashSet<>();
-    private final List<String> hardcodedDefaultScope = List.of("openid profile".split(" "));
+    private final List<String> hardcodedDefaultScope = List.of("profile".split(" "));
     private final String id;
     @Setter
     String organizationName;

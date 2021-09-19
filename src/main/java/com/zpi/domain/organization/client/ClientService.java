@@ -21,7 +21,7 @@ public class ClientService {
 
     public void addRedirectionURI(String client_name, String organization_name, String uri) {
         Optional<Client> client = clientRepository.findByNameAndOrganizationName(client_name, organization_name);
-        if(client.isEmpty()) {
+        if (client.isEmpty()) {
             throw new IllegalArgumentException("Client: " + client_name + " or organization: " + organization_name + "is not found.");
         }
         client.get().getAvailableRedirectUri().add(uri);

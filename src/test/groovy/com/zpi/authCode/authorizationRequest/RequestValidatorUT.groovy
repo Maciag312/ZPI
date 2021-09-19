@@ -156,7 +156,7 @@ class RequestValidatorUT extends Specification {
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
-                    .scope("openid%20phone%20photos%20asdf_asdf_asdf")
+                    .scope("phone%20photos%20asdf_asdf_asdf")
                     .state(CommonFixtures.state)
                     .build()
         }
@@ -166,7 +166,7 @@ class RequestValidatorUT extends Specification {
                     .clientId(CommonFixtures.clientId)
                     .redirectUri(uri)
                     .responseType(CommonFixtures.responseType)
-                    .scope("openid")
+                    .scope("profile")
                     .state(CommonFixtures.state)
                     .build()
         }
@@ -176,7 +176,7 @@ class RequestValidatorUT extends Specification {
                     .clientId(null)
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType(CommonFixtures.responseType)
-                    .scope("openid")
+                    .scope("profile")
                     .state(CommonFixtures.state)
                     .build()
         }
@@ -197,16 +197,6 @@ class RequestValidatorUT extends Specification {
                     .redirectUri(CommonFixtures.redirectUri)
                     .responseType("invalid")
                     .scope(CommonFixtures.scope)
-                    .state(CommonFixtures.state)
-                    .build()
-        }
-
-        static TicketRequestDTO scopeWithoutOpenId() {
-            return TicketRequestDTO.builder()
-                    .clientId(CommonFixtures.clientId)
-                    .redirectUri(CommonFixtures.redirectUri)
-                    .responseType(CommonFixtures.responseType)
-                    .scope("profile phone unknown_value other_unknown")
                     .state(CommonFixtures.state)
                     .build()
         }
