@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum TokenIssuerErrorType {
-    ERROR("ERROR");
+    UNRECOGNIZED_AUTH_CODE("UNRECOGNIZED_AUTH_CODE");
 
     private final String name;
 }

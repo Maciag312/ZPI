@@ -35,7 +35,7 @@ class TokenRequestFT extends Specification {
         authCodeRepository.clear()
     }
 
-    def "should return token when provided data is correct"() {
+    def "should return correct response when provided data is correct"() {
         given:
             def authCode = UUID.randomUUID().toString()
             def redirectUri = CommonFixtures.redirectUri
@@ -52,6 +52,13 @@ class TokenRequestFT extends Specification {
 
         then:
             !ResultHelpers.attributeFromResult("access_token", response).isEmpty()
+            ResultHelpers.attributeFromResult("token_type", response) == "Bearer"
+            !ResultHelpers.attributeFromResult("refresh_token", response).isEmpty()
+            ResultHelpers.attributeFromResult("expires_in", response) == "3600"
+
+        and:
+            ResultHelpers.headerFromResult("Cache-Control", response).contains("no-store")
+            ResultHelpers.headerFromResult("Pragma", response).contains("no-cache")
     }
 
     def "should return error on incorrect data"() {

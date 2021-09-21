@@ -12,8 +12,8 @@ public class AuthCodePersisterImpl implements AuthCodePersister {
     private final AuthCodeRepository repository;
 
     @Override
-    public AuthCode persist() {
-        var code = new AuthCode(generateAuthCode());
+    public AuthCode persist(String scope) {
+        var code = new AuthCode(generateAuthCode(), scope);
         repository.save(code.getValue(), code);
 
         return code;

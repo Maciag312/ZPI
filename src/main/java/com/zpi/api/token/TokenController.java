@@ -20,7 +20,7 @@ public class TokenController {
     public ResponseEntity<?> tokenRequest(@RequestBody TokenRequestDTO request) {
         try {
             var token = service.getToken(request.toDomain());
-            return ResponseEntity.ok(TokenResponseDTO.builder().access_token(token.getValue()).build());
+            return ResponseEntity.ok(new TokenResponseDTO(token));
         } catch(TokenErrorResponseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TokenErrorResponseDTO(e.getResponse()));
         }

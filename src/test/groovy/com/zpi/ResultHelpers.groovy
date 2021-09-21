@@ -21,4 +21,9 @@ class ResultHelpers {
         def value = JsonPath.read(response.getContentAsString(), String.format("\$.%s", attribute))
         return value.toString()
     }
+
+    static String headerFromResult(String header, ResultActions result) {
+        def response = result.andReturn().getResponse()
+        return response.getHeader(header);
+    }
 }
