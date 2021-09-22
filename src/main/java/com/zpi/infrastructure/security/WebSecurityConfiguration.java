@@ -1,9 +1,5 @@
 package com.zpi.infrastructure.security;
 
-import com.zpi.infrastructure.security.jwt.JwtTokenFilterConfigurer;
-import com.zpi.infrastructure.security.jwt.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,9 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static com.zpi.api.ui.UIRedirect.*;
 
@@ -25,19 +18,13 @@ import static com.zpi.api.ui.UIRedirect.*;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf().disable();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.authorizeRequests()//
-                .antMatchers("/api/docs").permitAll()
+        http.authorizeRequests()
                 .antMatchers("/api/user/**").permitAll()
                 .antMatchers(SIGN_IN_URI).permitAll()
                 .antMatchers(SIGN_UP_URI).permitAll()
@@ -49,17 +36,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/authenticate/**").permitAll()
                 .antMatchers("/api/consent/**").permitAll()
                 .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/v3/api-docs/**").permitAll()
                 .antMatchers("/swagger-resources").permitAll()
                 .antMatchers("/swagger-resources/configuration/ui").permitAll()
                 .antMatchers("/swagger-resources/configuration/security").permitAll()
+                .antMatchers("/api/docs").permitAll()
+                .antMatchers("/api/swagger-ui/**").permitAll()
                 .antMatchers("/api/user/signin").permitAll()
                 .antMatchers("/api/user/signup").permitAll()
                 .antMatchers("/h2-console").permitAll()
                 .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated();
-
-        http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
-
     }
 
     @Override
@@ -82,5 +69,4 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
 }

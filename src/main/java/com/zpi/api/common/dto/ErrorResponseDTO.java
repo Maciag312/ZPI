@@ -4,6 +4,7 @@ import com.zpi.domain.common.RequestError;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Getter
 @Setter
@@ -17,5 +18,13 @@ public class ErrorResponseDTO<ErrorType> {
         this.error = error.getError();
         this.error_description = error.getErrorDescription();
         this.state = state;
+    }
+
+    public String toUrl(String basePath) {
+        return UriComponentsBuilder.fromUriString(basePath)
+                .queryParam("error", error)
+                .queryParam("error_description", error_description)
+                .queryParam("state", state)
+                .toUriString();
     }
 }

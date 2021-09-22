@@ -14,6 +14,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.test.util.ReflectionTestUtils
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -33,8 +34,10 @@ class TokenIssuerUT extends Specification {
         given:
             def request = TokenRequest.builder().code(Fixtures.authCode.getValue()).build()
 
+            def config = new TokenIssuerConfig(Fixtures.secretKey)
+            ReflectionTestUtils.setField(config, "claims", Fixtures.claims())
         and:
-            configProvider.getConfig() >> new TokenIssuerConfig(Fixtures.secretKey, Fixtures.key, Fixtures.claims())
+            configProvider.getConfig() >> config
             authCodeRepository.findByKey(Fixtures.authCode.getValue()) >> Optional.of(Fixtures.authCode)
 
         when:
@@ -87,12 +90,12 @@ class TokenIssuerUT extends Specification {
         }
 
         static TokenClaims claims() {
-            final String issuer = "asdf";
-            final String subject = "asdf";
-            final String audience = "asdf";
-            final Date issuedAt = new Date();
-            final Date expirationTime = new Date(issuedAt.getTime() + validity);
-            return new TokenClaims(issuer, subject, audience, issuedAt, expirationTime);
+            final String issuer = "asdf"
+            final String subject = "asdf"
+            final String audience = "asdf"
+            final Date issuedAt = new Date()
+            final Date expirationTime = new Date(issuedAt.getTime() + validity)
+            return new TokenClaims(issuer, subject, audience, issuedAt, expirationTime)
         }
 
         static boolean areDatesQuiteEqual(Date one, Date two) {
