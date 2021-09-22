@@ -4,6 +4,7 @@ package com.zpi.authCode.ticketRequest
 import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.ResultHelpers
+import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.UserManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,6 +50,30 @@ class TicketRequestFT extends Specification {
             result.andExpect(status().isOk())
             ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
             ResultHelpers.attributeFromResult("ticket", result).length() != 0
+    }
+
+    def "should return failure on incorrect request"() {
+        given:
+            def request = TicketRequestDTO.builder()
+                    .clientId("")
+                    .redirectUri("")
+                    .responseType("")
+                    .scope("")
+                    .state(CommonFixtures.state)
+                    .build()
+
+            def user = CommonFixtures.userDTO()
+            addClientWithRedirectUri()
+            addUser()
+
+        when:
+            def result = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isBadRequest())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            !ResultHelpers.attributeFromResult("error", result).isEmpty()
+            !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
     }
 
     private void addClientWithRedirectUri() {

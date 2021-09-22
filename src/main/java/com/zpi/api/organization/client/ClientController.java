@@ -28,7 +28,7 @@ public class ClientController {
     }
 
     @PostMapping("/{client_name}/redirection_uris")
-    public ResponseEntity<?> addRedirectionURI(@RequestBody RedirectURIDTO uri, @PathVariable String organization_name, @PathVariable String client_name) {
+    public ResponseEntity<?> addRedirectionURI(@RequestBody RedirectUriDTO uri, @PathVariable String organization_name, @PathVariable String client_name) {
         try {
             service.addRedirectionURI(client_name, organization_name, uri.getRedirectURI());
         } catch (IllegalArgumentException notFoundOrganizationOrClient) {

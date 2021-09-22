@@ -78,7 +78,7 @@ class TokenServiceUT extends Specification {
                     .build()
 
             def expectedError = RequestError.builder()
-                    .error(TokenIssuerErrorType.ERROR)
+                    .error(TokenIssuerErrorType.UNRECOGNIZED_AUTH_CODE)
                     .errorDescription("asdf")
                     .build()
 

@@ -35,7 +35,8 @@ Content-Type: application/json
 {
   "id": "1",
   "availableRedirectUri": [
-    "file:///home/incvis/Documents/Projects/Studies/PracaInzynierska/zpi-ui/client_integration/client.html"
+    "file:///home/incvis/Documents/Projects/Studies/PracaInzynierska/zpi-ui/client_integration/client.html",
+    "file:///Users/bartekmaciag/Documents/PWR/ZPI/zpi-ui/client_integration/client.html"
   ]
 }
 

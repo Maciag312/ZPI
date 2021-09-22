@@ -27,7 +27,7 @@ public class ConsentServiceImpl implements ConsentService {
 
         ticketRepository.remove(ticket);
 
-        var authCode = authCodeIssuer.persist();
+        var authCode = authCodeIssuer.persist(authData.get().getScope());
         return new ConsentResponse(authCode, request.getState(), authData.get().getRedirectUri());
     }
 }

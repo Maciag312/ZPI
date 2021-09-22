@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RedirectURIDTO {
+public class RedirectUriDTO {
     private String redirectURI;
 }

@@ -7,4 +7,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthCode {
     private final String value;
+    private final String scope;
 }

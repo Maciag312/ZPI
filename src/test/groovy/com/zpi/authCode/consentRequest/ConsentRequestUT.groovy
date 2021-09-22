@@ -19,15 +19,16 @@ class ConsentRequestUT extends Specification {
             def request = CommonFixtures.consentRequest()
             def authData = TicketData.builder()
                     .redirectUri(CommonFixtures.redirectUri)
+                    .scope("")
                     .build()
 
             def ticket = request.getTicket()
-            def authCode = new AuthCode("asdf")
+            def authCode = new AuthCode("", authData.getScope())
 
         and:
             ticketRepository.findByKey(ticket) >> Optional.of(authData)
             ticketRepository.remove(ticket) >> null
-            authCodePersister.persist() >> authCode
+            authCodePersister.persist(authCode.getScope()) >> authCode
         when:
             def response = service.consent(request)
 
@@ -45,7 +46,7 @@ class ConsentRequestUT extends Specification {
             def request = CommonFixtures.consentRequest()
 
             ticketRepository.findByKey(request.getTicket()) >> Optional.empty()
-            authCodePersister.persist() >> null
+            authCodePersister.persist("") >> null
 
         when:
             service.consent(request)

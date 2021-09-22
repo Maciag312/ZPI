@@ -26,7 +26,7 @@ class TokenRequestValidatorUT extends Specification {
 
         and:
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode())
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", ""))
 
         when:
             validator.validate(request)
@@ -97,7 +97,7 @@ class TokenRequestValidatorUT extends Specification {
                     .build()
         and:
             clientRepository.findByKey(client.getId()) >> Optional.of(client)
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode())
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", ""))
 
         when:
             validator.validate(request)
@@ -126,7 +126,7 @@ class TokenRequestValidatorUT extends Specification {
 
         and:
             clientRepository.findByKey(clientId) >> Optional.empty()
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode())
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", ""))
 
         when:
             validator.validate(request)

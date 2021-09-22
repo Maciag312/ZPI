@@ -7,4 +7,5 @@ import lombok.Getter;
 @Getter
 public class TicketData {
     private final String redirectUri;
+    private final String scope;
 }

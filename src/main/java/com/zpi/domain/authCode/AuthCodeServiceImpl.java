@@ -7,6 +7,7 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType;
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator;
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException;
+import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse;
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService;
 import com.zpi.domain.authCode.consentRequest.ConsentRequest;
 import com.zpi.domain.authCode.consentRequest.ConsentResponse;
@@ -35,12 +36,11 @@ public class AuthCodeServiceImpl implements AuthCodeService {
         }
     }
 
-    public TicketResponseDTO authenticationTicket(User user, AuthenticationRequest request) throws ErrorResponseException {
+    public AuthorizationResponse authenticationTicket(User user, AuthenticationRequest request) throws ErrorResponseException {
         validateAndFillRequest(request);
         validateUser(user, request);
 
-        var response = authorizationService.createTicket(request);
-        return new TicketResponseDTO(response);
+        return authorizationService.createTicket(request);
     }
 
     private void validateUser(User user, AuthenticationRequest request) throws ErrorResponseException {

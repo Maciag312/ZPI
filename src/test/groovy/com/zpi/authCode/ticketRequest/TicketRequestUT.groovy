@@ -12,8 +12,8 @@ import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
-import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.common.RequestError
+import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.UserAuthenticator
 import spock.lang.Specification
 import spock.lang.Subject
@@ -43,8 +43,8 @@ class TicketRequestUT extends Specification {
             def response = tokenService.authenticationTicket(user, request)
 
         then:
-            response.getTicket().isPresent()
-            response.getState().get() == CommonFixtures.state
+            !response.getTicket().isEmpty()
+            response.getState() == CommonFixtures.state
     }
 
     def "should return error on wrong request"() {
