@@ -1,5 +1,6 @@
 package com.zpi.domain.token;
 
+import com.zpi.domain.token.refreshRequest.RefreshRequest;
 import com.zpi.domain.token.tokenRequest.Token;
 import com.zpi.domain.token.tokenRequest.TokenErrorResponse;
 import com.zpi.domain.token.tokenRequest.TokenRequest;
@@ -45,5 +46,16 @@ public class TokenServiceImpl implements TokenService {
                 .error(error)
                 .errorDescription(description)
                 .build());
+    }
+
+    @Override
+    public Token refreshToken(RefreshRequest request) throws TokenErrorResponseException {
+        try {
+            return issuer.refresh(request);
+        } catch (TokenIssuerFailedException e) {
+            throwTokenException(e);
+        }
+
+        return null;
     }
 }

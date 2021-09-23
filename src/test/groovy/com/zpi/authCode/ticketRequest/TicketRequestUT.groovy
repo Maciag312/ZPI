@@ -37,7 +37,7 @@ class TicketRequestUT extends Specification {
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> true
-            authorizationService.createTicket(request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
+            authorizationService.createTicket(user, request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
 
         when:
             def response = tokenService.authenticationTicket(user, request)

@@ -1,7 +1,8 @@
-package com.zpi.token
+package com.zpi.token.tokenRequest
 
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.AuthCode
+import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.token.tokenRequest.TokenRequest
@@ -9,6 +10,7 @@ import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestErrorType
 import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestValidator
 import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestValidatorImpl
 import com.zpi.domain.token.tokenRequest.requestValidator.ValidationFailedException
+import com.zpi.token.TokenCommonFixtures
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -26,7 +28,7 @@ class TokenRequestValidatorUT extends Specification {
 
         and:
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", ""))
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(TokenCommonFixtures.authCode)
 
         when:
             validator.validate(request)
@@ -97,7 +99,7 @@ class TokenRequestValidatorUT extends Specification {
                     .build()
         and:
             clientRepository.findByKey(client.getId()) >> Optional.of(client)
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", ""))
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(TokenCommonFixtures.authCode)
 
         when:
             validator.validate(request)
@@ -126,7 +128,7 @@ class TokenRequestValidatorUT extends Specification {
 
         and:
             clientRepository.findByKey(clientId) >> Optional.empty()
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", ""))
+            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", new AuthUserData("", "" ,"")))
 
         when:
             validator.validate(request)

@@ -88,8 +88,6 @@ class CommonFixtures {
     }
 
     static TicketData ticketData() {
-        return TicketData.builder()
-                .redirectUri(redirectUri)
-                .build();
+        return new TicketData(redirectUri, scope, login)
     }
 }

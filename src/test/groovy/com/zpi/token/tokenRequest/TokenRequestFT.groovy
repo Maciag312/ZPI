@@ -1,10 +1,11 @@
-package com.zpi.token
+package com.zpi.token.tokenRequest
 
 import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.ResultHelpers
 import com.zpi.api.token.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.AuthCode
+import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.token.tokenRequest.tokenIssuer.configProvider.TokenIssuerConfigProvider
@@ -49,7 +50,7 @@ class TokenRequestFT extends Specification {
 
         and:
             clientRepository.save(client.getId(), client)
-            authCodeRepository.save(authCode, new AuthCode(authCode, ""))
+            authCodeRepository.save(authCode, new AuthCode(authCode, new AuthUserData("", "", "")))
 
         when:
             def response = mvcRequestHelpers.postRequest(request, baseUrl)
@@ -63,6 +64,27 @@ class TokenRequestFT extends Specification {
         and:
             ResultHelpers.headerFromResult("Cache-Control", response).contains("no-store")
             ResultHelpers.headerFromResult("Pragma", response).contains("no-cache")
+    }
+
+    def "should return error on authCode used twice"() {
+        given:
+            def authCode = UUID.randomUUID().toString()
+            def redirectUri = CommonFixtures.redirectUri
+            def client = CommonFixtures.client()
+
+            def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, redirectUri, client.getId())
+
+        and:
+            clientRepository.save(client.getId(), client)
+            authCodeRepository.save(authCode, new AuthCode(authCode, new AuthUserData("", "", "")))
+
+        when:
+            mvcRequestHelpers.postRequest(request, baseUrl)
+            def response = mvcRequestHelpers.postRequest(request, baseUrl)
+
+        then:
+            !ResultHelpers.attributeFromResult("error", response).isEmpty()
+            !ResultHelpers.attributeFromResult("error_description", response).isEmpty()
     }
 
     def "should return error on incorrect data"() {

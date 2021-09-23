@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ConsentServiceImpl implements ConsentService {
     private final TicketRepository ticketRepository;
-    private final AuthCodePersister authCodeIssuer;
+    private final AuthCodePersister authCodePersister;
 
     public ConsentResponse consent(ConsentRequest request) throws ErrorConsentResponseException {
         var ticket = request.getTicket();
@@ -27,7 +27,7 @@ public class ConsentServiceImpl implements ConsentService {
 
         ticketRepository.remove(ticket);
 
-        var authCode = authCodeIssuer.persist(authData.get().getScope());
+        var authCode = authCodePersister.persist(authData.get());
         return new ConsentResponse(authCode, request.getState(), authData.get().getRedirectUri());
     }
 }
