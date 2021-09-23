@@ -1,4 +1,4 @@
-cd ../zpi-ui
+cd ../../zpi-ui
 npm run build
 rm -r ../ZPI-service/src/main/resources/static
 mkdir ../ZPI-service/src/main/resources/static

@@ -31,35 +31,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-        http.csrf().disable();
-
+        http.csrf().disable().authorizeRequests().anyRequest().anonymous().and().httpBasic().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.authorizeRequests()//
-                .antMatchers("/api/docs").permitAll()
-                .antMatchers("/api/user/**").permitAll()
-                .antMatchers(SIGN_IN_URI).permitAll()
-                .antMatchers(SIGN_UP_URI).permitAll()
-                .antMatchers(ALLOW_URI).permitAll()
-                .antMatchers("/api/organization/**").permitAll()
-                .antMatchers("/api/client/**").permitAll()
-                .antMatchers("/api/token/**").permitAll()
-                .antMatchers("/api/authorize/**").permitAll()
-                .antMatchers("/api/authenticate/**").permitAll()
-                .antMatchers("/api/consent/**").permitAll()
-                .antMatchers("/v2/api-docs").permitAll()
-                .antMatchers("/swagger-resources").permitAll()
-                .antMatchers("/swagger-resources/configuration/ui").permitAll()
-                .antMatchers("/swagger-resources/configuration/security").permitAll()
-                .antMatchers("/api/user/signin").permitAll()
-                .antMatchers("/api/user/signup").permitAll()
-                .antMatchers("/h2-console").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
-                .anyRequest().authenticated();
-
         http.apply(new JwtTokenFilterConfigurer(jwtTokenProvider));
-
     }
 
     @Override
