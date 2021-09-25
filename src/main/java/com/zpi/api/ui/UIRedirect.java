@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class UIRedirect {
 
-    public static final String ALLOW_URI = "/allow";
-    public static final String SIGN_IN_URI = "/signin";
-    public static final String SIGN_UP_URI = "/signup";
+    public static final String ALLOW_URI = "/allow/**";
+    public static final String SIGN_IN_URI = "/signin/**";
+    public static final String SIGN_UP_URI = "/signup/**";
+    public static final String DASHBOARD = "/dashboard/**";
 
-    private static final String INDEX_URI = "index.html";
+    private static final String INDEX_URI = "forward:/index.html";
 
     @RequestMapping(value = ALLOW_URI)
     public String allow() {
@@ -26,4 +27,7 @@ public class UIRedirect {
     public String signup() {
         return INDEX_URI;
     }
+
+    @RequestMapping(value = DASHBOARD)
+    public String dashboard() { return INDEX_URI; }
 }
