@@ -1,6 +1,6 @@
 package com.zpi.infrastructure.token;
 
-import com.zpi.domain.token.refreshRequest.TokenData;
+import com.zpi.domain.token.issuer.TokenData;
 import com.zpi.infrastructure.common.EntityTuple;
 import lombok.Data;
 import lombok.Getter;

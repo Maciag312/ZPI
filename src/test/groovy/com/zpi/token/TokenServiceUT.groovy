@@ -1,17 +1,11 @@
 package com.zpi.token
 
-
 import com.zpi.domain.common.RequestError
-import com.zpi.domain.token.TokenErrorResponseException
-import com.zpi.domain.token.TokenService
-import com.zpi.domain.token.TokenServiceImpl
-import com.zpi.domain.token.tokenRequest.TokenRequest
-import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestErrorType
-import com.zpi.domain.token.tokenRequest.requestValidator.TokenRequestValidator
-import com.zpi.domain.token.tokenRequest.requestValidator.ValidationFailedException
-import com.zpi.domain.token.tokenRequest.tokenIssuer.TokenIssuer
-import com.zpi.domain.token.tokenRequest.tokenIssuer.TokenIssuerErrorType
-import com.zpi.domain.token.tokenRequest.tokenIssuer.TokenIssuerFailedException
+import com.zpi.domain.token.*
+import com.zpi.domain.token.issuer.TokenIssuer
+import com.zpi.domain.token.validator.TokenRequestErrorType
+import com.zpi.domain.token.validator.TokenRequestValidator
+import com.zpi.domain.token.validator.ValidationFailedException
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -48,7 +42,7 @@ class TokenServiceUT extends Specification {
 
 
             def expectedError = RequestError.builder()
-                    .error(TokenRequestErrorType.UNRECOGNIZED_CLIENT_ID)
+                    .error(TokenRequestErrorType.INVALID_CLIENT)
                     .errorDescription(_ as String)
                     .build()
 
@@ -72,24 +66,43 @@ class TokenServiceUT extends Specification {
             response.getErrorDescription() == expectedError.getErrorDescription()
     }
 
-    def "should throw exception on issuer failure"() {
+    def "should refresh token on validation success and issuer success"() {
         given:
-            def request = TokenRequest.builder()
-                    .build()
-
-            def expectedError = RequestError.builder()
-                    .error(TokenIssuerErrorType.UNRECOGNIZED_AUTH_CODE)
-                    .errorDescription("asdf")
-                    .build()
+            def request = new RefreshRequest("", "", "", "")
+            def expectedToken = null
 
         and:
             validator.validate(request) >> null
-            issuer.issue(request) >> {
-                throw new TokenIssuerFailedException(expectedError)
-            }
+            issuer.refresh(request) >> expectedToken
 
         when:
-            service.getToken(request)
+            def actualToken = service.refreshToken(request)
+
+        then:
+            noExceptionThrown()
+
+        and:
+            actualToken == expectedToken
+    }
+
+    def "should throw exception on refresh validation failure"() {
+        given:
+            def request = new RefreshRequest("", "", "" ,"")
+
+            def expectedError = RequestError.builder()
+                    .error(TokenRequestErrorType.INVALID_CLIENT)
+                    .errorDescription(_ as String)
+                    .build()
+
+        and:
+            validator.validate(request) >> {
+                throw new ValidationFailedException(expectedError)
+            }
+
+            issuer.refresh(request) >> null
+
+        when:
+            service.refreshToken(request)
 
         then:
             def thrownException = thrown(TokenErrorResponseException)

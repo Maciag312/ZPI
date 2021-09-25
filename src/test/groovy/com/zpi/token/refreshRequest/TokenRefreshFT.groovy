@@ -4,8 +4,10 @@ import com.zpi.CommonFixtures
 import com.zpi.MvcRequestHelpers
 import com.zpi.ResultHelpers
 import com.zpi.api.token.RefreshRequestDTO
-import com.zpi.domain.token.refreshRequest.TokenData
-import com.zpi.domain.token.refreshRequest.TokenRepository
+import com.zpi.domain.organization.client.Client
+import com.zpi.domain.organization.client.ClientRepository
+import com.zpi.domain.token.issuer.TokenData
+import com.zpi.domain.token.TokenRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,19 +26,25 @@ class TokenRefreshFT extends Specification {
     @Autowired
     private TokenRepository tokenRepository
 
+    @Autowired
+    private ClientRepository clientRepository
+
     private static final String baseURl = "/api/token/refresh"
 
     def cleanup() {
         tokenRepository.clear()
+        clientRepository.clear()
     }
 
     def "should return token when refresh token correct"() {
         given:
             def refreshToken = "asdf"
-            def request = new RefreshRequestDTO(CommonFixtures.clientId, CommonFixtures.grantType, refreshToken, CommonFixtures.scope)
+            def request = new RefreshRequestDTO(CommonFixtures.clientId, CommonFixtures.grantType, refreshToken, "profile")
+            def client = new Client(request.getClient_id())
 
         and:
             tokenRepository.save(refreshToken, new TokenData("", "", ""))
+            clientRepository.save(client.getId(), client)
 
         when:
             def response = mvcRequestHelpers.postRequest(request, baseURl)

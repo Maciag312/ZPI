@@ -3,7 +3,7 @@ package com.zpi.token
 import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.AuthUserData
-import com.zpi.domain.token.tokenRequest.tokenIssuer.configProvider.TokenClaims
+import com.zpi.domain.token.issuer.config.TokenClaims
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
@@ -26,12 +26,9 @@ class TokenCommonFixtures {
     }
 
     static TokenClaims claims() {
-        final String issuer = "asdf"
-        final String subject = "asdf"
-        final String audience = "asdf"
         final Date issuedAt = new Date()
         final Date expirationTime = new Date(issuedAt.getTime() + validity)
-        return new TokenClaims(issuer, subject, audience, issuedAt, expirationTime)
+        return new TokenClaims(issuedAt, expirationTime)
     }
 
     static boolean areDatesQuiteEqual(Date one, Date two) {

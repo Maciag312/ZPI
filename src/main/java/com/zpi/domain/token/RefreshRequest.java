@@ -1,4 +1,4 @@
-package com.zpi.domain.token.refreshRequest;
+package com.zpi.domain.token;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

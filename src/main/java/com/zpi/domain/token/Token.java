@@ -1,6 +1,5 @@
-package com.zpi.domain.token.tokenRequest;
+package com.zpi.domain.token;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

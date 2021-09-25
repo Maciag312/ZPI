@@ -1,6 +1,5 @@
-package com.zpi.domain.token.refreshRequest;
+package com.zpi.domain.token.issuer;
 
-import com.zpi.domain.token.tokenRequest.tokenIssuer.UserClaims;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

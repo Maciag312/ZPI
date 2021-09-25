@@ -8,7 +8,7 @@ import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.organization.client.ClientRepository
-import com.zpi.domain.token.tokenRequest.tokenIssuer.configProvider.TokenIssuerConfigProvider
+import com.zpi.domain.token.issuer.config.TokenIssuerConfigProvider
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -43,10 +43,9 @@ class TokenRequestFT extends Specification {
     def "should return correct response when provided data is correct"() {
         given:
             def authCode = UUID.randomUUID().toString()
-            def redirectUri = CommonFixtures.redirectUri
             def client = CommonFixtures.client()
 
-            def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, redirectUri, client.getId())
+            def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, client.getId(), "profile")
 
         and:
             clientRepository.save(client.getId(), client)
@@ -69,10 +68,9 @@ class TokenRequestFT extends Specification {
     def "should return error on authCode used twice"() {
         given:
             def authCode = UUID.randomUUID().toString()
-            def redirectUri = CommonFixtures.redirectUri
             def client = CommonFixtures.client()
 
-            def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, redirectUri, client.getId())
+            def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, client.getId(), "profile")
 
         and:
             clientRepository.save(client.getId(), client)
@@ -90,10 +88,9 @@ class TokenRequestFT extends Specification {
     def "should return error on incorrect data"() {
         given:
             def authCode = "codeasdffdsa"
-            def redirectUri = "asdgsdfgasdfalk"
 
             def client = CommonFixtures.client()
-            def request = new TokenRequestDTO(null, authCode, redirectUri, client.getId())
+            def request = new TokenRequestDTO(null, authCode, client.getId(), "profile")
 
         and:
             clientRepository.save(client.getId(), client)
