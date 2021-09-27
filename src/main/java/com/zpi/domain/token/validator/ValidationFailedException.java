@@ -1,4 +1,4 @@
-package com.zpi.domain.token.tokenRequest.requestValidator;
+package com.zpi.domain.token.validator;
 
 import com.zpi.domain.common.RequestError;
 import lombok.Getter;

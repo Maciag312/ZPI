@@ -1,4 +1,4 @@
-package com.zpi.domain.token.tokenRequest.tokenIssuer.configProvider;
+package com.zpi.domain.token.issuer.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

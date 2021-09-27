@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
-public class AuthCode {
-    private final String value;
-    private final AuthUserData userData;
+public class AuthUserData {
+    private final String scope;
+    private final String redirectUri;
+    private final String username;
 }

@@ -8,6 +8,7 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.organization.client.Client
+import com.zpi.domain.token.TokenRequest
 
 class CommonFixtures {
     public static final String clientId = "id"
@@ -25,7 +26,6 @@ class CommonFixtures {
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
     public static final String authPageUrl = "/signin"
     public static final String grantType = "authorization_code"
-    public static final String hardcodedCode = "asdf"
 
     static TicketRequestDTO requestDTO() {
         return TicketRequestDTO.builder()
@@ -88,8 +88,10 @@ class CommonFixtures {
     }
 
     static TicketData ticketData() {
-        return TicketData.builder()
-                .redirectUri(redirectUri)
-                .build();
+        return new TicketData(redirectUri, scope, login)
+    }
+
+    static TokenRequest tokenRequest(String code) {
+        return new TokenRequest(grantType, code, clientId, scope)
     }
 }

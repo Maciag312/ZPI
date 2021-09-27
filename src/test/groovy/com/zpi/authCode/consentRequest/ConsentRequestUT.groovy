@@ -17,18 +17,18 @@ class ConsentRequestUT extends Specification {
     def "should return authentication code when ticket is in database"() {
         given:
             def request = CommonFixtures.consentRequest()
-            def authData = TicketData.builder()
-                    .redirectUri(CommonFixtures.redirectUri)
-                    .scope("")
-                    .build()
+            def authData = new TicketData(CommonFixtures.redirectUri, CommonFixtures.scope, CommonFixtures.userDTO().login)
 
             def ticket = request.getTicket()
-            def authCode = new AuthCode("", authData.getScope())
+            def scope = "bbbb"
+            def redirectUri = "cccc"
+            def username = "dddd"
+            def authCode = new AuthCode("aaaa", new AuthUserData(scope, redirectUri, username))
 
         and:
             ticketRepository.findByKey(ticket) >> Optional.of(authData)
             ticketRepository.remove(ticket) >> null
-            authCodePersister.persist(authCode.getScope()) >> authCode
+            authCodePersister.persist(authData) >> authCode
         when:
             def response = service.consent(request)
 
@@ -46,7 +46,7 @@ class ConsentRequestUT extends Specification {
             def request = CommonFixtures.consentRequest()
 
             ticketRepository.findByKey(request.getTicket()) >> Optional.empty()
-            authCodePersister.persist("") >> null
+            authCodePersister.persist(new TicketData("", "", "")) >> null
 
         when:
             service.consent(request)

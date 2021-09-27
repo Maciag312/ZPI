@@ -21,7 +21,17 @@ public class TokenController {
         try {
             var token = service.getToken(request.toDomain());
             return ResponseEntity.ok(new TokenResponseDTO(token));
-        } catch(TokenErrorResponseException e) {
+        } catch (TokenErrorResponseException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TokenErrorResponseDTO(e.getResponse()));
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshRequest(@RequestBody RefreshRequestDTO request) {
+        try {
+            var token = service.refreshToken(request.toDomain());
+            return ResponseEntity.ok(new TokenResponseDTO(token));
+        } catch (TokenErrorResponseException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TokenErrorResponseDTO(e.getResponse()));
         }
     }

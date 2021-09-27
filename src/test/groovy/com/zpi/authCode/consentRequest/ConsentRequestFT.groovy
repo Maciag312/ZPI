@@ -37,7 +37,7 @@ class ConsentRequestFT extends Specification {
 
     def "should return authentication code when ticket is up to date"() {
         given:
-            def request = CommonFixtures.consentRequestDTO()
+            def request = CommonFixtures.consentRequestDTO("")
 
         and:
             ticketRepository.save(request.getTicket(), CommonFixtures.ticketData())
@@ -64,7 +64,7 @@ class ConsentRequestFT extends Specification {
 
     def "should return error when ticket is outdated"() {
         given:
-            def request = CommonFixtures.consentRequestDTO()
+            def request = CommonFixtures.consentRequestDTO("")
 
         when:
             def response = mvcHelpers.postRequest(request, baseUrl)

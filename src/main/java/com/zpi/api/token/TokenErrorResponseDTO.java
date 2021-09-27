@@ -1,6 +1,6 @@
 package com.zpi.api.token;
 
-import com.zpi.domain.token.tokenRequest.TokenErrorResponse;
+import com.zpi.domain.token.TokenErrorResponse;
 import lombok.Getter;
 
 @Getter

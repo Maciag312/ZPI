@@ -1,4 +1,4 @@
-package com.zpi.domain.token.tokenRequest.tokenIssuer.configProvider;
+package com.zpi.domain.token.issuer.config;
 
 public interface TokenIssuerConfigProvider {
     TokenIssuerConfig getConfig();

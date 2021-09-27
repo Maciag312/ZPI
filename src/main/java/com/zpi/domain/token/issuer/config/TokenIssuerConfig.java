@@ -1,4 +1,4 @@
-package com.zpi.domain.token.tokenRequest.tokenIssuer.configProvider;
+package com.zpi.domain.token.issuer.config;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.WeakKeyException;
@@ -21,13 +21,10 @@ public class TokenIssuerConfig {
     public TokenIssuerConfig(String secretKey) {
         this.secretKey = secretKey;
         this.key = generateKey();
-        final String issuer = "asdf";
-        final String subject = "asdf";
-        final String audience = "asdf";
         final Date issuedAt = new Date();
         final Date expirationTime = new Date(issuedAt.getTime() + validityInMilliseconds);
 
-        claims = new TokenClaims(issuer, subject, audience, issuedAt, expirationTime);
+        claims = new TokenClaims(issuedAt, expirationTime);
     }
 
     private SecretKeySpec generateKey() throws IllegalArgumentException, WeakKeyException {

@@ -3,7 +3,6 @@ package com.zpi
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jayway.jsonpath.JsonPath
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
-import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersister
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -29,23 +28,19 @@ class CommonHelpers {
         def value = mapper.writeValueAsString(payload);
         def result = mockMvc.perform(
                 post(url)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(value)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(value)
         )
         return result
     }
 
     def <T> ResultActions postRequest(String url) throws Exception {
-        return mockMvc.perform(
-                post(url)        )
+        return mockMvc.perform(post(url))
     }
 
     def <T> ResultActions getRequest(String url) throws Exception {
-        return mockMvc.perform(
-                get(url)
-        )
+        return mockMvc.perform(get(url))
     }
-
 
     static String authParametersToUrl(TicketRequestDTO request, String uri) {
         return UriComponentsBuilder.fromUriString(uri)
@@ -61,5 +56,11 @@ class CommonHelpers {
         def response = result.andReturn().getResponse()
         def value = JsonPath.read(response.getContentAsString(), String.format("\$.%s", attribute))
         return value.toString()
+    }
+
+    static String attributeFromRedirectedUrl(String attribute, ResultActions result) {
+        def response = result.andReturn().getResponse()
+        def location = response.getHeader("Location")
+        return UriComponentsBuilder.fromUriString(location).build().getQueryParams().get(attribute).get(0)
     }
 }

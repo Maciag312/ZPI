@@ -1,27 +1,41 @@
 package com.zpi.authCode.consentRequest
 
 import com.zpi.domain.authCode.consentRequest.AuthCode
+import com.zpi.domain.authCode.consentRequest.AuthUserData
+import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersister
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersisterImpl
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
+import com.zpi.domain.common.AuthCodeGenerator
 import spock.lang.Specification
 import spock.lang.Subject
 
 class AuthCodePersisterUT extends Specification {
     def repository = Mock(AuthCodeRepository)
+    def generator = Mock(AuthCodeGenerator)
 
     @Subject
-    private AuthCodePersister persister = new AuthCodePersisterImpl(repository)
+    private AuthCodePersister persister = new AuthCodePersisterImpl(repository, generator)
 
     def "should return and save authCode in repository"() {
         given:
-            repository.save(_ as String, _ as AuthCode) >> null
+            def value = "asdf"
+            def redirectUri = "aaa"
+            def scope = "bbb"
+            def username = "ccc"
+
+            def data = new TicketData(redirectUri, scope, username)
+            def code = new AuthCode(value, new AuthUserData(scope, redirectUri, username))
+
+        and:
+            generator.generate() >> value
+            repository.save(value, code) >> null
 
         when:
-            def result = persister.persist()
+            def result = persister.persist(data)
 
         then:
-            1 * repository.save(_ as String, _ as AuthCode)
+            1 * repository.save(value, code)
 
         and:
             !result.getValue().isEmpty()

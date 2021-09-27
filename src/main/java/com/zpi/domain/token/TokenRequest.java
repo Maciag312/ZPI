@@ -1,4 +1,4 @@
-package com.zpi.domain.token.tokenRequest;
+package com.zpi.domain.token;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +8,6 @@ import lombok.Getter;
 public class TokenRequest {
     private final String grantType;
     private final String code;
-    private final String redirectUri;
     private final String clientId;
+    private final String scope;
 }

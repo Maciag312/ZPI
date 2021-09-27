@@ -1,8 +1,7 @@
 package com.zpi.api.token;
 
-import com.zpi.domain.token.tokenRequest.Token;
+import com.zpi.domain.token.Token;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class TokenResponseDTO {
