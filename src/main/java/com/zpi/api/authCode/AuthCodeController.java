@@ -100,7 +100,8 @@ public class AuthCodeController {
         try {
             var response = new ConsentResponseDTO(authCodeService.consentRequest(request));
             var location = response.toUrl();
-            return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
+            //FIXME should return Location header but it doesn't work for path with file suffix
+            return ResponseEntity.status(HttpStatus.OK).body(location);
         } catch (ErrorConsentResponseException e) {
             //TODO investigate how to pass organization when exception occurs
             var location = e.toUrl(AUTH_PAGE_URI(""), request.getState());
