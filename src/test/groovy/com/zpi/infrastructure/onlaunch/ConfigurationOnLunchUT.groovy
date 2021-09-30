@@ -1,4 +1,4 @@
-package com.zpi.infrastructure.launch
+package com.zpi.infrastructure.onlaunch
 
 import com.zpi.domain.organization.Organization
 import com.zpi.domain.organization.OrganizationRepository
