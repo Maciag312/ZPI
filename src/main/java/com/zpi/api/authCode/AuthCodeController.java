@@ -10,19 +10,26 @@ import com.zpi.api.common.exception.ErrorResponseException;
 import com.zpi.domain.authCode.AuthCodeService;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
+import com.zpi.domain.organization.client.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class AuthCodeController {
     private final AuthCodeService authCodeService;
+    private final ClientService clientService;
 
-    private static final String AUTH_PAGE_URI = "/signin";
+
+    private static String AUTH_PAGE_URI(String organization){
+        return "/organization/" + organization + "/signin";
+    }
 
     @GetMapping("/authorize")
     public ResponseEntity<?> authorize(@RequestParam String client_id,
@@ -37,18 +44,21 @@ public class AuthCodeController {
                 scope,
                 state);
         var request = requestDTO.toDomain();
-        return getRedirectInfo(request);
+        AtomicReference<String> organization = new AtomicReference<>("");
+        clientService.getClient(client_id)
+                .ifPresent(client -> organization.set(client.getOrganizationName()));
+        return getRedirectInfo(request, organization.get());
     }
 
-    private ResponseEntity<?> getRedirectInfo(AuthenticationRequest request) {
+    private ResponseEntity<?> getRedirectInfo(AuthenticationRequest request, String organization) {
         String location;
 
         try {
             var response = new AuthenticationResponseDTO(authCodeService.validateAndFillRequest(request));
-            location = response.toUrl(AUTH_PAGE_URI);
+            location = response.toUrl(AUTH_PAGE_URI(organization));
         } catch (ErrorResponseException e) {
             var response = e.getErrorResponse();
-            location = response.toUrl(AUTH_PAGE_URI);
+            location = response.toUrl(AUTH_PAGE_URI(organization));
         }
 
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
@@ -92,7 +102,8 @@ public class AuthCodeController {
             var location = response.toUrl();
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
         } catch (ErrorConsentResponseException e) {
-            var location = e.toUrl(AUTH_PAGE_URI, request.getState());
+            //TODO investigate how to pass organization when exception occurs
+            var location = e.toUrl(AUTH_PAGE_URI(""), request.getState());
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
         }
     }

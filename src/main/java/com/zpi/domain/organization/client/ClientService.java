@@ -19,6 +19,10 @@ public class ClientService {
         return true;
     }
 
+    public Optional<Client> getClient(String id) {
+        return clientRepository.findByKey(id);
+    }
+
     public void addRedirectionURI(String client_name, String organization_name, String uri) {
         Optional<Client> client = clientRepository.findByNameAndOrganizationName(client_name, organization_name);
         if (client.isEmpty()) {
