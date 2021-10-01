@@ -21,5 +21,9 @@ public class Client {
     private Set<String> availableGrantTypes = Set.of("authorization_code");
 
     @Setter
-    private String organizationName;
+    private String organizationName = "";
+
+    public void addRedirectUri(String uri) {
+        availableRedirectUri.add(uri);
+    }
 }

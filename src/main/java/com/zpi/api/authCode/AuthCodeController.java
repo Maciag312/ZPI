@@ -26,11 +26,15 @@ public class AuthCodeController {
     private final AuthCodeService authCodeService;
     private final ClientService clientService;
 
+    public final static String authorizeUri = "/authorize";
+    public final static String authenticateUri = "/authenticate";
+    public final static String consentUri = "/consent";
+
     private static String AUTH_PAGE_URI(String organization) {
         return "/organization/" + organization + "/signin";
     }
 
-    @GetMapping("/authorize")
+    @GetMapping(authorizeUri)
     public ResponseEntity<?> authorize(@RequestParam String client_id,
                                        @RequestParam(required = false) String redirect_uri,
                                        @RequestParam String response_type,
@@ -64,7 +68,7 @@ public class AuthCodeController {
     }
 
 
-    @PostMapping("/authenticate")
+    @PostMapping(authenticateUri)
     public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO,
                                           @RequestParam String client_id,
                                           @RequestParam(required = false) String redirect_uri,
@@ -90,7 +94,7 @@ public class AuthCodeController {
         }
     }
 
-    @PostMapping("/consent")
+    @PostMapping(consentUri)
     public ResponseEntity<?> consent(@RequestBody ConsentRequestDTO requestDTO) {
         var request = requestDTO.toDomain();
 
