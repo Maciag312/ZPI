@@ -7,22 +7,31 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TokenRequestDTO {
+    @NotNull
     private String grantType;
+
+    @NotNull
     private String code;
+
+    @NotNull
     private String clientId;
-    private String scope;
+
+    @NotNull
+    private String redirectUri;
 
     public TokenRequest toDomain() {
         return TokenRequest.builder()
                 .grantType(grantType)
                 .code(code)
                 .clientId(clientId)
-                .scope(scope)
+                .redirectUri(redirectUri)
                 .build();
     }
 }

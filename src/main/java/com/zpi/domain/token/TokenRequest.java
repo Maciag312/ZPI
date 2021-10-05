@@ -9,5 +9,5 @@ public class TokenRequest {
     private final String grantType;
     private final String code;
     private final String clientId;
-    private final String scope;
+    private final String redirectUri;
 }
