@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zpi.CommonHelpers
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.common.dto.UserDTO
-import com.zpi.domain.audit.AuditData
+import com.zpi.domain.audit.AuditLog
+import com.zpi.domain.audit.AuditMetadata
 import com.zpi.domain.audit.AuditRepository
 import com.zpi.domain.organization.Organization
 import com.zpi.domain.organization.OrganizationRepository
@@ -50,7 +51,7 @@ class AuditInterceptorFT extends Specification {
         auditRepository.clear()
     }
 
-    def "should add request headers to audit repository"() {
+    def "should add request headers from authenticate endpoint to audit repository when request is correct"() {
         given:
             def organization = new Organization("afgasdf")
             def client = new Client("asdfadsf")
@@ -79,14 +80,47 @@ class AuditInterceptorFT extends Specification {
 
         then:
             def result = auditRepository.findByOrganization(organization)
-            def expected = new AuditData(new Date(), host, userAgent, organization.getName())
+            def expected = new AuditLog(new Date(), new AuditMetadata(host, userAgent), organization.getName(), hashedUser.getLogin())
 
         and:
             result.size() == 1
 
         and:
             result.first().getOrganizationName() == expected.getOrganizationName()
-            result.first().getHost() == expected.getHost()
-            result.first().getUserAgent() == expected.getUserAgent()
+            result.first().getMetadata().getHost() == expected.getMetadata().getHost()
+            result.first().getMetadata().getUserAgent() == expected.getMetadata().getUserAgent()
+            result.first().getUsername() == expected.getUsername()
+    }
+
+    def "should add entry to incident repository when incorrect request is provided"() {
+        given:
+            organizationRepository.save(organization)
+            clientRepository.save(client.getId(), client)
+            userRepository.save(user.toHashedDomain().getLogin(), user.toHashedDomain())
+
+        when:
+            mockMvc.perform(
+                    post(CommonHelpers.authParametersToUrl(request, baseUri))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(mapper.writeValueAsString(user))
+                            .header("host", host)
+                            .header("user-agent", userAgent)
+            )
+
+        then:
+            def result = auditRepository.findByOrganization(organization)
+
+        and:
+            result.size() == 0
+
+        where:
+            organization         | client         | user                | host | userAgent | request                 || expected
+            new Organization("") | new Client("") | new UserDTO("", "") | ""   | ""        | Fixtures.emptyRequest() || null
+    }
+
+    private class Fixtures {
+        static TicketRequestDTO emptyRequest() {
+            return new TicketRequestDTO("", "", "", "", "")
+        }
     }
 }

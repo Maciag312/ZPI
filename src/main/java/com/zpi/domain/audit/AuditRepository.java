@@ -6,6 +6,6 @@ import com.zpi.domain.organization.Organization;
 import java.util.Date;
 import java.util.List;
 
-public interface AuditRepository extends EntityRepository<Date, AuditData> {
-    List<AuditData> findByOrganization(Organization organization);
+public interface AuditRepository extends EntityRepository<Date, AuditLog> {
+    List<AuditLog> findByOrganization(Organization organization);
 }

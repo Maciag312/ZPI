@@ -3,6 +3,8 @@ package com.zpi.authCode.ticketRequest
 import com.zpi.CommonFixtures
 import com.zpi.api.common.dto.ErrorResponseDTO
 import com.zpi.api.common.exception.ErrorResponseException
+import com.zpi.domain.audit.AuditMetadata
+import com.zpi.domain.audit.AuditService
 import com.zpi.domain.authCode.AuthCodeService
 import com.zpi.domain.authCode.AuthCodeServiceImpl
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
@@ -14,6 +16,7 @@ import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
 import com.zpi.domain.organization.client.ClientRepository
+import com.zpi.domain.user.User
 import com.zpi.domain.user.UserAuthenticator
 import spock.lang.Specification
 import spock.lang.Subject
@@ -24,9 +27,10 @@ class TicketRequestUT extends Specification {
     def authenticator = Mock(UserAuthenticator)
     def consentService = Mock(ConsentServiceImpl)
     def authorizationService = Mock(AuthorizationService)
+    def auditService = Mock(AuditService)
 
     @Subject
-    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, authenticator, consentService, authorizationService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, authenticator, consentService, authorizationService, auditService)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -38,9 +42,10 @@ class TicketRequestUT extends Specification {
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> true
             authorizationService.createTicket(user, request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
+            auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
 
         when:
-            def response = tokenService.authenticationTicket(user, request)
+            def response = tokenService.authenticationTicket(user, request, new AuditMetadata("", ""))
 
         then:
             !response.getTicket().isEmpty()
@@ -57,9 +62,10 @@ class TicketRequestUT extends Specification {
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
             }
+            auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
 
         when:
-            tokenService.authenticationTicket(user, request)
+            tokenService.authenticationTicket(user, request, new AuditMetadata("", ""))
 
         then:
             def error = new ErrorResponseDTO(Fixtures.unauthorizedClientError(), request.getState())
@@ -77,9 +83,10 @@ class TicketRequestUT extends Specification {
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> false
+            auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
 
         when:
-            tokenService.authenticationTicket(user, request)
+            tokenService.authenticationTicket(user, request, new AuditMetadata("", ""))
 
         then:
             def error = new ErrorResponseDTO(Fixtures.userAuthenticationFailedError(), request.getState())

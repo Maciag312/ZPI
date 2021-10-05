@@ -2,6 +2,8 @@ package com.zpi.domain.authCode;
 
 import com.zpi.api.common.dto.ErrorResponseDTO;
 import com.zpi.api.common.exception.ErrorResponseException;
+import com.zpi.domain.audit.AuditMetadata;
+import com.zpi.domain.audit.AuditService;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType;
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator;
@@ -25,6 +27,7 @@ public class AuthCodeServiceImpl implements AuthCodeService {
     private final UserAuthenticator userAuthenticator;
     private final ConsentService consentService;
     private final AuthorizationService authorizationService;
+    private final AuditService auditService;
 
     public AuthenticationRequest validateAndFillRequest(AuthenticationRequest request) throws ErrorResponseException {
         try {
@@ -35,8 +38,9 @@ public class AuthCodeServiceImpl implements AuthCodeService {
         }
     }
 
-    public AuthorizationResponse authenticationTicket(User user, AuthenticationRequest request) throws ErrorResponseException {
+    public AuthorizationResponse authenticationTicket(User user, AuthenticationRequest request, AuditMetadata metadata) throws ErrorResponseException {
         validateAndFillRequest(request);
+        auditService.audit(user, request, metadata);
         validateUser(user, request);
 
         return authorizationService.createTicket(user, request);
