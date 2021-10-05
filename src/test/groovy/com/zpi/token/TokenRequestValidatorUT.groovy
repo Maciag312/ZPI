@@ -9,6 +9,7 @@ import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.RefreshRequest
 import com.zpi.domain.token.TokenRequest
+import com.zpi.domain.token.issuer.TokenData
 import com.zpi.domain.token.validator.TokenRequestErrorType
 import com.zpi.domain.token.validator.TokenRequestValidator
 import com.zpi.domain.token.validator.TokenRequestValidatorImpl
@@ -178,21 +179,17 @@ class TokenRequestValidatorUT extends Specification {
             null           || "Unrecognized grant_type 'null'. Expected 'authorization_code'."
     }
 
-    def "should throw invalid_scope on incorrect scope"() {
+    def "for refresh request should throw invalid_scope on incorrect scope"() {
         given:
-            def request = TokenRequest.builder()
-                    .grantType(CommonFixtures.grantType)
-                    .code(Fixtures.correctRequest().getCode())
-                    .clientId(CommonFixtures.clientId)
-                    .scope(scope)
-                    .build()
+            def tokenData = new TokenData("asdfdf", "", "")
+            def request = new RefreshRequest(CommonFixtures.clientId, CommonFixtures.grantType, tokenData.getValue(), scope)
 
             def client = new Client(CommonFixtures.clientId)
             client.getAvailableRedirectUri().add(CommonFixtures.redirectUri)
 
         and:
             clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", new AuthUserData("", "", "")))
+        tokenRepository.findByKey(request.getRefreshToken()) >> Optional.of(tokenData)
 
         when:
             validator.validate(request)
@@ -219,7 +216,7 @@ class TokenRequestValidatorUT extends Specification {
                     .grantType(CommonFixtures.grantType)
                     .code(code)
                     .clientId(CommonFixtures.clientId)
-                    .scope("profile")
+                    .redirectUri(CommonFixtures.redirectUri)
                     .build()
         }
     }

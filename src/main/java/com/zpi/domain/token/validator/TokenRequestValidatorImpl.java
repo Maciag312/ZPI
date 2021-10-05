@@ -28,12 +28,12 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
     public void validate(RefreshRequest request) throws ValidationFailedException {
         validateRefreshToken(request);
         validate(new ValidationRequest(request));
+        validateScope(request);
     }
 
     private void validate(ValidationRequest request) throws ValidationFailedException {
         validateClientId(request);
         validateGrantType(request);
-        validateScope(request);
     }
 
     private void validateCode(TokenRequest request) throws ValidationFailedException {
@@ -135,7 +135,7 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
         return String.format("Unrecognized %s '%s'", name, value);
     }
 
-    private void validateScope(ValidationRequest request) throws ValidationFailedException {
+    private void validateScope(RefreshRequest request) throws ValidationFailedException {
         if (isInvalidScope(request)) {
             var error = RequestError.<TokenRequestErrorType>builder()
                     .error(TokenRequestErrorType.INVALID_SCOPE)
@@ -155,12 +155,12 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
         }
     }
 
-    private boolean isInvalidScope(ValidationRequest request) {
+    private boolean isInvalidScope(RefreshRequest request) {
         var scope = request.getScope();
         return scope == null || scope.isEmpty();
     }
 
-    private boolean isScopeExceedingRights(ValidationRequest request) {
+    private boolean isScopeExceedingRights(RefreshRequest request) {
         var client = clientRepository.findByKey(request.getClientId());
 
         if (client.isEmpty()) {

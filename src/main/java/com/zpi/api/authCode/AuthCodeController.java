@@ -26,8 +26,7 @@ public class AuthCodeController {
     private final AuthCodeService authCodeService;
     private final ClientService clientService;
 
-
-    private static String AUTH_PAGE_URI(String organization){
+    private static String AUTH_PAGE_URI(String organization) {
         return "/organization/" + organization + "/signin";
     }
 
@@ -90,8 +89,6 @@ public class AuthCodeController {
             return new ResponseEntity<>("Empty userDTO", HttpStatus.BAD_REQUEST);
         }
     }
-
-    private static final String ALLOW_PAGE_URI = "/allow";
 
     @PostMapping("/consent")
     public ResponseEntity<?> consent(@RequestBody ConsentRequestDTO requestDTO) {
