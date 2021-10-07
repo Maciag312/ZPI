@@ -4,7 +4,7 @@ import com.zpi.CommonFixtures
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
-import com.zpi.domain.authCode.authenticationRequest.RequestValidator
+import com.zpi.domain.authCode.authenticationRequest.RequestValidatorImpl
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
 import com.zpi.domain.organization.client.Client
 import com.zpi.domain.organization.client.ClientRepository
@@ -17,7 +17,7 @@ class RequestValidatorUT extends Specification {
     def filler = Mock(OptionalParamsFiller)
 
     @Subject
-    private RequestValidator requestValidation = new RequestValidator(clientRepository, filler)
+    private RequestValidatorImpl requestValidation = new RequestValidatorImpl(clientRepository, filler)
 
     def "should not throw when all parameters correct"() {
         given:

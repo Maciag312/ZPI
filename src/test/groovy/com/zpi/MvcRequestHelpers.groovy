@@ -27,6 +27,8 @@ class MvcRequestHelpers {
                 post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(object)
+                        .header("host", "192.168.0.1")
+                        .header("user-agent", "agent")
         )
     }
 

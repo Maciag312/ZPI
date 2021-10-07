@@ -26,12 +26,13 @@ class CommonHelpers {
 
     def <T> ResultActions postRequest(T payload, String url) throws Exception {
         def value = mapper.writeValueAsString(payload);
-        def result = mockMvc.perform(
+        return mockMvc.perform(
                 post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(value)
+                        .header("host", "asdfga")
+                        .header("user-agent", "asdfadsg")
         )
-        return result
     }
 
     def <T> ResultActions postRequest(String url) throws Exception {

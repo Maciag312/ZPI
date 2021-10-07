@@ -38,19 +38,20 @@ class AuthFlowE2E extends Specification {
     @Autowired
     private OrganizationRepository organizationRepository
 
-
     @Autowired
     private CommonHelpers commonHelpers
 
     private static final String organizationURI = '/api/organization/';
 
     private static final String clientRegisterUrl(String organizationName) {
-        return organizationURI + organizationName + '/client/register'
+        return organizationURI + organizationName + '/client/register';
     }
 
     private static final String userRegisterUrl(String organizationName) {
         return organizationURI + organizationName + '/user/register'
     }
+
+    private static final String organizationRegisterUrl = "/api/organization/register/"
     private static final String authorizeRequestUrl = "/api/authorize"
     private static final String authenticateRequestUrl = "/api/authenticate"
     private static final String consentRequestUrl = "/api/consent"
@@ -76,7 +77,7 @@ class AuthFlowE2E extends Specification {
             def scope = "profile"
 
         when:
-            commonHelpers.postRequest('/api/organization/register/' + organizationName)
+            commonHelpers.postRequest(organizationRegisterUrl + organizationName)
             commonHelpers.postRequest(client, clientRegisterUrl(organizationName))
             commonHelpers.postRequest(user, userRegisterUrl(organizationName))
 
