@@ -1,6 +1,6 @@
-cd ../zpi-ui
+mkdir -p src/main/resources/static
+rm -r src/main/resources/static/*
+cd ../ZPI-authorize-UI
 npm install
 npm run build
-mkdir -p ../ZPI-service/src/main/resources/static
-rm -r ../ZPI-service/src/main/resources/static/*
-cp -a ./build/. ../ZPI-service/src/main/resources/static/
+cp -a ./build/. ../ZPI-authorize-service/src/main/resources/static/
