@@ -1,0 +1,2 @@
+ams:
+  url: http://localhost:${wiremock.server.port}

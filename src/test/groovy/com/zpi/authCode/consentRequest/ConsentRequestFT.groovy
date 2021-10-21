@@ -1,17 +1,18 @@
 package com.zpi.authCode.consentRequest
 
-import com.zpi.CommonFixtures
-import com.zpi.MvcRequestHelpers
-import com.zpi.UriParamsResult
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
+import com.zpi.testUtils.CommonFixtures
+import com.zpi.testUtils.CommonHelpers
+import com.zpi.testUtils.MvcRequestHelpers
+import com.zpi.testUtils.UriParamsResult
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.web.util.UriComponentsBuilder
 import spock.lang.Specification
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,19 +47,19 @@ class ConsentRequestFT extends Specification {
             def response = mvcHelpers.postRequest(request, baseUrl)
 
         then:
-            response.andExpect(status().isFound())
+            def uri = UriComponentsBuilder
+                    .fromUriString(
+                            response.andReturn().getResponse().getContentAsString()
+                    ).build()
 
-        and:
-            def actual = new UriParamsResult(response)
-
-            actual.getParam("state") == request.getState()
-            actual.getPath() == CommonFixtures.redirectUri
+            CommonHelpers.attributeFromRedirectedUrlInBody("state", response) == request.getState()
+            uri.getPath() == CommonFixtures.redirectUri
 
         and:
             ticketRepository.findByKey(request.getTicket()).isEmpty()
 
         and:
-            def code = actual.getParam("code")
+            def code = CommonHelpers.attributeFromRedirectedUrlInBody("code", response)
             authCodeRepository.findByKey(code).isPresent()
     }
 
@@ -70,9 +71,6 @@ class ConsentRequestFT extends Specification {
             def response = mvcHelpers.postRequest(request, baseUrl)
 
         then:
-            response.andExpect(status().isFound())
-
-        and:
             def actual = new UriParamsResult(response)
             actual.getParam("error") == "TICKET_EXPIRED"
             actual.getParam("error_description").replace("%20", " ") == "Ticket expired"

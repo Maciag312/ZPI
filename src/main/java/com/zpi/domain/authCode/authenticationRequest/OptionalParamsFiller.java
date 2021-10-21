@@ -1,7 +1,8 @@
 package com.zpi.domain.authCode.authenticationRequest;
 
-import com.zpi.domain.organization.client.Client;
-import com.zpi.domain.organization.client.ClientRepository;
+import com.zpi.domain.rest.ams.AmsService;
+import com.zpi.domain.rest.ams.Client;
+import com.zpi.infrastructure.rest.ams.AmsClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,14 +12,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public
 class OptionalParamsFiller {
-    private final ClientRepository repository;
+    private final AmsService ams;
 
     private Client client;
 
     public AuthenticationRequest fill(AuthenticationRequest request) {
         var clientId = request.getClientId();
 
-        this.client = repository.findByKey(clientId).orElse(null);
+        this.client = ams.clientDetails(clientId).orElse(null);
 
         var redirectUri = fillRedirectUri(request);
         var responseType = request.getResponseType();

@@ -1,14 +1,12 @@
-package com.zpi
+package com.zpi.testUtils
 
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
-import com.zpi.api.organization.client.ClientDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.token.TokenRequest
+import com.zpi.domain.rest.ams.Client
 
 class CommonFixtures {
     public static final String clientId = "id"
@@ -24,7 +22,7 @@ class CommonFixtures {
     public static final String password = "Password"
 
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
-    public static final String authPageUrl = "/organization/signin"
+    public static final String authPageUrl = "/organization/pizza-house/signin"
     public static final String grantType = "authorization_code"
 
     static TicketRequestDTO requestDTO() {
@@ -56,17 +54,7 @@ class CommonFixtures {
     }
 
     static Client client() {
-        def client = new Client(clientId)
-        client.getAvailableRedirectUri().add(redirectUri)
-
-        return client
-    }
-
-    static ClientDTO clientDTO() {
-        return ClientDTO.builder()
-                .id(clientId)
-                .availableRedirectUri(List.of(redirectUri))
-                .build()
+        return new Client(List.of(CommonFixtures.redirectUri), clientId)
     }
 
     static UserDTO userDTO() {
@@ -89,9 +77,5 @@ class CommonFixtures {
 
     static TicketData ticketData() {
         return new TicketData(redirectUri, scope, login)
-    }
-
-    static TokenRequest tokenRequest(String code) {
-        return new TokenRequest(grantType, code, clientId, scope)
     }
 }

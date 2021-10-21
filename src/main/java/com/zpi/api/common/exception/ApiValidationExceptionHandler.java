@@ -1,6 +1,5 @@
 package com.zpi.api.common.exception;
 
-import com.zpi.api.organization.client.ClientController;
 import com.zpi.api.authCode.AuthCodeController;
 import com.zpi.api.organization.user.UserController;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-@ControllerAdvice(basePackageClasses = {ClientController.class, UserController.class, AuthCodeController.class})
+@ControllerAdvice(basePackageClasses = {UserController.class, AuthCodeController.class})
 public class ApiValidationExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {

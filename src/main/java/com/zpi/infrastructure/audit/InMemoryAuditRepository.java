@@ -2,7 +2,6 @@ package com.zpi.infrastructure.audit;
 
 import com.zpi.domain.audit.AuditLog;
 import com.zpi.domain.audit.AuditRepository;
-import com.zpi.domain.organization.Organization;
 import com.zpi.infrastructure.common.EntityTuple;
 import com.zpi.infrastructure.common.InMemoryRepository;
 import org.springframework.stereotype.Repository;
@@ -19,14 +18,11 @@ public class InMemoryAuditRepository extends InMemoryRepository<Date, AuditLog> 
     }
 
     @Override
-    public List<AuditLog> findByOrganization(Organization organization) {
-        var organizationName = organization.getName();
-        var entriesForOrganization = super.repository.entrySet().stream().filter(
-                (entry) -> entry.getValue().toDomain().getOrganizationName().equals(organizationName)
+    public List<AuditLog> findByUsername(String username) {
+        var entriesUsername = super.repository.entrySet().stream().filter(
+                (entry) -> entry.getValue().toDomain().getUsername().equals(username)
         ).collect(Collectors.toList());
 
-        return entriesForOrganization.stream().map(
-                entry -> entry.getValue().toDomain()
-        ).collect(Collectors.toList());
+        return entriesUsername.stream().map(entry -> entry.getValue().toDomain()).collect(Collectors.toList());
     }
 }

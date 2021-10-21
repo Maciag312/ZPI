@@ -12,6 +12,5 @@ import java.util.Date;
 public class AuditLog {
     private final Date date;
     private final AuditMetadata metadata;
-    private final String organizationName;
     private final String username;
 }

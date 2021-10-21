@@ -1,19 +1,24 @@
 package com.zpi.e2e
 
-import com.zpi.CommonFixtures
-import com.zpi.CommonHelpers
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.token.RefreshRequestDTO
 import com.zpi.api.token.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import com.zpi.domain.organization.OrganizationRepository
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.organization.client.ClientRepository
+import com.zpi.domain.rest.ams.Client
 import com.zpi.domain.user.UserRepository
+import com.zpi.infrastructure.rest.ams.AmsClient
+import com.zpi.testUtils.wiremock.ClientMocks
+import com.zpi.testUtils.CommonFixtures
+import com.zpi.testUtils.CommonHelpers
+
 import com.zpi.token.TokenCommonFixtures
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
@@ -22,12 +27,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureWireMock(port = 0)
+@ActiveProfiles("test")
 class AuthFlowE2E extends Specification {
     @Autowired
     private MockMvc mockMvc
 
     @Autowired
-    private ClientRepository clientRepository
+    private AmsClient amsClient
+
+    @Autowired
+    private WireMockServer mockServer
 
     @Autowired
     private UserRepository userRepository
@@ -59,19 +69,18 @@ class AuthFlowE2E extends Specification {
     private static final String refreshTokenRequestUrl = "/api/token/refresh"
 
     def setup() {
-        clientRepository.clear()
         userRepository.clear()
         ticketRepository.clear()
         organizationRepository.clear()
+
+        ClientMocks.setupMockClientDetailsResponse(mockServer)
     }
 
     def "should perform whole oauth2 flow"() {
         given:
             def organizationName = "pizza-house-231"
-            def redirectUri = "https://asdffdsa.com"
-            def client = new Client("client0001")
-            client.setOrganizationName(organizationName)
-            client.getAvailableRedirectUri().add(redirectUri)
+            def redirectUri = CommonFixtures.redirectUri
+            def client = new Client(List.of(redirectUri), CommonFixtures.clientId)
             def user = CommonFixtures.userDTO()
             def grantType = "authorization_code"
             def scope = "profile"
@@ -107,7 +116,7 @@ class AuthFlowE2E extends Specification {
             def consentResponse = commonHelpers.postRequest(consentRequest, CommonHelpers.authParametersToUrl(request, consentRequestUrl))
 
         then:
-            def code = CommonHelpers.attributeFromRedirectedUrl("code", consentResponse)
+            def code = CommonHelpers.attributeFromRedirectedUrlInBody("code", consentResponse)
 
         when:
             def tokenRequest = new TokenRequestDTO(grantType, code, client.getId(), scope)
@@ -127,6 +136,6 @@ class AuthFlowE2E extends Specification {
         and:
             refreshedToken != token
             refreshedToken.getBody().get("username_hash") == user.toHashedDomain().getLogin()
-            refreshedToken.getBody().getIssuer() == organizationName
+            refreshedToken.getBody().getIssuer() == ""
     }
 }

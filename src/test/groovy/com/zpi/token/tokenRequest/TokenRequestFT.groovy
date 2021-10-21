@@ -1,31 +1,40 @@
 package com.zpi.token.tokenRequest
 
-import com.zpi.CommonFixtures
-import com.zpi.MvcRequestHelpers
-import com.zpi.ResultHelpers
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.token.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.token.issuer.config.TokenIssuerConfigProvider
+import com.zpi.infrastructure.rest.ams.AmsClient
+import com.zpi.testUtils.CommonFixtures
+import com.zpi.testUtils.MvcRequestHelpers
+import com.zpi.testUtils.ResultHelpers
+import com.zpi.testUtils.wiremock.ClientMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
-@SpringBootTest(properties = "security.jwt.token.secret-key=AJASFDNUS812DAMNXMANSDHQHW83183JD18JJ1HFG8JXJ12JSH1XCHBUJ28X2JH12J182XJH1F3H1JS81G7RESHD13H71")
+@SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureWireMock(port = 0)
+@ActiveProfiles("test")
 class TokenRequestFT extends Specification {
     @Autowired
     private MockMvc mockMvc
 
     @Autowired
-    private MvcRequestHelpers mvcRequestHelpers
+    private AmsClient ams
 
     @Autowired
-    private ClientRepository clientRepository
+    private WireMockServer mockServer
+
+    @Autowired
+    private MvcRequestHelpers mvcRequestHelpers
 
     @Autowired
     private AuthCodeRepository authCodeRepository
@@ -35,8 +44,11 @@ class TokenRequestFT extends Specification {
 
     private static final String baseUrl = "/api/token"
 
+    def setup() {
+        ClientMocks.setupMockClientDetailsResponse(mockServer)
+    }
+
     def cleanup() {
-        clientRepository.clear()
         authCodeRepository.clear()
     }
 
@@ -48,7 +60,6 @@ class TokenRequestFT extends Specification {
             def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, client.getId(), "profile")
 
         and:
-            clientRepository.save(client.getId(), client)
             authCodeRepository.save(authCode, new AuthCode(authCode, new AuthUserData("", "", "")))
 
         when:
@@ -73,7 +84,6 @@ class TokenRequestFT extends Specification {
             def request = new TokenRequestDTO(CommonFixtures.grantType, authCode, client.getId(), "profile")
 
         and:
-            clientRepository.save(client.getId(), client)
             authCodeRepository.save(authCode, new AuthCode(authCode, new AuthUserData("", "", "")))
 
         when:
@@ -91,9 +101,6 @@ class TokenRequestFT extends Specification {
 
             def client = CommonFixtures.client()
             def request = new TokenRequestDTO(null, authCode, client.getId(), "profile")
-
-        and:
-            clientRepository.save(client.getId(), client)
 
         when:
             def response = mvcRequestHelpers.postRequest(request, baseUrl)

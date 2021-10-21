@@ -2,30 +2,36 @@ package com.zpi.domain.token.validator;
 
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
 import com.zpi.domain.common.RequestError;
-import com.zpi.domain.organization.client.ClientRepository;
-import com.zpi.domain.token.TokenRepository;
+import com.zpi.domain.rest.ams.AmsService;
+import com.zpi.domain.rest.ams.Client;
 import com.zpi.domain.token.RefreshRequest;
+import com.zpi.domain.token.TokenRepository;
 import com.zpi.domain.token.TokenRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class TokenRequestValidatorImpl implements TokenRequestValidator {
-    private final ClientRepository clientRepository;
+    private final AmsService ams;
     private final AuthCodeRepository authCodeRepository;
     private final TokenRepository tokenRepository;
 
+    private Optional<Client> client;
+
     @Override
     public void validate(TokenRequest request) throws ValidationFailedException {
+        this.client = ams.clientDetails(request.getClientId());
         validateCode(request);
         validate(new ValidationRequest(request));
     }
 
     @Override
     public void validate(RefreshRequest request) throws ValidationFailedException {
+        this.client = ams.clientDetails(request.getClientId());
         validateRefreshToken(request);
         validate(new ValidationRequest(request));
         validateScope(request);
@@ -77,15 +83,6 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
 
             throw new ValidationFailedException(error);
         }
-
-        if (!isClientAuthorizedToUseGrantType(request)) {
-            var error = RequestError.<TokenRequestErrorType>builder()
-                    .error(TokenRequestErrorType.UNAUTHORIZED_CLIENT)
-                    .errorDescription("Client is not authorized to use provided grant_type")
-                    .build();
-
-            throw new ValidationFailedException(error);
-        }
     }
 
     private boolean isNotSupportedGrantType(ValidationRequest request) {
@@ -95,17 +92,6 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
 
         return type == null || !type.equals(SUPPORTED_GRANT_TYPE);
     }
-
-    private boolean isClientAuthorizedToUseGrantType(ValidationRequest request) {
-        var client = clientRepository.findByKey(request.getClientId());
-
-        if (client.isEmpty()) {
-            return true;
-        }
-
-        return client.get().getAvailableGrantTypes().contains(request.getGrantType());
-    }
-
 
     private String unrecognizedGrantTypeMsg(ValidationRequest request) {
         return String.format("Unrecognized grant_type '%s'. Expected 'authorization_code'.", request.getGrantType());
@@ -128,7 +114,7 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
             return true;
         }
 
-        return clientRepository.findByKey(request.getClientId()).isEmpty();
+        return client.isEmpty();
     }
 
     private String unrecognizedValueMsg(String name, String value) {
@@ -161,8 +147,6 @@ public class TokenRequestValidatorImpl implements TokenRequestValidator {
     }
 
     private boolean isScopeExceedingRights(RefreshRequest request) {
-        var client = clientRepository.findByKey(request.getClientId());
-
         if (client.isEmpty()) {
             return true;
         }

@@ -1,7 +1,7 @@
 package com.zpi.audit
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.zpi.CommonHelpers
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.audit.AuditLog
@@ -9,13 +9,18 @@ import com.zpi.domain.audit.AuditMetadata
 import com.zpi.domain.audit.AuditRepository
 import com.zpi.domain.organization.Organization
 import com.zpi.domain.organization.OrganizationRepository
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.organization.client.ClientRepository
+import com.zpi.domain.rest.ams.Client
 import com.zpi.domain.user.UserRepository
+import com.zpi.infrastructure.rest.ams.AmsClient
+import com.zpi.testUtils.CommonFixtures
+import com.zpi.testUtils.CommonHelpers
+import com.zpi.testUtils.wiremock.ClientMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.http.MediaType
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
@@ -23,15 +28,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@AutoConfigureWireMock(port = 0)
+@ActiveProfiles("test")
 class AuditInterceptorFT extends Specification {
     @Autowired
     private MockMvc mockMvc
 
     @Autowired
-    private ObjectMapper mapper
+    private AmsClient ams;
 
     @Autowired
-    private ClientRepository clientRepository
+    private WireMockServer mockServer
+
+    @Autowired
+    private ObjectMapper mapper
 
     @Autowired
     private UserRepository userRepository
@@ -45,7 +55,7 @@ class AuditInterceptorFT extends Specification {
     private static final String baseUri = "/api/authenticate"
 
     def setup() {
-        clientRepository.clear()
+        ClientMocks.setupMockClientDetailsResponse(mockServer)
         userRepository.clear()
         organizationRepository.clear()
         auditRepository.clear()
@@ -54,10 +64,8 @@ class AuditInterceptorFT extends Specification {
     def "should add request headers from authenticate endpoint to audit repository when request is correct"() {
         given:
             def organization = new Organization("afgasdf")
-            def client = new Client("asdfadsf")
-            client.setOrganizationName(organization.getName())
-            def redirectUri = "sasdfdg"
-            client.addRedirectUri(redirectUri)
+            def redirectUri = CommonFixtures.redirectUri
+            def client = new Client(List.of(redirectUri), "asdfadsf")
             def request = new TicketRequestDTO(client.getId(), redirectUri, "code", "profile", "agasdf")
             def host = "192.168.0.1"
             def userAgent = "agent"
@@ -66,7 +74,6 @@ class AuditInterceptorFT extends Specification {
 
         and:
             organizationRepository.save(organization)
-            clientRepository.save(client.getId(), client)
             userRepository.save(hashedUser.getLogin(), hashedUser)
 
         when:
@@ -79,14 +86,13 @@ class AuditInterceptorFT extends Specification {
             )
 
         then:
-            def result = auditRepository.findByOrganization(organization)
-            def expected = new AuditLog(new Date(), new AuditMetadata(host, userAgent), organization.getName(), hashedUser.getLogin())
+            def result = auditRepository.findByUsername(hashedUser.getLogin())
+            def expected = new AuditLog(new Date(), new AuditMetadata(host, userAgent), hashedUser.getLogin())
 
         and:
             result.size() == 1
 
         and:
-            result.first().getOrganizationName() == expected.getOrganizationName()
             result.first().getMetadata().getHost() == expected.getMetadata().getHost()
             result.first().getMetadata().getUserAgent() == expected.getMetadata().getUserAgent()
             result.first().getUsername() == expected.getUsername()
@@ -95,7 +101,6 @@ class AuditInterceptorFT extends Specification {
     def "should add entry to incident repository when incorrect request is provided"() {
         given:
             organizationRepository.save(organization)
-            clientRepository.save(client.getId(), client)
             userRepository.save(user.toHashedDomain().getLogin(), user.toHashedDomain())
 
         when:
@@ -108,19 +113,13 @@ class AuditInterceptorFT extends Specification {
             )
 
         then:
-            def result = auditRepository.findByOrganization(organization)
+            def result = auditRepository.findByUsername(user.getLogin())
 
         and:
             result.size() == 0
 
         where:
-            organization         | client         | user                | host | userAgent | request                 || expected
-            new Organization("") | new Client("") | new UserDTO("", "") | ""   | ""        | Fixtures.emptyRequest() || null
-    }
-
-    private class Fixtures {
-        static TicketRequestDTO emptyRequest() {
-            return new TicketRequestDTO("", "", "", "", "")
-        }
+            organization         | user                | host | userAgent | request                                  || expected
+            new Organization("") | new UserDTO("", "") | ""   | ""        | new TicketRequestDTO("", "", "", "", "") || null
     }
 }

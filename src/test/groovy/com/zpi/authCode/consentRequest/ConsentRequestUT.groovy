@@ -1,6 +1,6 @@
 package com.zpi.authCode.consentRequest
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.*
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersister
 import com.zpi.domain.common.RequestError

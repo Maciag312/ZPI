@@ -1,15 +1,19 @@
 package com.zpi.authCode.ticketRequest
 
-
-import com.zpi.CommonFixtures
-import com.zpi.MvcRequestHelpers
-import com.zpi.ResultHelpers
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
-import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.UserManager
+import com.zpi.infrastructure.rest.ams.AmsClient
+import com.zpi.testUtils.CommonFixtures
+import com.zpi.testUtils.MvcRequestHelpers
+import com.zpi.testUtils.ResultHelpers
+import com.zpi.testUtils.wiremock.ClientMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
@@ -17,12 +21,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureWireMock(port = 0)
+@ActiveProfiles("test")
 class TicketRequestFT extends Specification {
     @Autowired
     private MockMvc mockMvc
 
     @Autowired
-    private ClientRepository repository
+    private AmsClient ams
+
+    @Autowired
+    private WireMockServer mockServer
 
     @Autowired
     private UserManager userManager
@@ -32,15 +41,14 @@ class TicketRequestFT extends Specification {
 
     private static final String baseUri = "/api/authenticate"
 
-    def cleanup() {
-        repository.clear()
+    def setup() {
+        ClientMocks.setupMockClientDetailsResponse(mockServer)
     }
 
     def "should return success on correct request"() {
         given:
             def request = CommonFixtures.requestDTO()
             def user = CommonFixtures.userDTO()
-            addClientWithRedirectUri()
             addUser()
 
         when:
@@ -63,7 +71,6 @@ class TicketRequestFT extends Specification {
                     .build()
 
             def user = CommonFixtures.userDTO()
-            addClientWithRedirectUri()
             addUser()
 
         when:
@@ -74,11 +81,6 @@ class TicketRequestFT extends Specification {
             ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
             !ResultHelpers.attributeFromResult("error", result).isEmpty()
             !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
-    }
-
-    private void addClientWithRedirectUri() {
-        def client = CommonFixtures.client()
-        repository.save(client.getId(), client)
     }
 
     private void addUser() {

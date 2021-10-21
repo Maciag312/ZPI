@@ -1,29 +1,29 @@
 package com.zpi.token
 
-import com.zpi.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.organization.client.ClientRepository
-import com.zpi.domain.token.TokenRepository
+import com.zpi.domain.rest.ams.AmsService
+import com.zpi.domain.rest.ams.Client
 import com.zpi.domain.token.RefreshRequest
+import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.TokenRequest
 import com.zpi.domain.token.issuer.TokenData
 import com.zpi.domain.token.validator.TokenRequestErrorType
 import com.zpi.domain.token.validator.TokenRequestValidator
 import com.zpi.domain.token.validator.TokenRequestValidatorImpl
 import com.zpi.domain.token.validator.ValidationFailedException
+import com.zpi.testUtils.CommonFixtures
 import spock.lang.Specification
 import spock.lang.Subject
 
 class TokenRequestValidatorUT extends Specification {
-    def clientRepository = Mock(ClientRepository)
     def authCodeRepository = Mock(AuthCodeRepository)
     def tokenRepository = Mock(TokenRepository)
+    def amsService = Mock(AmsService)
 
     @Subject
-    private TokenRequestValidator validator = new TokenRequestValidatorImpl(clientRepository, authCodeRepository, tokenRepository)
+    private TokenRequestValidator validator = new TokenRequestValidatorImpl(amsService, authCodeRepository, tokenRepository)
 
     def "should not throw on correct data"() {
         given:
@@ -31,7 +31,7 @@ class TokenRequestValidatorUT extends Specification {
             def client = CommonFixtures.client()
 
         and:
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            amsService.clientDetails(request.getClientId()) >> Optional.of(client)
             authCodeRepository.findByKey(request.getCode()) >> Optional.of(TokenCommonFixtures.authCode)
 
         when:
@@ -50,7 +50,7 @@ class TokenRequestValidatorUT extends Specification {
                     .build()
 
         and:
-            clientRepository.findByKey(clientId) >> Optional.empty()
+            amsService.clientDetails(request.getClientId()) >> Optional.empty()
             authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", new AuthUserData("", "", "")))
 
         when:
@@ -78,11 +78,11 @@ class TokenRequestValidatorUT extends Specification {
                     .code(code)
                     .build()
 
-            def client = new Client(CommonFixtures.clientId)
+            def client = new Client(List.of(CommonFixtures.redirectUri), CommonFixtures.clientId)
 
         and:
             authCodeRepository.findByKey(request.getCode()) >> Optional.empty()
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            amsService.clientDetails(request.getClientId()) >> Optional.of(client)
 
         when:
             validator.validate(request)
@@ -104,11 +104,11 @@ class TokenRequestValidatorUT extends Specification {
     def "should throw invalid_grant on incorrect refresh_token"() {
         given:
             def request = new RefreshRequest(CommonFixtures.clientId, CommonFixtures.grantType, refreshToken, "profile")
-            def client = new Client(CommonFixtures.clientId)
+            def client = new Client(List.of(CommonFixtures.redirectUri), CommonFixtures.clientId)
 
         and:
             tokenRepository.findByKey(request.getRefreshToken()) >> Optional.empty()
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            amsService.clientDetails(request.getClientId()) >> Optional.of(client)
 
         when:
             validator.validate(request)
@@ -127,27 +127,6 @@ class TokenRequestValidatorUT extends Specification {
             null           || "Unrecognized refresh_token 'null'"
     }
 
-    def "should throw unauthorized_client when client is not authorized to use provided grant_type"() {
-        given:
-            def request = Fixtures.correctRequest()
-            def client = new Client("asdf")
-            client.setAvailableGrantTypes(Set.of(""))
-
-        and:
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
-            authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", new AuthUserData("", "", "")))
-
-        when:
-            validator.validate(request)
-
-        then:
-            def thrown = thrown(ValidationFailedException)
-
-        and:
-            thrown.getError().error == TokenRequestErrorType.UNAUTHORIZED_CLIENT
-            thrown.getError().getErrorDescription() == "Client is not authorized to use provided grant_type"
-    }
-
     def "should throw unsupported_grant_type on incorrect grant_type"() {
         given:
             def request = TokenRequest.builder()
@@ -156,10 +135,10 @@ class TokenRequestValidatorUT extends Specification {
                     .code(Fixtures.correctRequest().getCode())
                     .build()
 
-            def client = new Client(CommonFixtures.clientId)
+            def client = new Client(List.of(CommonFixtures.redirectUri), CommonFixtures.clientId)
 
         and:
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            amsService.clientDetails(request.getClientId()) >> Optional.of(client)
             authCodeRepository.findByKey(request.getCode()) >> Optional.of(new AuthCode("", new AuthUserData("", "", "")))
 
         when:
@@ -184,12 +163,11 @@ class TokenRequestValidatorUT extends Specification {
             def tokenData = new TokenData("asdfdf", "", "")
             def request = new RefreshRequest(CommonFixtures.clientId, CommonFixtures.grantType, tokenData.getValue(), scope)
 
-            def client = new Client(CommonFixtures.clientId)
-            client.getAvailableRedirectUri().add(CommonFixtures.redirectUri)
+            def client = new Client(List.of(CommonFixtures.redirectUri), CommonFixtures.clientId)
 
         and:
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
-        tokenRepository.findByKey(request.getRefreshToken()) >> Optional.of(tokenData)
+            amsService.clientDetails(request.getClientId()) >> Optional.of(client)
+            tokenRepository.findByKey(request.getRefreshToken()) >> Optional.of(tokenData)
 
         when:
             validator.validate(request)

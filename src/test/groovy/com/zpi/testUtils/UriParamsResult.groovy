@@ -1,4 +1,4 @@
-package com.zpi
+package com.zpi.testUtils
 
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import org.springframework.test.web.servlet.ResultActions

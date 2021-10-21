@@ -1,8 +1,7 @@
 package com.zpi.user
 
-
-import com.zpi.MvcRequestHelpers
 import com.zpi.api.common.dto.UserDTO
+import com.zpi.testUtils.MvcRequestHelpers
 import com.zpi.domain.organization.Organization
 import com.zpi.domain.organization.OrganizationRepository
 import com.zpi.domain.user.UserRepository
@@ -137,7 +136,6 @@ class UserRegistrationFT extends Specification {
             return UserDTO.builder()
                     .login(login)
                     .password(password)
-
                     .build()
         }
     }

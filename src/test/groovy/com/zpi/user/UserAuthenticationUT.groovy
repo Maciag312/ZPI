@@ -1,6 +1,6 @@
 package com.zpi.user
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.user.UserAuthenticator
 import com.zpi.domain.user.UserRepository
