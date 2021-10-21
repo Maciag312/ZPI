@@ -32,7 +32,7 @@ class AuditRequestFT extends Specification {
     @Autowired
     private ObjectMapper mapper
 
-    private static final String baseUri = "/api/audit/"
+    private static final String baseUri = "/api/audit/users/"
 
     def setup() {
         auditRepository.clear()

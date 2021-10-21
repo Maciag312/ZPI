@@ -29,9 +29,7 @@ public class AuthCodeController {
     public final static String authenticateUri = "/authenticate";
     public final static String consentUri = "/consent";
 
-    private static String AUTH_PAGE_URI(String organization) {
-        return "/organization/" + organization + "/signin";
-    }
+    private final static String AUTH_PAGE_URI = "/organization/pizza-house/signin";
 
     @GetMapping(authorizeUri)
     public ResponseEntity<?> authorize(@RequestParam String client_id,
@@ -46,19 +44,18 @@ public class AuthCodeController {
                 scope,
                 state);
         var request = requestDTO.toDomain();
-        AtomicReference<String> organization = new AtomicReference<>("");
-        return getRedirectInfo(request, organization.get());
+        return getRedirectInfo(request);
     }
 
-    private ResponseEntity<?> getRedirectInfo(AuthenticationRequest request, String organization) {
+    private ResponseEntity<?> getRedirectInfo(AuthenticationRequest request) {
         String location;
 
         try {
             var response = new AuthenticationResponseDTO(authCodeService.validateAndFillRequest(request));
-            location = response.toUrl(AUTH_PAGE_URI(organization));
+            location = response.toUrl(AUTH_PAGE_URI);
         } catch (ErrorResponseException e) {
             var response = e.getErrorResponse();
-            location = response.toUrl(AUTH_PAGE_URI(organization));
+            location = response.toUrl(AUTH_PAGE_URI);
         }
 
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
@@ -103,7 +100,7 @@ public class AuthCodeController {
             var location = response.toUrl();
             return ResponseEntity.status(HttpStatus.OK).body(location);
         } catch (ErrorConsentResponseException e) {
-            var location = e.toUrl(AUTH_PAGE_URI(""), request.getState());
+            var location = e.toUrl(AUTH_PAGE_URI, request.getState());
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
         }
     }

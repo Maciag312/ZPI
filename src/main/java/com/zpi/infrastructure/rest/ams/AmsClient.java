@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
-@FeignClient(name = "ams", url = "localhost:${wiremock.server.port:#{10000}}/api/authserver/client")
+@FeignClient(name = "ams", url = "localhost:${wiremock.server.port:#{10000}}/api/authserver")
 public interface AmsClient {
     @GetMapping("/client/{id}/")
     Optional<ClientDTO> clientDetails(@PathVariable String id);

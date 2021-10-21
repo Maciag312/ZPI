@@ -16,7 +16,7 @@ public class AuditController {
 
     private final AuditService service;
 
-    @GetMapping(auditUri + "/{username}")
+    @GetMapping(auditUri + "/users/{username}")
     public ResponseEntity<?> audit(@PathVariable String username) {
         return ResponseEntity.ok(service.findByUsername(username));
     }
