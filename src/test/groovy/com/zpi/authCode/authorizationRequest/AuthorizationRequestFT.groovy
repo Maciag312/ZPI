@@ -1,26 +1,33 @@
 package com.zpi.authCode.authorizationRequest
 
-import com.zpi.CommonFixtures
-import com.zpi.MvcRequestHelpers
-import com.zpi.ResultHelpers
-import com.zpi.UriParamsResult
+import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.domain.authCode.consentRequest.TicketRepository
-import com.zpi.domain.organization.client.ClientRepository
+import com.zpi.infrastructure.rest.ams.AmsClient
+import com.zpi.testUtils.CommonFixtures
+import com.zpi.testUtils.MvcRequestHelpers
+import com.zpi.testUtils.ResultHelpers
+import com.zpi.testUtils.UriParamsResult
+import com.zpi.testUtils.wiremock.ClientMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureWireMock(port = 0)
 class AuthorizationRequestFT extends Specification {
     @Autowired
     private MockMvc mockMvc
 
     @Autowired
-    private ClientRepository clientRepository
+    private AmsClient amsClient
+
+    @Autowired
+    private WireMockServer mockServer
 
     @Autowired
     private TicketRepository ticketRepository
@@ -31,13 +38,11 @@ class AuthorizationRequestFT extends Specification {
     private static final String baseUrl = "/api/authorize"
 
     def setup() {
-        def client = CommonFixtures.client()
-        clientRepository.save(client.getId(), client)
+        ClientMocks.setupMockClientDetailsResponse(mockServer)
     }
 
     def cleanup() {
         ticketRepository.clear()
-        clientRepository.clear()
     }
 
     def "should redirect with success with all correct parameters"() {
@@ -61,7 +66,7 @@ class AuthorizationRequestFT extends Specification {
             def response = mvcRequestHelpers.getRequest(ResultHelpers.authParametersToUrl(request, baseUrl))
 
         then:
-            def redirectUri = clientRepository.findByKey(request.getClientId()).get().getAvailableRedirectUri().stream().findFirst().orElse(null)
+            def redirectUri = amsClient.clientDetails(request.getClientId()).get().getAvailableRedirectUri().stream().findFirst().orElse(null)
 
         and:
             def expected = TicketRequestDTO.builder()

@@ -11,7 +11,6 @@ import com.zpi.api.common.exception.ErrorResponseException;
 import com.zpi.domain.authCode.AuthCodeService;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
-import com.zpi.domain.organization.client.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("/api")
 public class AuthCodeController {
     private final AuthCodeService authCodeService;
-    private final ClientService clientService;
 
     public final static String authorizeUri = "/authorize";
     public final static String authenticateUri = "/authenticate";
@@ -49,8 +47,6 @@ public class AuthCodeController {
                 state);
         var request = requestDTO.toDomain();
         AtomicReference<String> organization = new AtomicReference<>("");
-        clientService.getClient(client_id)
-                .ifPresent(client -> organization.set(client.getOrganizationName()));
         return getRedirectInfo(request, organization.get());
     }
 
@@ -94,7 +90,7 @@ public class AuthCodeController {
         } catch (ErrorResponseException e) {
             return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>("Empty userDTO", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -105,10 +101,8 @@ public class AuthCodeController {
         try {
             var response = new ConsentResponseDTO(authCodeService.consentRequest(request));
             var location = response.toUrl();
-            //FIXME should return Location header but it doesn't work for path with file suffix
             return ResponseEntity.status(HttpStatus.OK).body(location);
         } catch (ErrorConsentResponseException e) {
-            //TODO investigate how to pass organization when exception occurs
             var location = e.toUrl(AUTH_PAGE_URI(""), request.getState());
             return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, location).body(null);
         }

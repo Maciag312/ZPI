@@ -1,4 +1,4 @@
-package com.zpi
+package com.zpi.testUtils
 
 import com.jayway.jsonpath.JsonPath
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO

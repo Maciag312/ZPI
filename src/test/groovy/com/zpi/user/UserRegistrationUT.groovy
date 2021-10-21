@@ -1,6 +1,6 @@
 package com.zpi.user
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.user.UserRepository
 import com.zpi.domain.user.UserManager
 import spock.lang.Specification

@@ -1,6 +1,6 @@
 package com.zpi.token
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.token.issuer.config.TokenClaims

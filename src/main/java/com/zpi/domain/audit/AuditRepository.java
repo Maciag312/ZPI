@@ -7,5 +7,5 @@ import java.util.Date;
 import java.util.List;
 
 public interface AuditRepository extends EntityRepository<Date, AuditLog> {
-    List<AuditLog> findByOrganization(Organization organization);
+    List<AuditLog> findByUsername(String username);
 }

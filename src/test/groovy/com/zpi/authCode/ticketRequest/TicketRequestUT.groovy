@@ -1,6 +1,6 @@
 package com.zpi.authCode.ticketRequest
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.api.common.dto.ErrorResponseDTO
 import com.zpi.api.common.exception.ErrorResponseException
 import com.zpi.domain.audit.AuditMetadata
@@ -15,14 +15,12 @@ import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
-import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.user.User
 import com.zpi.domain.user.UserAuthenticator
 import spock.lang.Specification
 import spock.lang.Subject
 
 class TicketRequestUT extends Specification {
-    def clientRepository = Mock(ClientRepository)
     def requestValidator = Mock(RequestValidator)
     def authenticator = Mock(UserAuthenticator)
     def consentService = Mock(ConsentServiceImpl)
@@ -38,7 +36,6 @@ class TicketRequestUT extends Specification {
             def user = CommonFixtures.userDTO().toHashedDomain()
             def client = CommonFixtures.client()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> true
             authorizationService.createTicket(user, request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
@@ -58,7 +55,6 @@ class TicketRequestUT extends Specification {
             def client = CommonFixtures.client()
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
             }
@@ -80,7 +76,6 @@ class TicketRequestUT extends Specification {
             def client = CommonFixtures.client()
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             authenticator.isAuthenticated(user) >> false
             auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null

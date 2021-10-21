@@ -1,4 +1,4 @@
-package com.zpi.infrastructure.user;
+package com.zpi.infrastructure.organization.user;
 
 import com.zpi.domain.user.User;
 import com.zpi.domain.user.UserRepository;

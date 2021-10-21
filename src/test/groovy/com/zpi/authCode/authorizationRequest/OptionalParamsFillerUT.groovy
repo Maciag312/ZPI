@@ -1,18 +1,18 @@
 package com.zpi.authCode.authorizationRequest
 
-import com.zpi.CommonFixtures
-import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.organization.client.ClientRepository
+import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
+import com.zpi.domain.rest.ams.AmsService
+import com.zpi.domain.rest.ams.Client
 import spock.lang.Specification
 import spock.lang.Subject
 
 class OptionalParamsFillerUT extends Specification {
-    def clientRepository = Mock(ClientRepository)
+    def ams = Mock(AmsService)
 
     @Subject
-    private OptionalParamsFiller filler = new OptionalParamsFiller(clientRepository)
+    private OptionalParamsFiller filler = new OptionalParamsFiller(ams)
 
     def "should fill missing redirect_uri"() {
         given:
@@ -26,9 +26,8 @@ class OptionalParamsFillerUT extends Specification {
 
         and:
             def defaultRedirectUri = "asdfasdfsadfasdfasdf"
-            def client = new Client("1")
-            client.getAvailableRedirectUri().addAll(List.of(defaultRedirectUri));
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            def client = new Client(List.of(defaultRedirectUri), "1")
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
 
         when:
             def filled = filler.fill(request)
@@ -56,9 +55,9 @@ class OptionalParamsFillerUT extends Specification {
                     .build()
 
         and:
-            def client = new Client('1')
+            def client = new Client(new ArrayList<String>(), "1")
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
 
         when:
             def filled = filler.fill(request)

@@ -1,4 +1,4 @@
-package com.zpi
+package com.zpi.testUtils
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.jayway.jsonpath.JsonPath
@@ -8,7 +8,10 @@ import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
+import org.springframework.util.MultiValueMap
 import org.springframework.web.util.UriComponentsBuilder
+
+import java.util.stream.Collectors
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -64,4 +67,26 @@ class CommonHelpers {
         def location = response.getHeader("Location")
         return UriComponentsBuilder.fromUriString(location).build().getQueryParams().get(attribute).get(0)
     }
+
+    static String attributeFromRedirectedUrlInBody(String attribute, ResultActions result) {
+        def uri = UriComponentsBuilder
+                .fromUriString(
+                        result.andReturn().getResponse().getContentAsString()
+                ).build()
+
+
+        return getParam(attribute, uri.getQueryParams())
+    }
+
+    private static String getParam(String name, MultiValueMap<String, String> params) {
+        return listToString(params.get(name))
+    }
+
+    private static String listToString(List<String> list) {
+        return list.stream()
+                .map(s -> s)
+                .collect(Collectors.joining(" "))
+                .trim()
+    }
+
 }

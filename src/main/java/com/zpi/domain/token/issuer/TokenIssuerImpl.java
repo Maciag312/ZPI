@@ -3,8 +3,6 @@ package com.zpi.domain.token.issuer;
 import com.zpi.domain.authCode.consentRequest.AuthCode;
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
 import com.zpi.domain.common.AuthCodeGenerator;
-import com.zpi.domain.organization.client.Client;
-import com.zpi.domain.organization.client.ClientRepository;
 import com.zpi.domain.token.RefreshRequest;
 import com.zpi.domain.token.Token;
 import com.zpi.domain.token.TokenRepository;
@@ -22,7 +20,6 @@ public class TokenIssuerImpl implements TokenIssuer {
     private final TokenIssuerConfigProvider configProvider;
     private final AuthCodeRepository authCodeRepository;
     private final TokenRepository tokenRepository;
-    private final ClientRepository clientRepository;
     private final AuthCodeGenerator generator;
 
     private static final String tokenType = "Bearer";
@@ -30,8 +27,7 @@ public class TokenIssuerImpl implements TokenIssuer {
     @Override
     public Token issue(TokenRequest tokenRequest) throws NoSuchElementException {
         var code = retrieveCode(tokenRequest);
-        var client = retrieveClient(tokenRequest.getClientId());
-        var claims = new UserClaims(code, client);
+        var claims = new UserClaims(code);
 
         return issueToken(claims);
     }
@@ -39,8 +35,7 @@ public class TokenIssuerImpl implements TokenIssuer {
     @Override
     public Token refresh(RefreshRequest request) throws NoSuchElementException {
         var data = retrieveTokenData(request);
-        var client = retrieveClient(request.getClientId());
-        var claims = new UserClaims(data, client);
+        var claims = new UserClaims(data);
 
         return issueToken(claims);
     }
@@ -67,11 +62,6 @@ public class TokenIssuerImpl implements TokenIssuer {
         tokenRepository.remove(request.getRefreshToken());
 
         return data.orElseThrow();
-    }
-
-    private Client retrieveClient(String clientId) {
-        var data = clientRepository.findByKey(clientId);
-        return data.orElse(null);
     }
 
     private String buildAccessToken(UserClaims userClaims) {

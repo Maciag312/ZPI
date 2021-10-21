@@ -1,8 +1,8 @@
 package com.zpi.domain.authCode.authenticationRequest;
 
-import com.zpi.domain.organization.client.Client;
-import com.zpi.domain.organization.client.ClientRepository;
 import com.zpi.domain.common.RequestError;
+import com.zpi.domain.rest.ams.AmsService;
+import com.zpi.domain.rest.ams.Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class RequestValidatorImpl implements RequestValidator {
-    private final ClientRepository clientRepository;
+    private final AmsService ams;
     private final OptionalParamsFiller filler;
 
     private static final HashSet<String> supportedResponseTypes = new HashSet<>(Collections.singleton("code"));
@@ -25,7 +25,7 @@ public class RequestValidatorImpl implements RequestValidator {
     @Override
     public AuthenticationRequest validateAndFillMissingFields(AuthenticationRequest request) throws ValidationFailedException {
         this.request = request;
-        this.client = clientRepository.findByKey(request.getClientId()).orElse(null);
+        this.client = ams.clientDetails(request.getClientId()).orElse(null);
 
         validateClient();
 

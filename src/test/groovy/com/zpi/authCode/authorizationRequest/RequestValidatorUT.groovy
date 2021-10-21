@@ -1,30 +1,30 @@
 package com.zpi.authCode.authorizationRequest
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
-import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
+import com.zpi.domain.authCode.authenticationRequest.OptionalParamsFiller
 import com.zpi.domain.authCode.authenticationRequest.RequestValidatorImpl
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.organization.client.ClientRepository
 import com.zpi.domain.common.RequestError
+import com.zpi.domain.rest.ams.AmsService
+import com.zpi.domain.rest.ams.Client
 import spock.lang.Specification
 import spock.lang.Subject
 
 class RequestValidatorUT extends Specification {
-    def clientRepository = Mock(ClientRepository)
     def filler = Mock(OptionalParamsFiller)
+    def ams = Mock(AmsService)
 
     @Subject
-    private RequestValidatorImpl requestValidation = new RequestValidatorImpl(clientRepository, filler)
+    private RequestValidatorImpl requestValidation = new RequestValidatorImpl(ams, filler)
 
     def "should not throw when all parameters correct"() {
         given:
             def request = CommonFixtures.request()
             def client = CommonFixtures.client()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -38,7 +38,7 @@ class RequestValidatorUT extends Specification {
         given:
             def request = Fixtures.correctRequest().toDomain()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.empty()
+            ams.clientDetails(request.getClientId()) >> Optional.empty()
             filler.fill(request) >> request
 
         when:
@@ -60,7 +60,7 @@ class RequestValidatorUT extends Specification {
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = CommonFixtures.client()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -82,7 +82,7 @@ class RequestValidatorUT extends Specification {
             def request = Fixtures.requestWithCustomUri("UnrecognizedUri").toDomain()
             def client = Fixtures.clientWithEmptyRedirectURIs()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -103,7 +103,7 @@ class RequestValidatorUT extends Specification {
         given:
             def client = CommonFixtures.client()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -129,7 +129,7 @@ class RequestValidatorUT extends Specification {
         given:
             def client = CommonFixtures.client()
 
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
+            ams.clientDetails(request.getClientId()) >> Optional.of(client)
             filler.fill(request) >> request
 
         when:
@@ -202,7 +202,7 @@ class RequestValidatorUT extends Specification {
         }
 
         static Client clientWithEmptyRedirectURIs() {
-            return new Client(CommonFixtures.clientId);
+            return new Client(new ArrayList(),CommonFixtures.clientId);
         }
     }
 }

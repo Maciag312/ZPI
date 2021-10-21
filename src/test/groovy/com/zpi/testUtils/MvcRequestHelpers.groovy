@@ -1,4 +1,4 @@
-package com.zpi
+package com.zpi.testUtils
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Autowired

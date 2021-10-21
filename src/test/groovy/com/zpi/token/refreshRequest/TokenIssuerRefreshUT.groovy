@@ -1,16 +1,15 @@
 package com.zpi.token.refreshRequest
 
-import com.zpi.CommonFixtures
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.common.AuthCodeGenerator
-import com.zpi.domain.organization.client.Client
-import com.zpi.domain.organization.client.ClientRepository
-import com.zpi.domain.token.*
+import com.zpi.domain.token.RefreshRequest
+import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.issuer.TokenData
 import com.zpi.domain.token.issuer.TokenIssuer
+import com.zpi.domain.token.issuer.TokenIssuerImpl
 import com.zpi.domain.token.issuer.config.TokenIssuerConfig
 import com.zpi.domain.token.issuer.config.TokenIssuerConfigProvider
-import com.zpi.domain.token.issuer.TokenIssuerImpl
 import com.zpi.token.TokenCommonFixtures
 import org.springframework.test.util.ReflectionTestUtils
 import spock.lang.Specification
@@ -20,20 +19,16 @@ class TokenIssuerRefreshUT extends Specification {
     def configProvider = Mock(TokenIssuerConfigProvider)
     def authCodeRepository = Mock(AuthCodeRepository)
     def tokenRepository = Mock(TokenRepository)
-    def clientRepository = Mock(ClientRepository)
     def generator = Mock(AuthCodeGenerator)
 
     @Subject
-    private TokenIssuer issuer = new TokenIssuerImpl(configProvider, authCodeRepository, tokenRepository, clientRepository, generator)
+    private TokenIssuer issuer = new TokenIssuerImpl(configProvider, authCodeRepository, tokenRepository, generator)
 
     def "should refresh token if data correct"() {
         given:
             def refreshToken = "asdf"
             def request = new RefreshRequest(CommonFixtures.clientId, CommonFixtures.grantType, refreshToken, CommonFixtures.scope)
-
             def config = new TokenIssuerConfig(TokenCommonFixtures.secretKey)
-            def client = new Client(request.getClientId())
-            client.setOrganizationName("asdf")
 
             ReflectionTestUtils.setField(config, "claims", TokenCommonFixtures.claims())
         and:
@@ -41,7 +36,6 @@ class TokenIssuerRefreshUT extends Specification {
             configProvider.getConfig() >> config
             authCodeRepository.findByKey(TokenCommonFixtures.authCode.getValue()) >> Optional.of(TokenCommonFixtures.authCode)
             tokenRepository.findByKey(refreshToken) >> Optional.of(new TokenData(refreshToken, CommonFixtures.scope, CommonFixtures.userDTO().login))
-            clientRepository.findByKey(request.getClientId()) >> Optional.of(client)
 
         when:
             def result = issuer.refresh(request)
@@ -56,7 +50,7 @@ class TokenIssuerRefreshUT extends Specification {
         and:
             def body = parsed.getBody()
 
-            body.getIssuer() == client.getOrganizationName()
+            body.getIssuer() == ""
             TokenCommonFixtures.areDatesQuiteEqual(body.getIssuedAt(), TokenCommonFixtures.claims().getIssuedAt())
             TokenCommonFixtures.areDatesQuiteEqual(body.getExpiration(), TokenCommonFixtures.claims().getExpirationTime())
             body.get("scope") == TokenCommonFixtures.authCode.getUserData().getScope()

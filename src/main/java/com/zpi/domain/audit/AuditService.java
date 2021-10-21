@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface AuditService {
     void audit(User user, AuthenticationRequest request, AuditMetadata metadata);
-    List<AuditLog> findByOrganization(String organizationName) throws ErrorResponseException;
+    List<AuditLog> findByUsername(String username);
 }
