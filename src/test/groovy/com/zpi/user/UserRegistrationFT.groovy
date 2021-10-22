@@ -1,10 +1,8 @@
 package com.zpi.user
 
 import com.zpi.api.common.dto.UserDTO
-import com.zpi.testUtils.MvcRequestHelpers
-import com.zpi.domain.organization.Organization
-import com.zpi.domain.organization.OrganizationRepository
 import com.zpi.domain.user.UserRepository
+import com.zpi.testUtils.MvcRequestHelpers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -19,21 +17,9 @@ class UserRegistrationFT extends Specification {
     private UserRepository repository
 
     @Autowired
-    private OrganizationRepository organizationRepository;
-
-    @Autowired
     private MvcRequestHelpers commonHelpers
 
-    private static final String url(String organizationName) {
-        return "/api/organization/" + organizationName + "/user/register"
-    }
-
-    private static organizationName = "pizzaHouse"
-
-
-    def setup() {
-        organizationRepository.save(new Organization(organizationName));
-    }
+    private static final String baseUri = "/api/user/register"
 
     def cleanup() {
         repository.clear()
@@ -44,7 +30,7 @@ class UserRegistrationFT extends Specification {
             def user = Fixtures.userWithRandomData()
 
         when:
-            def request = commonHelpers.postRequest(user, url(organizationName))
+            def request = commonHelpers.postRequest(user, baseUri)
 
         then:
             request.andExpect(status().isCreated())
@@ -62,8 +48,8 @@ class UserRegistrationFT extends Specification {
             def user = Fixtures.userWithRandomData()
 
         when:
-            commonHelpers.postRequest(user, url(organizationName))
-            def request = commonHelpers.postRequest(user, url(organizationName))
+            commonHelpers.postRequest(user, baseUri)
+            def request = commonHelpers.postRequest(user, baseUri)
 
         then:
             request.andExpect(status().isConflict())
@@ -86,8 +72,8 @@ class UserRegistrationFT extends Specification {
                     .build()
 
         when:
-            commonHelpers.postRequest(userA, url(organizationName))
-            def request = commonHelpers.postRequest(userB, url(organizationName))
+            commonHelpers.postRequest(userA, baseUri)
+            def request = commonHelpers.postRequest(userB, baseUri)
 
         then:
             request.andExpect(status().isConflict())
@@ -105,7 +91,7 @@ class UserRegistrationFT extends Specification {
             def user = null
 
         when:
-            def request = commonHelpers.postRequest(user, url(organizationName))
+            def request = commonHelpers.postRequest(user, baseUri)
 
         then:
             request.andExpect(status().isBadRequest())
@@ -114,13 +100,12 @@ class UserRegistrationFT extends Specification {
 
     def "should return bad request on malformed user"() {
         given:
-            def organizationName = "pizzaHouse"
             def userA = UserDTO.builder().build()
             def userB = UserDTO.builder().login("Login").build()
 
         when:
-            def requestA = commonHelpers.postRequest(userA, url(organizationName))
-            def requestB = commonHelpers.postRequest(userB, url(organizationName))
+            def requestA = commonHelpers.postRequest(userA, baseUri)
+            def requestB = commonHelpers.postRequest(userB, baseUri)
 
         then:
             requestA.andExpect(status().isBadRequest())

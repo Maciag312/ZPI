@@ -7,8 +7,6 @@ import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.audit.AuditLog
 import com.zpi.domain.audit.AuditMetadata
 import com.zpi.domain.audit.AuditRepository
-import com.zpi.domain.organization.Organization
-import com.zpi.domain.organization.OrganizationRepository
 import com.zpi.domain.rest.ams.Client
 import com.zpi.domain.user.UserRepository
 import com.zpi.infrastructure.rest.ams.AmsClient
@@ -47,9 +45,6 @@ class AuditInterceptorFT extends Specification {
     private UserRepository userRepository
 
     @Autowired
-    private OrganizationRepository organizationRepository
-
-    @Autowired
     private AuditRepository auditRepository
 
     private static final String baseUri = "/api/authenticate"
@@ -57,13 +52,11 @@ class AuditInterceptorFT extends Specification {
     def setup() {
         ClientMocks.setupMockClientDetailsResponse(mockServer)
         userRepository.clear()
-        organizationRepository.clear()
         auditRepository.clear()
     }
 
     def "should add request headers from authenticate endpoint to audit repository when request is correct"() {
         given:
-            def organization = new Organization("afgasdf")
             def redirectUri = CommonFixtures.redirectUri
             def client = new Client(List.of(redirectUri), "asdfadsf")
             def request = new TicketRequestDTO(client.getId(), redirectUri, "code", "profile", "agasdf")
@@ -73,7 +66,6 @@ class AuditInterceptorFT extends Specification {
             def hashedUser = user.toHashedDomain()
 
         and:
-            organizationRepository.save(organization)
             userRepository.save(hashedUser.getLogin(), hashedUser)
 
         when:
@@ -100,7 +92,6 @@ class AuditInterceptorFT extends Specification {
 
     def "should add entry to incident repository when incorrect request is provided"() {
         given:
-            organizationRepository.save(organization)
             userRepository.save(user.toHashedDomain().getLogin(), user.toHashedDomain())
 
         when:
@@ -119,7 +110,7 @@ class AuditInterceptorFT extends Specification {
             result.size() == 0
 
         where:
-            organization         | user                | host | userAgent | request                                  || expected
-            new Organization("") | new UserDTO("", "") | ""   | ""        | new TicketRequestDTO("", "", "", "", "") || null
+             user                | host | userAgent | request                                  || expected
+             new UserDTO("", "") | ""   | ""        | new TicketRequestDTO("", "", "", "", "") || null
     }
 }

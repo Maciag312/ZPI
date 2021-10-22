@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -29,7 +27,7 @@ public class AuthCodeController {
     public final static String authenticateUri = "/authenticate";
     public final static String consentUri = "/consent";
 
-    private final static String AUTH_PAGE_URI = "/organization/pizza-house/signin";
+    private final static String AUTH_PAGE_URI = "/signin";
 
     @GetMapping(authorizeUri)
     public ResponseEntity<?> authorize(@RequestParam String client_id,

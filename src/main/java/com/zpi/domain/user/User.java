@@ -13,7 +13,4 @@ import java.util.Optional;
 public class User {
     private final String login;
     private final String password;
-
-    @Setter
-    private String organization;
 }

@@ -1,13 +1,15 @@
-package com.zpi.api.organization.user;
+package com.zpi.api.user;
 
 import com.zpi.api.common.dto.UserDTO;
-import com.zpi.domain.organization.OrganizationService;
 import com.zpi.domain.user.UserManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -15,18 +17,13 @@ import javax.validation.Valid;
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/api/organization/{name}/user")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserManager userService;
-    private final OrganizationService organizationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO, @PathVariable String name) {
-        if (!organizationService.exists(name)) {
-            throw new IllegalArgumentException("Organization with such name doesn't exists");
-        }
+    public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO) {
         var user = userDTO.toHashedDomain();
-        user.setOrganization(name);
         if (userService.createUser(user)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

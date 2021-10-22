@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.zpi.domain.audit.AuditLog
 import com.zpi.domain.audit.AuditMetadata
 import com.zpi.domain.audit.AuditRepository
-import com.zpi.domain.organization.OrganizationRepository
 import com.zpi.testUtils.CommonHelpers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -22,9 +21,6 @@ class AuditRequestFT extends Specification {
 
     @Autowired
     private AuditRepository auditRepository
-
-    @Autowired
-    private OrganizationRepository organizationRepository
 
     @Autowired
     private CommonHelpers helpers
@@ -53,7 +49,7 @@ class AuditRequestFT extends Specification {
             response.andExpect(content().json(mapper.writeValueAsString(List.of(log))))
     }
 
-    def "should return empty response for registered organization with no audit data"() {
+    def "should return empty response for user with no audit data"() {
         when:
             def response = helpers.getRequest(baseUri + "asdf")
 

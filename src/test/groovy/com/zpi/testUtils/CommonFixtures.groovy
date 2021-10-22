@@ -22,7 +22,7 @@ class CommonFixtures {
     public static final String password = "Password"
 
     public static final String ticket = "defaultTicketsfasdgfartasdfafta"
-    public static final String authPageUrl = "/organization/pizza-house/signin"
+    public static final String authPageUrl = "/signin"
     public static final String grantType = "authorization_code"
 
     static TicketRequestDTO requestDTO() {
