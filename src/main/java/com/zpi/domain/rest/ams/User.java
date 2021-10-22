@@ -1,4 +1,4 @@
-package com.zpi.domain.user;
+package com.zpi.domain.rest.ams;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

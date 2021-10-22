@@ -6,11 +6,11 @@ import com.zpi.api.token.dto.RefreshRequestDTO
 import com.zpi.api.token.dto.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import com.zpi.domain.rest.ams.Client
-import com.zpi.domain.user.UserRepository
 import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.testUtils.CommonHelpers
 import com.zpi.testUtils.wiremock.ClientMocks
+import com.zpi.testUtils.wiremock.UserMocks
 import com.zpi.token.TokenCommonFixtures
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -38,9 +38,6 @@ class AuthFlowE2E extends Specification {
     private WireMockServer mockServer
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
     private TicketRepository ticketRepository
 
     @Autowired
@@ -55,10 +52,11 @@ class AuthFlowE2E extends Specification {
     private static final String refreshTokenRequestUri = "/api/token/refresh"
 
     def setup() {
-        userRepository.clear()
         ticketRepository.clear()
 
         ClientMocks.setupMockClientDetailsResponse(mockServer)
+        UserMocks.setupMockUserRegisterResponse(mockServer)
+        UserMocks.setupMockUserAuthenticateResponse(mockServer)
     }
 
     def "should perform whole oauth2 flow"() {

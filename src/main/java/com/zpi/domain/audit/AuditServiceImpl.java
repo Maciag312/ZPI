@@ -1,7 +1,7 @@
 package com.zpi.domain.audit;
 
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
-import com.zpi.domain.user.User;
+import com.zpi.domain.rest.ams.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

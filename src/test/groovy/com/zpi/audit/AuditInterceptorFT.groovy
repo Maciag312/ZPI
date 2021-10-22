@@ -8,7 +8,6 @@ import com.zpi.domain.audit.AuditLog
 import com.zpi.domain.audit.AuditMetadata
 import com.zpi.domain.audit.AuditRepository
 import com.zpi.domain.rest.ams.Client
-import com.zpi.domain.user.UserRepository
 import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.testUtils.CommonHelpers
@@ -42,16 +41,12 @@ class AuditInterceptorFT extends Specification {
     private ObjectMapper mapper
 
     @Autowired
-    private UserRepository userRepository
-
-    @Autowired
     private AuditRepository auditRepository
 
     private static final String baseUri = "/api/authenticate"
 
     def setup() {
         ClientMocks.setupMockClientDetailsResponse(mockServer)
-        userRepository.clear()
         auditRepository.clear()
     }
 
@@ -64,9 +59,6 @@ class AuditInterceptorFT extends Specification {
             def userAgent = "agent"
             def user = new UserDTO("login", "password")
             def hashedUser = user.toHashedDomain()
-
-        and:
-            userRepository.save(hashedUser.getLogin(), hashedUser)
 
         when:
             mockMvc.perform(
@@ -91,9 +83,6 @@ class AuditInterceptorFT extends Specification {
     }
 
     def "should add entry to incident repository when incorrect request is provided"() {
-        given:
-            userRepository.save(user.toHashedDomain().getLogin(), user.toHashedDomain())
-
         when:
             mockMvc.perform(
                     post(CommonHelpers.authParametersToUrl(request, baseUri))

@@ -1,7 +1,7 @@
 package com.zpi.api.user;
 
 import com.zpi.api.common.dto.UserDTO;
-import com.zpi.domain.user.UserManager;
+import com.zpi.domain.rest.ams.AmsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +19,12 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
 public class UserController {
-    private final UserManager userService;
+    private final AmsService service;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO) {
         var user = userDTO.toHashedDomain();
-        if (userService.createUser(user)) {
+        if (service.registerUser(user)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
 

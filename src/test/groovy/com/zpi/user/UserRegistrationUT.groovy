@@ -1,25 +1,27 @@
 package com.zpi.user
 
+import com.zpi.api.common.dto.UserDTO
+import com.zpi.domain.rest.ams.AmsService
+import com.zpi.domain.rest.ams.AmsServiceImpl
+import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
-import com.zpi.domain.user.UserRepository
-import com.zpi.domain.user.UserManager
 import spock.lang.Specification
 import spock.lang.Subject
 
 class UserRegistrationUT extends Specification {
-    def userRepository = Mock(UserRepository)
+    def ams = Mock(AmsClient)
 
     @Subject
-    private UserManager userService = new UserManager(userRepository)
+    private AmsService amsService = new AmsServiceImpl(ams)
 
     def "should create user"() {
         given:
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            userRepository.findByKey(user.getLogin()) >> Optional.empty()
+            ams.registerUser(_ as UserDTO) >> true
 
         when:
-            def isSuccess = userService.createUser(user)
+            def isSuccess = amsService.registerUser(user)
 
         then:
             isSuccess
@@ -29,10 +31,10 @@ class UserRegistrationUT extends Specification {
         given:
             def user = CommonFixtures.userDTO().toHashedDomain()
 
-            userRepository.findByKey(user.getLogin()) >> Optional.of(user)
+            ams.registerUser(new UserDTO(user.getLogin(), user.getPassword())) >> false
 
         when:
-            def isSuccess = userService.createUser(user)
+            def isSuccess = amsService.registerUser(user)
 
         then:
             !isSuccess
