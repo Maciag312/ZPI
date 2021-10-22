@@ -1,4 +1,4 @@
-package com.zpi.api.token;
+package com.zpi.api.token.dto;
 
 import com.zpi.domain.token.TokenErrorResponse;
 import lombok.Getter;

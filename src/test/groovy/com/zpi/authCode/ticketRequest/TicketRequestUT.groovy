@@ -1,6 +1,5 @@
 package com.zpi.authCode.ticketRequest
 
-import com.zpi.testUtils.CommonFixtures
 import com.zpi.api.common.dto.ErrorResponseDTO
 import com.zpi.api.common.exception.ErrorResponseException
 import com.zpi.domain.audit.AuditMetadata
@@ -15,29 +14,29 @@ import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
-import com.zpi.domain.user.User
-import com.zpi.domain.user.UserAuthenticator
+import com.zpi.domain.rest.ams.AmsService
+import com.zpi.domain.rest.ams.User
+import com.zpi.testUtils.CommonFixtures
 import spock.lang.Specification
 import spock.lang.Subject
 
 class TicketRequestUT extends Specification {
     def requestValidator = Mock(RequestValidator)
-    def authenticator = Mock(UserAuthenticator)
+    def ams = Mock(AmsService)
     def consentService = Mock(ConsentServiceImpl)
     def authorizationService = Mock(AuthorizationService)
     def auditService = Mock(AuditService)
 
     @Subject
-    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, authenticator, consentService, authorizationService, auditService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService, auditService)
 
     def "should return auth ticket when request is valid"() {
         given:
             def request = CommonFixtures.request()
             def user = CommonFixtures.userDTO().toHashedDomain()
-            def client = CommonFixtures.client()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
-            authenticator.isAuthenticated(user) >> true
+            ams.isAuthenticated(user) >> true
             authorizationService.createTicket(user, request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
             auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
 
@@ -52,7 +51,6 @@ class TicketRequestUT extends Specification {
     def "should return error on wrong request"() {
         given:
             def request = CommonFixtures.request()
-            def client = CommonFixtures.client()
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
@@ -73,11 +71,10 @@ class TicketRequestUT extends Specification {
     def "should return error when user not authenticated"() {
         given:
             def request = CommonFixtures.request()
-            def client = CommonFixtures.client()
             def user = CommonFixtures.userDTO().toHashedDomain()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
-            authenticator.isAuthenticated(user) >> false
+            ams.isAuthenticated(user) >> false
             auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
 
         when:

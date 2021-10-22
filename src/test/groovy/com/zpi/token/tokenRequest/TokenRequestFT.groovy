@@ -1,7 +1,7 @@
 package com.zpi.token.tokenRequest
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.zpi.api.token.TokenRequestDTO
+import com.zpi.api.token.dto.TokenRequestDTO
 import com.zpi.domain.authCode.consentRequest.AuthCode
 import com.zpi.domain.authCode.consentRequest.AuthUserData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository

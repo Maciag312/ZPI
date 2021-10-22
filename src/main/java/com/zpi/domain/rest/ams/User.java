@@ -1,4 +1,4 @@
-package com.zpi.domain.user;
+package com.zpi.domain.rest.ams;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,4 @@ import java.util.Optional;
 public class User {
     private final String login;
     private final String password;
-
-    @Setter
-    private String organization;
 }

@@ -1,7 +1,7 @@
 package com.zpi.token.refreshRequest
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.zpi.api.token.RefreshRequestDTO
+import com.zpi.api.token.dto.RefreshRequestDTO
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.issuer.TokenData
 import com.zpi.infrastructure.rest.ams.AmsClient

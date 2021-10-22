@@ -4,7 +4,7 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.domain.authCode.consentRequest.TicketRepository;
 import com.zpi.domain.common.AuthCodeGenerator;
-import com.zpi.domain.user.User;
+import com.zpi.domain.rest.ams.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

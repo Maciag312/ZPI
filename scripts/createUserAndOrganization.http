@@ -1,34 +1,4 @@
-POST http://localhost:8080/api/organization/master/manager/signin
-accept: */*
-Content-Type: application/json
-
-{
-  "username": "admin",
-  "password": "admin",
-  "role": "SUPER_ADMIN"
-}
-
-###
-
-POST http://localhost:8080/api/organization/master/manager/signin
-accept: */*
-Content-Type: application/json
-
-{
-  "username": "admin",
-  "password": "admin",
-  "role": "MANAGER"
-}
-
-###
-
-POST http://localhost:8080/api/organization/register/pizza-house
-accept: */*
-Content-Type: application/json
-
-###
-
-POST http://localhost:8080/api/organization/pizza-house/user/register
+POST http://localhost:8080/api/user/register
 accept: */*
 Content-Type: application/json
 

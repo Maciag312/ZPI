@@ -31,5 +31,4 @@ public class AuthenticationResponseDTO {
                 .queryParam("state", state)
                 .toUriString();
     }
-
 }

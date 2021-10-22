@@ -2,18 +2,17 @@ package com.zpi.authCode.ticketRequest
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
-import com.zpi.domain.user.UserManager
 import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.testUtils.MvcRequestHelpers
 import com.zpi.testUtils.ResultHelpers
 import com.zpi.testUtils.wiremock.ClientMocks
+import com.zpi.testUtils.wiremock.UserMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
@@ -34,22 +33,19 @@ class TicketRequestFT extends Specification {
     private WireMockServer mockServer
 
     @Autowired
-    private UserManager userManager
-
-    @Autowired
     private MvcRequestHelpers commonHelpers
 
     private static final String baseUri = "/api/authenticate"
 
     def setup() {
         ClientMocks.setupMockClientDetailsResponse(mockServer)
+        UserMocks.setupMockUserAuthenticateResponse(mockServer)
     }
 
     def "should return success on correct request"() {
         given:
             def request = CommonFixtures.requestDTO()
             def user = CommonFixtures.userDTO()
-            addUser()
 
         when:
             def result = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, baseUri))
@@ -71,8 +67,6 @@ class TicketRequestFT extends Specification {
                     .build()
 
             def user = CommonFixtures.userDTO()
-            addUser()
-
         when:
             def result = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, baseUri))
 
@@ -81,10 +75,5 @@ class TicketRequestFT extends Specification {
             ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
             !ResultHelpers.attributeFromResult("error", result).isEmpty()
             !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
-    }
-
-    private void addUser() {
-        def user = CommonFixtures.userDTO().toHashedDomain()
-        userManager.createUser(user)
     }
 }

@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/audit")
 public class AuditController {
-    public final static String auditUri = "/audit";
-
     private final AuditService service;
 
-    @GetMapping(auditUri + "/users/{username}")
+    @GetMapping("/users/{username}")
     public ResponseEntity<?> audit(@PathVariable String username) {
         return ResponseEntity.ok(service.findByUsername(username));
     }
