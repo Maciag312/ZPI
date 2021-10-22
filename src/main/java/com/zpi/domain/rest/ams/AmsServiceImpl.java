@@ -12,19 +12,32 @@ import java.util.Optional;
 @Component
 public class AmsServiceImpl implements AmsService {
     private final AmsClient client;
+    private final AmsServiceFallback fallback;
 
     @Override
     public Optional<Client> clientDetails(String id) {
-        return client.clientDetails(id).map(ClientDTO::toDomain);
+        try {
+            return client.clientDetails(id).map(ClientDTO::toDomain);
+        } catch (Exception ignored) {
+            return fallback.clientDetails(id).map(ClientDTO::toDomain);
+        }
     }
 
     @Override
     public boolean registerUser(User user) {
-        return client.registerUser(new UserDTO(user.getLogin(), user.getPassword()));
+        try {
+            return client.registerUser(new UserDTO(user.getLogin(), user.getPassword()));
+        } catch (Exception ignored) {
+            return fallback.registerUser(new UserDTO(user.getLogin(), user.getPassword()));
+        }
     }
 
     @Override
     public boolean isAuthenticated(User user) {
-        return client.isAuthenticated(new UserDTO(user.getLogin(), user.getPassword()));
+        try {
+            return client.isAuthenticated(new UserDTO(user.getLogin(), user.getPassword()));
+        } catch (Exception e) {
+            return fallback.isAuthenticated(new UserDTO(user.getLogin(), user.getPassword()));
+        }
     }
 }

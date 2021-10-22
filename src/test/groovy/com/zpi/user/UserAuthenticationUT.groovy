@@ -2,6 +2,7 @@ package com.zpi.user
 
 import com.zpi.api.common.dto.UserDTO
 import com.zpi.domain.rest.ams.AmsService
+import com.zpi.domain.rest.ams.AmsServiceFallback
 import com.zpi.domain.rest.ams.AmsServiceImpl
 import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
@@ -10,9 +11,10 @@ import spock.lang.Subject
 
 class UserAuthenticationUT extends Specification {
     def ams = Mock(AmsClient)
+    def fallback = Mock(AmsServiceFallback)
 
     @Subject
-    private AmsService service = new AmsServiceImpl(ams)
+    private AmsService service = new AmsServiceImpl(ams, fallback)
 
     def "should return true when credentials match"() {
         given:
