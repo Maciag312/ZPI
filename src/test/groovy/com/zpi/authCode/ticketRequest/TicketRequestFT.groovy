@@ -1,6 +1,7 @@
 package com.zpi.authCode.ticketRequest
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.zpi.api.authCode.authenticationRequest.AuthenticationRequestDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
@@ -45,10 +46,10 @@ class TicketRequestFT extends Specification {
     def "should return success on correct request"() {
         given:
             def request = CommonFixtures.requestDTO()
-            def user = CommonFixtures.userDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
 
         when:
-            def result = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, baseUri))
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
 
         then:
             result.andExpect(status().isOk())
@@ -66,9 +67,9 @@ class TicketRequestFT extends Specification {
                     .state(CommonFixtures.state)
                     .build()
 
-            def user = CommonFixtures.userDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
         when:
-            def result = commonHelpers.postRequest(user, ResultHelpers.authParametersToUrl(request, baseUri))
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
 
         then:
             result.andExpect(status().isBadRequest())

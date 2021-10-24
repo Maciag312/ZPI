@@ -1,12 +1,11 @@
 package com.zpi.api.authCode;
 
-import com.zpi.api.authCode.authenticationRequest.AuditMetadataDTO;
+import com.zpi.api.authCode.authenticationRequest.AuthenticationRequestDTO;
 import com.zpi.api.authCode.authenticationRequest.AuthenticationResponseDTO;
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO;
 import com.zpi.api.authCode.consentRequest.ConsentResponseDTO;
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO;
 import com.zpi.api.authCode.ticketRequest.TicketResponseDTO;
-import com.zpi.api.common.dto.UserDTO;
 import com.zpi.api.common.exception.ErrorResponseException;
 import com.zpi.domain.authCode.AuthCodeService;
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
@@ -61,32 +60,31 @@ public class AuthCodeController {
 
 
     @PostMapping(authenticateUri)
-    public ResponseEntity<?> authenticate(@RequestBody UserDTO userDTO,
+    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDTO requestDTO,
                                           @RequestParam String client_id,
                                           @RequestParam(required = false) String redirect_uri,
                                           @RequestParam String response_type,
                                           @RequestParam(required = false) String scope,
-                                          @RequestParam String state,
-                                          @RequestHeader("host") String host,
-                                          @RequestHeader("user-agent") String userAgent) {
+                                          @RequestParam String state) {
 
-        var requestDTO = new TicketRequestDTO(client_id,
+        var ticketRequest = new TicketRequestDTO(client_id,
                 redirect_uri,
                 response_type,
                 scope,
-                state);
-        var request = requestDTO.toDomain();
-        var metadata = (new AuditMetadataDTO(host, userAgent)).toDomain();
+                state).toDomain();
+
+        var analysisRequest = requestDTO.getAudit().toDomain(requestDTO.getUser());
 
         try {
-            var user = userDTO.toHashedDomain();
-            var body = new TicketResponseDTO(authCodeService.authenticationTicket(user, request, metadata));
+            var user = requestDTO.getUser().toHashedDomain();
+            var body = new TicketResponseDTO(authCodeService.authenticationTicket(user, ticketRequest, analysisRequest));
             return ResponseEntity.ok(body);
         } catch (ErrorResponseException e) {
             return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+            }
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
     }
 
     @PostMapping(consentUri)

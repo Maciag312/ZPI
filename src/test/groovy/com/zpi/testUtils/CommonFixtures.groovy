@@ -1,5 +1,8 @@
 package com.zpi.testUtils
 
+import com.zpi.api.authCode.authenticationRequest.audit.AuditMetadataDTO
+import com.zpi.api.authCode.authenticationRequest.audit.DeviceInfoDTO
+import com.zpi.api.authCode.authenticationRequest.audit.IpInfoDTO
 import com.zpi.api.authCode.consentRequest.ConsentRequestDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.common.dto.UserDTO
@@ -7,6 +10,12 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.rest.ams.Client
+import com.zpi.domain.rest.analysis.request.AnalysisRequest
+import com.zpi.domain.rest.analysis.request.AuditUser
+import com.zpi.domain.rest.analysis.request.DeviceInfo
+import com.zpi.domain.rest.analysis.request.IpInfo
+import com.zpi.domain.rest.analysis.response.AnalysisResponse
+import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO
 
 class CommonFixtures {
     public static final String clientId = "id"
@@ -77,5 +86,22 @@ class CommonFixtures {
 
     static TicketData ticketData() {
         return new TicketData(redirectUri, scope, login)
+    }
+
+    static AnalysisRequestDTO analysisRequestDTO() {
+        return new AnalysisRequestDTO(analysisRequest())
+    }
+
+    static AnalysisRequest analysisRequest() {
+        var device = new DeviceInfo("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, "", false, false, false, "", "", "", false, "")
+        var ip = new IpInfo("", "", "", "", "", "", "")
+        var user = new AuditUser("")
+        return new AnalysisRequest(device, ip, user)
+    }
+
+    static AuditMetadataDTO auditMetadataDTO() {
+        var ip = new IpInfoDTO("", "", "", "", "", "", "")
+        var device = new DeviceInfoDTO("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, "", false, false, false, "", "", "", false, "")
+        return new AuditMetadataDTO(ip, device)
     }
 }

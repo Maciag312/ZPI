@@ -36,3 +36,6 @@ logging:
 
 ams:
   url: http://localhost:10000
+
+analysis:
+  url: http://localhost:8000
