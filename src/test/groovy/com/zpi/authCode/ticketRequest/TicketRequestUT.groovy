@@ -2,8 +2,6 @@ package com.zpi.authCode.ticketRequest
 
 import com.zpi.api.common.dto.ErrorResponseDTO
 import com.zpi.api.common.exception.ErrorResponseException
-import com.zpi.domain.audit.AuditMetadata
-import com.zpi.domain.audit.AuditService
 import com.zpi.domain.authCode.AuthCodeService
 import com.zpi.domain.authCode.AuthCodeServiceImpl
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
@@ -15,7 +13,9 @@ import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
 import com.zpi.domain.rest.ams.AmsService
-import com.zpi.domain.rest.ams.User
+import com.zpi.domain.rest.analysis.AnalysisService
+import com.zpi.domain.rest.analysis.request.AnalysisRequest
+import com.zpi.domain.rest.analysis.response.AnalysisResponse
 import com.zpi.testUtils.CommonFixtures
 import spock.lang.Specification
 import spock.lang.Subject
@@ -25,10 +25,10 @@ class TicketRequestUT extends Specification {
     def ams = Mock(AmsService)
     def consentService = Mock(ConsentServiceImpl)
     def authorizationService = Mock(AuthorizationService)
-    def auditService = Mock(AuditService)
+    def analysisService = Mock(AnalysisService)
 
     @Subject
-    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService, auditService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService, analysisService)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -38,10 +38,10 @@ class TicketRequestUT extends Specification {
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             ams.isAuthenticated(user) >> true
             authorizationService.createTicket(user, request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
-            auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
+            analysisService.isAdditionalLayerRequired(_ as AnalysisRequest) >> Fixtures.stubAnalysisResponse()
 
         when:
-            def response = tokenService.authenticationTicket(user, request, new AuditMetadata("", ""))
+            def response = tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
 
         then:
             !response.getTicket().isEmpty()
@@ -56,10 +56,10 @@ class TicketRequestUT extends Specification {
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
             }
-            auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
+            analysisService.isAdditionalLayerRequired(_ as AnalysisRequest) >> Fixtures.stubAnalysisResponse()
 
         when:
-            tokenService.authenticationTicket(user, request, new AuditMetadata("", ""))
+            tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
 
         then:
             def error = new ErrorResponseDTO(Fixtures.unauthorizedClientError(), request.getState())
@@ -75,10 +75,10 @@ class TicketRequestUT extends Specification {
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             ams.isAuthenticated(user) >> false
-            auditService.audit(_ as User, _ as AuthenticationRequest, new AuditMetadata("", "")) >> null
+            analysisService.isAdditionalLayerRequired(_ as AnalysisRequest) >> Fixtures.stubAnalysisResponse()
 
         when:
-            tokenService.authenticationTicket(user, request, new AuditMetadata("", ""))
+            tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
 
         then:
             def error = new ErrorResponseDTO(Fixtures.userAuthenticationFailedError(), request.getState())
@@ -110,6 +110,10 @@ class TicketRequestUT extends Specification {
                     .error(errorType)
                     .errorDescription(description)
                     .build()
+        }
+
+        static AnalysisResponse stubAnalysisResponse() {
+            return new AnalysisResponse(false)
         }
     }
 }

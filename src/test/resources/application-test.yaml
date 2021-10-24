@@ -1,2 +1,5 @@
 ams:
   url: http://localhost:${wiremock.server.port}
+
+analysis:
+  url: http://localhost:${wiremock.server.port}

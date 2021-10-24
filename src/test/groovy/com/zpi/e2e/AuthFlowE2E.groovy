@@ -1,6 +1,7 @@
 package com.zpi.e2e
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.zpi.api.authCode.authenticationRequest.AuthenticationRequestDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.api.token.dto.RefreshRequestDTO
 import com.zpi.api.token.dto.TokenRequestDTO
@@ -66,6 +67,7 @@ class AuthFlowE2E extends Specification {
             def user = CommonFixtures.userDTO()
             def grantType = "authorization_code"
             def scope = "profile"
+            def auditMetadata = CommonFixtures.auditMetadataDTO()
 
         when:
             commonHelpers.postRequest(user, userRegisterUri)
@@ -86,7 +88,7 @@ class AuthFlowE2E extends Specification {
             authorizeResponse.andExpect(header().exists("Location"))
 
         when:
-            def authenticateResponse = commonHelpers.postRequest(user, CommonHelpers.authParametersToUrl(request, authenticateRequestUri))
+            def authenticateResponse = commonHelpers.postRequest(new AuthenticationRequestDTO(user, auditMetadata), CommonHelpers.authParametersToUrl(request, authenticateRequestUri))
 
         then:
             def ticket = CommonHelpers.attributeFromResult("ticket", authenticateResponse)

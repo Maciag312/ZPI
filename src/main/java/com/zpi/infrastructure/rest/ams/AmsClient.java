@@ -20,5 +20,4 @@ public interface AmsClient {
 
     @GetMapping("/user/authenticate")
     boolean isAuthenticated(UserDTO userDTO);
-
 }
