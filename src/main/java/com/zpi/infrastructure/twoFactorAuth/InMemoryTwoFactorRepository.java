@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 public class InMemoryTwoFactorRepository extends InMemoryRepository<String, TwoFactorData> implements TwoFactorRepository {
     @Override
     public EntityTuple<TwoFactorData> fromDomain(TwoFactorData entity) {
-        return null;
+        return new TwoFactorTuple(entity.getTicket(), entity.getTwoFactorCode());
+    }
+
+    @Override
+    public void remove(String key) {
+        super.repository.remove(key);
     }
 }

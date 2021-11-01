@@ -8,8 +8,11 @@ import lombok.Getter;
 @Getter
 @Data
 class TwoFactorTuple implements EntityTuple<TwoFactorData> {
+    private final String ticket;
+    private final String twoFactorCode;
+
     @Override
     public TwoFactorData toDomain() {
-        return null;
+        return new TwoFactorData(ticket, twoFactorCode);
     }
 }

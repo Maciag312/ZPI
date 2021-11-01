@@ -43,6 +43,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private String saveTwoFactorCode(String ticket) {
         var twoFactorKey = generator.ticketCode();
         var twoFactorCode = generator.twoFactorCode();
+        System.out.printf("TwoFactorCode >>>>> %s\n", twoFactorCode);
         var data = new TwoFactorData(ticket, twoFactorCode);
         twoFactorRepository.save(twoFactorKey, data);
 
