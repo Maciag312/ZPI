@@ -2,7 +2,7 @@ package com.zpi.token.refreshRequest
 
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.common.AuthCodeGenerator
+import com.zpi.domain.common.CodeGenerator
 import com.zpi.domain.token.RefreshRequest
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.issuer.TokenData
@@ -19,7 +19,7 @@ class TokenIssuerRefreshUT extends Specification {
     def configProvider = Mock(TokenIssuerConfigProvider)
     def authCodeRepository = Mock(AuthCodeRepository)
     def tokenRepository = Mock(TokenRepository)
-    def generator = Mock(AuthCodeGenerator)
+    def generator = Mock(CodeGenerator)
 
     @Subject
     private TokenIssuer issuer = new TokenIssuerImpl(configProvider, authCodeRepository, tokenRepository, generator)
@@ -32,7 +32,7 @@ class TokenIssuerRefreshUT extends Specification {
 
             ReflectionTestUtils.setField(config, "claims", TokenCommonFixtures.claims())
         and:
-            generator.generate() >> "fdsafdsa"
+            generator.ticketCode() >> "fdsafdsa"
             configProvider.getConfig() >> config
             authCodeRepository.findByKey(TokenCommonFixtures.authCode.getValue()) >> Optional.of(TokenCommonFixtures.authCode)
             tokenRepository.findByKey(refreshToken) >> Optional.of(new TokenData(refreshToken, CommonFixtures.scope, CommonFixtures.userDTO().login))

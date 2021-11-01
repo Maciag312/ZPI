@@ -8,6 +8,7 @@ public class UIRedirect {
     public static final String ALLOW_URI = "/allow/**";
     public static final String SIGN_IN_URI = "/signin/**";
     public static final String SIGN_UP_URI = "/signup/**";
+    public static final String TWO_FACTOR_URI = "/2fa/**";
 
     private static final String INDEX_URI = "forward:/index.html";
 
@@ -23,6 +24,11 @@ public class UIRedirect {
 
     @RequestMapping(value = SIGN_UP_URI)
     public String signup() {
+        return INDEX_URI;
+    }
+
+    @RequestMapping(value = TWO_FACTOR_URI)
+    public String twoFactorAuth() {
         return INDEX_URI;
     }
 }

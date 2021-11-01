@@ -10,6 +10,7 @@ import com.zpi.domain.authCode.authenticationRequest.RequestValidator
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
+import com.zpi.domain.authCode.authorizationRequest.TicketType
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
 import com.zpi.domain.rest.ams.AmsService
@@ -25,23 +26,22 @@ class TicketRequestUT extends Specification {
     def ams = Mock(AmsService)
     def consentService = Mock(ConsentServiceImpl)
     def authorizationService = Mock(AuthorizationService)
-    def analysisService = Mock(AnalysisService)
 
     @Subject
-    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService, analysisService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService)
 
     def "should return auth ticket when request is valid"() {
         given:
             def request = CommonFixtures.request()
             def user = CommonFixtures.userDTO().toHashedDomain()
+            def analysisRequest = CommonFixtures.analysisRequest()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             ams.isAuthenticated(user) >> true
-            authorizationService.createTicket(user, request) >> new AuthorizationResponse(CommonFixtures.ticket, CommonFixtures.state)
-            analysisService.isAdditionalLayerRequired(_ as AnalysisRequest) >> Fixtures.stubAnalysisResponse()
+            authorizationService.createTicket(user, request, analysisRequest) >> new AuthorizationResponse(CommonFixtures.ticket, TicketType.TICKET, CommonFixtures.state)
 
         when:
-            def response = tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
+            def response = tokenService.authenticationTicket(user, request, analysisRequest)
 
         then:
             !response.getTicket().isEmpty()
@@ -56,7 +56,6 @@ class TicketRequestUT extends Specification {
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
             }
-            analysisService.isAdditionalLayerRequired(_ as AnalysisRequest) >> Fixtures.stubAnalysisResponse()
 
         when:
             tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
@@ -75,7 +74,6 @@ class TicketRequestUT extends Specification {
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             ams.isAuthenticated(user) >> false
-            analysisService.isAdditionalLayerRequired(_ as AnalysisRequest) >> Fixtures.stubAnalysisResponse()
 
         when:
             tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())

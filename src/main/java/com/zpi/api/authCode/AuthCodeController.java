@@ -67,11 +67,13 @@ public class AuthCodeController {
                                           @RequestParam(required = false) String scope,
                                           @RequestParam String state) {
 
-        var ticketRequest = new TicketRequestDTO(client_id,
+        var ticketRequest = new TicketRequestDTO(
+                client_id,
                 redirect_uri,
                 response_type,
                 scope,
-                state).toDomain();
+                state
+        ).toDomain();
 
         var analysisRequest = requestDTO.getAudit().toDomain(requestDTO.getUser());
 
@@ -81,10 +83,7 @@ public class AuthCodeController {
             return ResponseEntity.ok(body);
         } catch (ErrorResponseException e) {
             return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
-            }
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
+        }
     }
 
     @PostMapping(consentUri)

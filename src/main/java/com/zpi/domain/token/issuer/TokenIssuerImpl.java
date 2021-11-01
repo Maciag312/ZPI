@@ -2,7 +2,7 @@ package com.zpi.domain.token.issuer;
 
 import com.zpi.domain.authCode.consentRequest.AuthCode;
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
-import com.zpi.domain.common.AuthCodeGenerator;
+import com.zpi.domain.common.CodeGenerator;
 import com.zpi.domain.token.RefreshRequest;
 import com.zpi.domain.token.Token;
 import com.zpi.domain.token.TokenRepository;
@@ -20,7 +20,7 @@ public class TokenIssuerImpl implements TokenIssuer {
     private final TokenIssuerConfigProvider configProvider;
     private final AuthCodeRepository authCodeRepository;
     private final TokenRepository tokenRepository;
-    private final AuthCodeGenerator generator;
+    private final CodeGenerator generator;
 
     private static final String tokenType = "Bearer";
 
@@ -42,7 +42,7 @@ public class TokenIssuerImpl implements TokenIssuer {
 
     private Token issueToken(UserClaims claims) {
         var accessToken = buildAccessToken(claims);
-        String refreshToken = generator.generate();
+        String refreshToken = generator.ticketCode();
         String expiresIn = expiresInSeconds();
 
         tokenRepository.save(refreshToken, new TokenData(refreshToken, claims));

@@ -10,6 +10,7 @@ import com.zpi.domain.rest.ams.Client
 import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.testUtils.CommonHelpers
+import com.zpi.testUtils.wiremock.AnalysisMocks
 import com.zpi.testUtils.wiremock.ClientMocks
 import com.zpi.testUtils.wiremock.UserMocks
 import com.zpi.token.TokenCommonFixtures
@@ -58,6 +59,7 @@ class AuthFlowE2E extends Specification {
         ClientMocks.setupMockClientDetailsResponse(mockServer)
         UserMocks.setupMockUserRegisterResponse(mockServer)
         UserMocks.setupMockUserAuthenticateResponse(mockServer)
+        AnalysisMocks.setupMockNegativeAnalysisResponse(mockServer)
     }
 
     def "should perform whole oauth2 flow"() {

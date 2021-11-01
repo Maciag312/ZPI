@@ -7,5 +7,6 @@ import lombok.Getter;
 @Builder
 public class AuthorizationResponse {
     private final String ticket;
+    private final TicketType ticketType;
     private final String state;
 }
