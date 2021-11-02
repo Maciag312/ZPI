@@ -56,6 +56,7 @@ public class MailServiceImpl implements MailService {
         } catch (MessagingException mex) {
             mex.printStackTrace();
             System.out.println(mex.getMessage());
+            System.out.println("2FA_CODE: " + code);
         }
     }
 }
