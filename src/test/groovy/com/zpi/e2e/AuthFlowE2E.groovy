@@ -119,7 +119,7 @@ class AuthFlowE2E extends Specification {
 
         and:
             refreshedToken != token
-            refreshedToken.getBody().get("username_hash") == user.toHashedDomain().getLogin()
+            refreshedToken.getBody().get("username") == user.toDomain().getLogin()
             refreshedToken.getBody().getIssuer() == ""
     }
 }

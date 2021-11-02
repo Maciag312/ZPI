@@ -78,7 +78,7 @@ public class AuthCodeController {
         var analysisRequest = requestDTO.getAudit().toDomain(requestDTO.getUser());
 
         try {
-            var user = requestDTO.getUser().toHashedDomain();
+            var user = requestDTO.getUser().toDomain();
             var body = new TicketResponseDTO(authCodeService.authenticationTicket(user, ticketRequest, analysisRequest));
             return ResponseEntity.ok(body);
         } catch (ErrorResponseException e) {

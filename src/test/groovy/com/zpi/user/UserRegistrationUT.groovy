@@ -18,7 +18,7 @@ class UserRegistrationUT extends Specification {
 
     def "should create user"() {
         given:
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
 
             ams.registerUser(_ as UserDTO) >> true
 
@@ -31,7 +31,7 @@ class UserRegistrationUT extends Specification {
 
     def "should return conflict if user exists"() {
         given:
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
 
             ams.registerUser(new UserDTO(user.getLogin(), user.getPassword())) >> false
 

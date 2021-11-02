@@ -14,8 +14,6 @@ import com.zpi.domain.authCode.authorizationRequest.TicketType
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
 import com.zpi.domain.rest.ams.AmsService
-import com.zpi.domain.rest.analysis.AnalysisService
-import com.zpi.domain.rest.analysis.request.AnalysisRequest
 import com.zpi.domain.rest.analysis.response.AnalysisResponse
 import com.zpi.testUtils.CommonFixtures
 import spock.lang.Specification
@@ -33,7 +31,7 @@ class TicketRequestUT extends Specification {
     def "should return auth ticket when request is valid"() {
         given:
             def request = CommonFixtures.request()
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
             def analysisRequest = CommonFixtures.analysisRequest()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
@@ -51,7 +49,7 @@ class TicketRequestUT extends Specification {
     def "should return error on wrong request"() {
         given:
             def request = CommonFixtures.request()
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> {
                 throw Fixtures.sampleException()
@@ -70,7 +68,7 @@ class TicketRequestUT extends Specification {
     def "should return error when user not authenticated"() {
         given:
             def request = CommonFixtures.request()
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             ams.isAuthenticated(user) >> false

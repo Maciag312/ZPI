@@ -3,9 +3,11 @@ package com.zpi.authCode.ticketRequest
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationServiceImpl
 import com.zpi.domain.authCode.authorizationRequest.TicketType
+import com.zpi.domain.authCode.authorizationRequest.mailService.MailService
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import com.zpi.domain.common.CodeGenerator
+import com.zpi.domain.rest.ams.User
 import com.zpi.domain.rest.analysis.AnalysisService
 import com.zpi.domain.twoFactorAuth.TwoFactorData
 import com.zpi.domain.twoFactorAuth.TwoFactorRepository
@@ -18,13 +20,14 @@ class AuthorizationServiceUT extends Specification {
     def generator = Mock(CodeGenerator)
     def analysisService = Mock(AnalysisService)
     def twoFactorRepository = Mock(TwoFactorRepository)
+    def mail = Mock(MailService)
 
     @Subject
-    private AuthorizationService service = new AuthorizationServiceImpl(ticketRepository, generator, analysisService, twoFactorRepository)
+    private AuthorizationService service = new AuthorizationServiceImpl(ticketRepository, generator, analysisService, twoFactorRepository, mail)
 
     def "should when 2fa is not required"() {
         given:
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
             def analysisRequest = CommonFixtures.analysisRequest()
             def request = CommonFixtures.request()
             def ticket = "a"
@@ -47,7 +50,7 @@ class AuthorizationServiceUT extends Specification {
 
     def "should when 2fa is required"() {
         given:
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
             def analysisRequest = CommonFixtures.analysisRequest()
             def request = CommonFixtures.request()
             def ticket = "a"
@@ -58,6 +61,7 @@ class AuthorizationServiceUT extends Specification {
             analysisService.isAdditionalLayerRequired(analysisRequest) >> true
             generator.ticketCode() >>> [ticket, twoFactorTicket]
             generator.twoFactorCode() >> twoFactorCode
+            mail.send(_ as String, _ as User) >> null
 
         when:
             def result = service.createTicket(user, request, analysisRequest)

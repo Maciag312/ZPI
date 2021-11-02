@@ -1,6 +1,7 @@
 package com.zpi.domain.authCode.authorizationRequest;
 
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
+import com.zpi.domain.authCode.authorizationRequest.mailService.MailService;
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.domain.authCode.consentRequest.TicketRepository;
 import com.zpi.domain.common.CodeGenerator;
@@ -19,6 +20,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final CodeGenerator generator;
     private final AnalysisService analysisService;
     private final TwoFactorRepository twoFactorRepository;
+    private final MailService mail;
 
     @Override
     public AuthorizationResponse createTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) {
@@ -27,7 +29,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         repository.save(ticket, authData);
 
         if (analysisService.isAdditionalLayerRequired(analysisRequest)) {
-            return new AuthorizationResponse(saveTwoFactorCode(ticket), TicketType.TICKET_2FA, request.getState());
+            return new AuthorizationResponse(saveTwoFactorCode(ticket, user), TicketType.TICKET_2FA, request.getState());
         }
 
         return new AuthorizationResponse(ticket, TicketType.TICKET, request.getState());
@@ -40,10 +42,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return new TicketData(redirectUri, scope, username);
     }
 
-    private String saveTwoFactorCode(String ticket) {
+    private String saveTwoFactorCode(String ticket, User user) {
         var twoFactorKey = generator.ticketCode();
         var twoFactorCode = generator.twoFactorCode();
-        System.out.printf("TwoFactorCode >>>>> %s\n", twoFactorCode);
+        mail.send(twoFactorCode, user);
         var data = new TwoFactorData(ticket, twoFactorCode);
         twoFactorRepository.save(twoFactorKey, data);
 

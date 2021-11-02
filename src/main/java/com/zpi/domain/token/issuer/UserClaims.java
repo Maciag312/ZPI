@@ -17,7 +17,7 @@ public class UserClaims {
 
         this.claims = new HashMap<>();
         claims.put("scope", scope);
-        claims.put("username_hash", username);
+        claims.put("username", username);
 
         var issuer = "";
         claims.put("iss", issuer);

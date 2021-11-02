@@ -20,7 +20,7 @@ public class AmsServiceFallbackImpl implements AmsServiceFallback {
 
     @Override
     public boolean isAuthenticated(UserDTO user) {
-        var hashed = new UserDTO("s", "s").toHashedDomain();
-        return user.getLogin().equals(hashed.getLogin()) && user.getPassword().equals(hashed.getPassword());
+        var domain = new UserDTO("user@zpi.com", "s").toDomain();
+        return user.getLogin().equals(domain.getLogin()) && user.getPassword().equals(domain.getPassword());
     }
 }

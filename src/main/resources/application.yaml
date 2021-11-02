@@ -33,3 +33,10 @@ ams:
 
 analysis:
   url: http://localhost:5000
+
+email:
+  address: admin@zpi.com
+  password: admin
+  server:
+    host: localhost
+    port: 587

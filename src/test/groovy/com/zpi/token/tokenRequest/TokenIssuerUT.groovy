@@ -52,6 +52,6 @@ class TokenIssuerUT extends Specification {
             TokenCommonFixtures.areDatesQuiteEqual(body.getIssuedAt(), TokenCommonFixtures.claims().getIssuedAt())
             TokenCommonFixtures.areDatesQuiteEqual(body.getExpiration(), TokenCommonFixtures.claims().getExpirationTime())
             body.get("scope") == TokenCommonFixtures.authCode.getUserData().getScope()
-            body.get("username_hash") == TokenCommonFixtures.authCode.getUserData().getUsername()
+            body.get("username") == TokenCommonFixtures.authCode.getUserData().getUsername()
     }
 }
