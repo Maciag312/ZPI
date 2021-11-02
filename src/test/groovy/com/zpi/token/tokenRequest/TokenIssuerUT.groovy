@@ -2,7 +2,7 @@ package com.zpi.token.tokenRequest
 
 
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.common.AuthCodeGenerator
+import com.zpi.domain.common.CodeGenerator
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.TokenRequest
 import com.zpi.domain.token.issuer.TokenIssuer
@@ -18,7 +18,7 @@ class TokenIssuerUT extends Specification {
     def configProvider = Mock(TokenIssuerConfigProvider)
     def authCodeRepository = Mock(AuthCodeRepository)
     def tokenRepository = Mock(TokenRepository)
-    def generator = Mock(AuthCodeGenerator)
+    def generator = Mock(CodeGenerator)
 
     @Subject
     private TokenIssuer issuer = new TokenIssuerImpl(configProvider, authCodeRepository, tokenRepository, generator)
@@ -31,7 +31,7 @@ class TokenIssuerUT extends Specification {
 
             ReflectionTestUtils.setField(config, "claims", TokenCommonFixtures.claims())
         and:
-            generator.generate() >> "fdsafdsa"
+            generator.ticketCode() >> "fdsafdsa"
             configProvider.getConfig() >> config
             authCodeRepository.findByKey(TokenCommonFixtures.authCode.getValue()) >> Optional.of(TokenCommonFixtures.authCode)
 
@@ -52,6 +52,6 @@ class TokenIssuerUT extends Specification {
             TokenCommonFixtures.areDatesQuiteEqual(body.getIssuedAt(), TokenCommonFixtures.claims().getIssuedAt())
             TokenCommonFixtures.areDatesQuiteEqual(body.getExpiration(), TokenCommonFixtures.claims().getExpirationTime())
             body.get("scope") == TokenCommonFixtures.authCode.getUserData().getScope()
-            body.get("username_hash") == TokenCommonFixtures.authCode.getUserData().getUsername()
+            body.get("username") == TokenCommonFixtures.authCode.getUserData().getUsername()
     }
 }

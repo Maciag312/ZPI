@@ -23,7 +23,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserDTO userDTO) {
-        var user = userDTO.toHashedDomain();
+        var user = userDTO.toDomain();
         if (service.registerUser(user)) {
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

@@ -28,14 +28,15 @@ security:
   aes:
     secret-key: "shSHs321ecuredsadD51HdsaACQLOA33sharedsadD51HdsaACQLOA33ACO3482JJ12SHs321ecudsaredaredsadD51HdsaACQLOA33ACO3482JJ12sadD51HdsaACQLOA33ACO3482JJ123DEF1LONGA0AENUGH4dDSAACO348shSHs321ecuredsadD51HdsaACQLOA33ACO3482JJ123DEF1LONGA0AENUGH4dDSA2JJ123DEF1LONGA0AENUGH4dDSA-dA58i1A123FAHFh"
 
-logging:
-  level:
-    org:
-      springframework:
-        web: DEBUG
-
 ams:
   url: http://localhost:10000
 
 analysis:
-  url: http://localhost:8000
+  url: http://localhost:5000
+
+email:
+  address: admin@zpi.com
+  password: admin
+  server:
+    host: localhost
+    port: 587

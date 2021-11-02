@@ -7,6 +7,7 @@ import com.zpi.infrastructure.rest.ams.AmsClient
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.testUtils.MvcRequestHelpers
 import com.zpi.testUtils.ResultHelpers
+import com.zpi.testUtils.wiremock.AnalysisMocks
 import com.zpi.testUtils.wiremock.ClientMocks
 import com.zpi.testUtils.wiremock.UserMocks
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,10 +44,13 @@ class TicketRequestFT extends Specification {
         UserMocks.setupMockUserAuthenticateResponse(mockServer)
     }
 
-    def "should return success on correct request"() {
+    def "should return success on correct request when 2fa is not required"() {
         given:
             def request = CommonFixtures.requestDTO()
             def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.setupMockNegativeAnalysisResponse(mockServer)
 
         when:
             def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
@@ -55,6 +59,25 @@ class TicketRequestFT extends Specification {
             result.andExpect(status().isOk())
             ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
             ResultHelpers.attributeFromResult("ticket", result).length() != 0
+            ResultHelpers.attributeFromResult("ticket_type", result) == "TICKET"
+    }
+
+    def "should return success on correct request when 2fa is required"() {
+        given:
+            def request = CommonFixtures.requestDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.setupMockPositiveAnalysisResponse(mockServer)
+
+        when:
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isOk())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            ResultHelpers.attributeFromResult("ticket", result).length() != 0
+            ResultHelpers.attributeFromResult("ticket_type", result) == "TICKET_2FA"
     }
 
     def "should return failure on incorrect request"() {

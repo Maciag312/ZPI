@@ -15,7 +15,6 @@ import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.common.RequestError;
 import com.zpi.domain.rest.ams.AmsService;
 import com.zpi.domain.rest.ams.User;
-import com.zpi.domain.rest.analysis.AnalysisService;
 import com.zpi.domain.rest.analysis.request.AnalysisRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ public class AuthCodeServiceImpl implements AuthCodeService {
     private final AmsService ams;
     private final ConsentService consentService;
     private final AuthorizationService authorizationService;
-    private final AnalysisService analysisService;
 
     public AuthenticationRequest validateAndFillRequest(AuthenticationRequest request) throws ErrorResponseException {
         try {
@@ -40,10 +38,8 @@ public class AuthCodeServiceImpl implements AuthCodeService {
 
     public AuthorizationResponse authenticationTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) throws ErrorResponseException {
         validateAndFillRequest(request);
-        System.out.println("Analysis result: (isAdditionalLayerRequired)" + analysisService.isAdditionalLayerRequired(analysisRequest));
         validateUser(user, request);
-
-        return authorizationService.createTicket(user, request);
+        return authorizationService.createTicket(user, request, analysisRequest);
     }
 
     private void validateUser(User user, AuthenticationRequest request) throws ErrorResponseException {

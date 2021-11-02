@@ -6,13 +6,13 @@ import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersister
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodePersisterImpl
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
-import com.zpi.domain.common.AuthCodeGenerator
+import com.zpi.domain.common.CodeGenerator
 import spock.lang.Specification
 import spock.lang.Subject
 
 class AuthCodePersisterUT extends Specification {
     def repository = Mock(AuthCodeRepository)
-    def generator = Mock(AuthCodeGenerator)
+    def generator = Mock(CodeGenerator)
 
     @Subject
     private AuthCodePersister persister = new AuthCodePersisterImpl(repository, generator)
@@ -28,7 +28,7 @@ class AuthCodePersisterUT extends Specification {
             def code = new AuthCode(value, new AuthUserData(scope, redirectUri, username))
 
         and:
-            generator.generate() >> value
+            generator.ticketCode() >> value
             repository.save(value, code) >> null
 
         when:

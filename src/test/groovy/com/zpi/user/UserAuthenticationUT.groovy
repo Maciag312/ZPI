@@ -18,7 +18,7 @@ class UserAuthenticationUT extends Specification {
 
     def "should return true when credentials match"() {
         given:
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
             ams.isAuthenticated(_ as UserDTO) >> true
 
         when:
@@ -30,7 +30,7 @@ class UserAuthenticationUT extends Specification {
 
     def "should return false when user credentials are not correct"() {
         given:
-            def user = CommonFixtures.userDTO().toHashedDomain()
+            def user = CommonFixtures.userDTO().toDomain()
             ams.isAuthenticated(CommonFixtures.userDTO()) >> false
 
         when:

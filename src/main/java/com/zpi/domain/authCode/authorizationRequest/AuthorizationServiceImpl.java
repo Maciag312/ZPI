@@ -1,10 +1,15 @@
 package com.zpi.domain.authCode.authorizationRequest;
 
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
+import com.zpi.domain.authCode.authorizationRequest.mailService.MailService;
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.domain.authCode.consentRequest.TicketRepository;
-import com.zpi.domain.common.AuthCodeGenerator;
+import com.zpi.domain.common.CodeGenerator;
 import com.zpi.domain.rest.ams.User;
+import com.zpi.domain.rest.analysis.AnalysisService;
+import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.twoFactorAuth.TwoFactorData;
+import com.zpi.domain.twoFactorAuth.TwoFactorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,14 +17,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthorizationServiceImpl implements AuthorizationService {
     private final TicketRepository repository;
-    private final AuthCodeGenerator generator;
+    private final CodeGenerator generator;
+    private final AnalysisService analysisService;
+    private final TwoFactorRepository twoFactorRepository;
+    private final MailService mail;
 
     @Override
-    public AuthorizationResponse createTicket(User user, AuthenticationRequest request) {
-        var ticket = generator.generate();
+    public AuthorizationResponse createTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) {
+        var ticket = generator.ticketCode();
         var authData = getAuthData(user, request);
         repository.save(ticket, authData);
-        return new AuthorizationResponse(ticket, request.getState());
+
+        if (analysisService.isAdditionalLayerRequired(analysisRequest)) {
+            return new AuthorizationResponse(saveTwoFactorCode(ticket, user), TicketType.TICKET_2FA, request.getState());
+        }
+
+        return new AuthorizationResponse(ticket, TicketType.TICKET, request.getState());
     }
 
     private TicketData getAuthData(User user, AuthenticationRequest request) {
@@ -27,5 +40,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         var scope = request.getScope();
         var username = user.getLogin();
         return new TicketData(redirectUri, scope, username);
+    }
+
+    private String saveTwoFactorCode(String ticket, User user) {
+        var twoFactorKey = generator.ticketCode();
+        var twoFactorCode = generator.twoFactorCode();
+        mail.send(twoFactorCode, user);
+        var data = new TwoFactorData(ticket, twoFactorCode);
+        twoFactorRepository.save(twoFactorKey, data);
+
+        return twoFactorKey;
     }
 }
