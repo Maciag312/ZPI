@@ -17,7 +17,7 @@ class ConsentRequestUT extends Specification {
     def "should return authentication code when ticket is in database"() {
         given:
             def request = CommonFixtures.consentRequest()
-            def authData = new TicketData(CommonFixtures.redirectUri, CommonFixtures.scope, CommonFixtures.userDTO().login)
+            def authData = new TicketData(CommonFixtures.redirectUri, CommonFixtures.scope, CommonFixtures.userDTO().email)
 
             def ticket = request.getTicket()
             def scope = "bbbb"

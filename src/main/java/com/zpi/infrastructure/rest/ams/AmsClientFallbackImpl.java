@@ -1,26 +1,34 @@
-package com.zpi.domain.rest.ams;
+package com.zpi.infrastructure.rest.ams;
 
 import com.zpi.api.common.dto.UserDTO;
-import com.zpi.infrastructure.rest.ams.ClientDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class AmsServiceFallbackImpl implements AmsServiceFallback {
+public class AmsClientFallbackImpl implements AmsClientFallback {
     @Override
     public Optional<ClientDTO> clientDetails(String id) {
         return Optional.empty();
     }
 
     @Override
-    public boolean registerUser(UserDTO user) {
-        return !isAuthenticated(user);
+    public ResponseEntity<?> registerUser(UserDTO user) {
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @Override
-    public boolean isAuthenticated(UserDTO user) {
+    public ResponseEntity<?> authenticate(UserDTO user) {
         var domain = new UserDTO("user@zpi.com", "s").toDomain();
-        return user.getLogin().equals(domain.getLogin()) && user.getPassword().equals(domain.getPassword());
+        if (user == null || user.getEmail() == null || user.getPassword() == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        if (user.getEmail().equals(domain.getEmail()) && user.getPassword().equals(domain.getPassword())) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }

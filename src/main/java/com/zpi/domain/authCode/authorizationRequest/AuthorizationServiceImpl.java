@@ -38,7 +38,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private TicketData getAuthData(User user, AuthenticationRequest request) {
         var redirectUri = request.getRedirectUri();
         var scope = request.getScope();
-        var username = user.getLogin();
+        var username = user.getEmail();
         return new TicketData(redirectUri, scope, username);
     }
 

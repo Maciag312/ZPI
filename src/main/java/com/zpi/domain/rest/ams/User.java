@@ -11,6 +11,6 @@ import java.util.Optional;
 @Builder
 @EqualsAndHashCode
 public class User {
-    private final String login;
+    private final String email;
     private final String password;
 }

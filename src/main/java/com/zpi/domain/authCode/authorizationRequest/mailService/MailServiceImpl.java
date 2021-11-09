@@ -26,7 +26,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void send(String code, User user) {
-        String to = user.getLogin();
+        String to = user.getEmail();
         String from = senderAddress;
 
         Properties properties = System.getProperties();

@@ -13,6 +13,6 @@ public class AuditMetadataDTO {
     private final DeviceInfoDTO deviceInfo;
 
     public AnalysisRequest toDomain(UserDTO user) {
-        return new AnalysisRequest(deviceInfo.toDomain(), ipInfo.toDomain(), new AuditUser(user.getLogin()));
+        return new AnalysisRequest(deviceInfo.toDomain(), ipInfo.toDomain(), new AuditUser(user.getEmail()));
     }
 }

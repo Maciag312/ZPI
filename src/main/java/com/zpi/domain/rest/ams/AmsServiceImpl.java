@@ -2,8 +2,10 @@ package com.zpi.domain.rest.ams;
 
 import com.zpi.api.common.dto.UserDTO;
 import com.zpi.infrastructure.rest.ams.AmsClient;
+import com.zpi.infrastructure.rest.ams.AmsClientFallback;
 import com.zpi.infrastructure.rest.ams.ClientDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -12,7 +14,7 @@ import java.util.Optional;
 @Component
 public class AmsServiceImpl implements AmsService {
     private final AmsClient client;
-    private final AmsServiceFallback fallback;
+    private final AmsClientFallback fallback;
 
     @Override
     public Optional<Client> clientDetails(String id) {
@@ -26,18 +28,18 @@ public class AmsServiceImpl implements AmsService {
     @Override
     public boolean registerUser(User user) {
         try {
-            return client.registerUser(new UserDTO(user.getLogin(), user.getPassword()));
+            return client.registerUser(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.CREATED;
         } catch (Exception ignored) {
-            return fallback.registerUser(new UserDTO(user.getLogin(), user.getPassword()));
+            return fallback.registerUser(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.CREATED;
         }
     }
 
     @Override
     public boolean isAuthenticated(User user) {
         try {
-            return client.isAuthenticated(new UserDTO(user.getLogin(), user.getPassword()));
+            return client.authenticate(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.OK;
         } catch (Exception e) {
-            return fallback.isAuthenticated(new UserDTO(user.getLogin(), user.getPassword()));
+            return fallback.authenticate(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.OK;
         }
     }
 }

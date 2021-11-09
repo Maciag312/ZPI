@@ -20,7 +20,7 @@ class UserMocks {
 
     static void setupMockUserAuthenticateResponse(WireMockServer mockService) throws IOException {
         def mapper = new ObjectMapper()
-        mockService.stubFor(WireMock.post(WireMock.urlMatching("/api/authserver/user/authenticate"))
+        mockService.stubFor(WireMock.post(WireMock.urlMatching("/api/users/authenticate"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
