@@ -21,14 +21,6 @@ public class AmsClientFallbackImpl implements AmsClientFallback {
 
     @Override
     public ResponseEntity<?> authenticate(UserDTO user) {
-        var domain = new UserDTO("user@zpi.com", "s").toDomain();
-        if (user == null || user.getEmail() == null || user.getPassword() == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        if (user.getEmail().equals(domain.getEmail()) && user.getPassword().equals(domain.getPassword())) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
