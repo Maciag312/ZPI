@@ -1,4 +1,4 @@
-package com.zpi.domain.rest.analysis;
+package com.zpi.infrastructure.rest.analysis;
 
 import com.zpi.infrastructure.rest.analysis.AnalysisClient;
 

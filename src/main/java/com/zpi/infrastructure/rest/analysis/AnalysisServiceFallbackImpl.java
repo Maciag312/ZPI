@@ -1,6 +1,5 @@
-package com.zpi.domain.rest.analysis;
+package com.zpi.infrastructure.rest.analysis;
 
-import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO;
 import org.springframework.stereotype.Component;
 
 @Component

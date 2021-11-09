@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class UserDTO {
     @NotNull
     @NotEmpty
-    private String login;
+    private String email;
 
     @NotNull
     @NotEmpty
@@ -24,7 +24,7 @@ public class UserDTO {
 
     public User toDomain() {
         return User.builder()
-                .login(login)
+                .email(email)
                 .password(password)
                 .build();
     }

@@ -21,7 +21,7 @@ public class IpInfoDTO {
                 continentCode,
                 continentName,
                 countryCode,
-                continentName,
+                countryName,
                 ipAddress,
                 stateProv
         );

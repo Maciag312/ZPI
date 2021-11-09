@@ -35,7 +35,7 @@ class TokenIssuerRefreshUT extends Specification {
             generator.ticketCode() >> "fdsafdsa"
             configProvider.getConfig() >> config
             authCodeRepository.findByKey(TokenCommonFixtures.authCode.getValue()) >> Optional.of(TokenCommonFixtures.authCode)
-            tokenRepository.findByKey(refreshToken) >> Optional.of(new TokenData(refreshToken, CommonFixtures.scope, CommonFixtures.userDTO().login))
+            tokenRepository.findByKey(refreshToken) >> Optional.of(new TokenData(refreshToken, CommonFixtures.scope, CommonFixtures.userDTO().email))
 
         when:
             def result = issuer.refresh(request)
