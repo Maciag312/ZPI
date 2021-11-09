@@ -3,6 +3,7 @@ package com.zpi.domain.rest.analysis;
 import com.zpi.domain.rest.analysis.request.AnalysisRequest;
 import com.zpi.infrastructure.rest.analysis.AnalysisClient;
 import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO;
+import com.zpi.infrastructure.rest.analysis.AnalysisServiceFallback;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
