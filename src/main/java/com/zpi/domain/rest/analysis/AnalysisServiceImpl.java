@@ -22,4 +22,13 @@ public class AnalysisServiceImpl implements AnalysisService {
             return fallback.isAdditionalLayerRequired(new AnalysisRequestDTO(request));
         }
     }
+
+    @Override
+    public void reportFailedLogin(AnalysisRequest request) {
+        try {
+            client.reportLoginFail(new AnalysisRequestDTO(request));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

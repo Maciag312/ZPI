@@ -15,6 +15,7 @@ import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.common.RequestError;
 import com.zpi.domain.rest.ams.AmsService;
 import com.zpi.domain.rest.ams.User;
+import com.zpi.domain.rest.analysis.AnalysisService;
 import com.zpi.domain.rest.analysis.request.AnalysisRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class AuthCodeServiceImpl implements AuthCodeService {
     private final RequestValidator requestValidator;
     private final AmsService ams;
+    private final AnalysisService analysis;
     private final ConsentService consentService;
     private final AuthorizationService authorizationService;
 
@@ -38,7 +40,14 @@ public class AuthCodeServiceImpl implements AuthCodeService {
 
     public AuthorizationResponse authenticationTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) throws ErrorResponseException {
         validateAndFillRequest(request);
-        validateUser(user, request);
+
+        try {
+            validateUser(user, request);
+        } catch (ErrorResponseException e) {
+            analysis.reportFailedLogin(analysisRequest);
+            throw e;
+        }
+
         return authorizationService.createTicket(user, request, analysisRequest);
     }
 

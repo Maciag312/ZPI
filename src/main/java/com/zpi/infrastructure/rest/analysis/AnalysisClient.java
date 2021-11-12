@@ -10,4 +10,7 @@ import javax.validation.Valid;
 public interface AnalysisClient {
     @PostMapping("/analyse")
     boolean isAdditionalLayerRequired(@Valid @RequestBody AnalysisRequestDTO request);
+
+    @PostMapping("/login-fail")
+    void reportLoginFail(@Valid @RequestBody AnalysisRequestDTO request);
 }

@@ -8,4 +8,8 @@ public class AnalysisServiceFallbackImpl implements AnalysisServiceFallback {
     public boolean isAdditionalLayerRequired(AnalysisRequestDTO request) {
         return true;
     }
+
+    @Override
+    public void reportLoginFail(AnalysisRequestDTO request) {
+    }
 }
