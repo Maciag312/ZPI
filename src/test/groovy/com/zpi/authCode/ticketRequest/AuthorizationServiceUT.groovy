@@ -3,7 +3,7 @@ package com.zpi.authCode.ticketRequest
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
 import com.zpi.domain.authCode.authorizationRequest.AuthorizationServiceImpl
 import com.zpi.domain.authCode.authorizationRequest.TicketType
-import com.zpi.domain.authCode.authorizationRequest.mailService.MailService
+import com.zpi.domain.authCode.authorizationRequest.MailService
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.authCode.consentRequest.TicketRepository
 import com.zpi.domain.common.CodeGenerator

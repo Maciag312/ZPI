@@ -12,6 +12,11 @@ spring:
   h2:
     console:
       enabled: true
+  mail:
+    host: localhost
+    port: 587
+    username: admin@zpi.com
+    password: admin
 
 springdoc:
   swagger-ui:
@@ -34,9 +39,3 @@ ams:
 analysis:
   url: http://localhost:5000
 
-email:
-  address: admin@zpi.com
-  password: admin
-  server:
-    host: localhost
-    port: 587

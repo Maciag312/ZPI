@@ -1,7 +1,6 @@
 package com.zpi.domain.authCode.authorizationRequest;
 
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest;
-import com.zpi.domain.authCode.authorizationRequest.mailService.MailService;
 import com.zpi.domain.authCode.consentRequest.TicketData;
 import com.zpi.domain.authCode.consentRequest.TicketRepository;
 import com.zpi.domain.common.CodeGenerator;
