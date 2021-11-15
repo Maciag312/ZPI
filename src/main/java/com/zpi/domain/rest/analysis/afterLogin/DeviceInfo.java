@@ -1,4 +1,4 @@
-package com.zpi.domain.rest.analysis.request;
+package com.zpi.domain.rest.analysis.afterLogin;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

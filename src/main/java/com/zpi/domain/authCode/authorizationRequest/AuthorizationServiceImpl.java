@@ -7,7 +7,7 @@ import com.zpi.domain.authCode.consentRequest.TicketRepository;
 import com.zpi.domain.common.CodeGenerator;
 import com.zpi.domain.rest.ams.User;
 import com.zpi.domain.rest.analysis.AnalysisService;
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest;
 import com.zpi.domain.twoFactorAuth.TwoFactorData;
 import com.zpi.domain.twoFactorAuth.TwoFactorRepository;
 import lombok.RequiredArgsConstructor;

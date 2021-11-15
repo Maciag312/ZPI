@@ -1,6 +1,7 @@
 package com.zpi.domain.rest.analysis;
 
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest;
+import com.zpi.domain.rest.analysis.failedLogin.LockoutResponse;
 import com.zpi.infrastructure.rest.analysis.AnalysisClient;
 import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO;
 import com.zpi.infrastructure.rest.analysis.AnalysisServiceFallback;
@@ -24,11 +25,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     @Override
-    public void reportFailedLogin(AnalysisRequest request) {
+    public LockoutResponse failedLoginLockout(AnalysisRequest request) {
         try {
-            client.reportLoginFail(new AnalysisRequestDTO(request));
+            var response = client.reportLoginFail(new AnalysisRequestDTO(request));
+            return response.toDomain();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return fallback.reportLoginFail(new AnalysisRequestDTO(request)) == null ? null : null;
         }
     }
 }

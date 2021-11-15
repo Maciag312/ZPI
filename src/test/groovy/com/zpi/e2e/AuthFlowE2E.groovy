@@ -56,10 +56,11 @@ class AuthFlowE2E extends Specification {
     def setup() {
         ticketRepository.clear()
 
-        ClientMocks.setupMockClientDetailsResponse(mockServer)
-        UserMocks.setupMockUserRegisterResponse(mockServer)
-        UserMocks.setupMockUserAuthenticateResponse(mockServer)
-        AnalysisMocks.setupMockNegativeAnalysisResponse(mockServer)
+        ClientMocks.clientDetails(mockServer)
+        UserMocks.userRegister(mockServer)
+        UserMocks.userAuthenticate(mockServer)
+        AnalysisMocks.negativeAnalysis(mockServer)
+        AnalysisMocks.lockoutAllow(mockServer)
     }
 
     def "should perform whole oauth2 flow"() {

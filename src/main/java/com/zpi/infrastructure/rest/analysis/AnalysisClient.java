@@ -12,5 +12,5 @@ public interface AnalysisClient {
     boolean isAdditionalLayerRequired(@Valid @RequestBody AnalysisRequestDTO request);
 
     @PostMapping("/login-fail")
-    void reportLoginFail(@Valid @RequestBody AnalysisRequestDTO request);
+    LoginFailedDTO reportLoginFail(@Valid @RequestBody AnalysisRequestDTO request);
 }

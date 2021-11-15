@@ -10,7 +10,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {

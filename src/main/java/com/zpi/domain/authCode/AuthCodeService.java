@@ -7,7 +7,7 @@ import com.zpi.domain.authCode.consentRequest.ConsentRequest;
 import com.zpi.domain.authCode.consentRequest.ConsentResponse;
 import com.zpi.domain.authCode.consentRequest.ErrorConsentResponseException;
 import com.zpi.domain.rest.ams.User;
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest;
 
 public interface AuthCodeService {
     AuthenticationRequest validateAndFillRequest(AuthenticationRequest request) throws ErrorResponseException;

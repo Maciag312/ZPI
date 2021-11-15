@@ -10,11 +10,10 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.rest.ams.Client
-import com.zpi.domain.rest.analysis.request.AnalysisRequest
-import com.zpi.domain.rest.analysis.request.AuditUser
-import com.zpi.domain.rest.analysis.request.DeviceInfo
-import com.zpi.domain.rest.analysis.request.IpInfo
-import com.zpi.domain.rest.analysis.response.AnalysisResponse
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest
+import com.zpi.domain.rest.analysis.afterLogin.AuditUser
+import com.zpi.domain.rest.analysis.afterLogin.DeviceInfo
+import com.zpi.domain.rest.analysis.afterLogin.IpInfo
 import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO
 
 class CommonFixtures {

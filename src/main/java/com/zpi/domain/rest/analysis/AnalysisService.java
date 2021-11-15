@@ -1,8 +1,10 @@
 package com.zpi.domain.rest.analysis;
 
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest;
+import com.zpi.domain.rest.analysis.failedLogin.LockoutResponse;
 
 public interface AnalysisService {
     boolean isAdditionalLayerRequired(AnalysisRequest request);
-    void reportFailedLogin(AnalysisRequest request);
+
+    LockoutResponse failedLoginLockout(AnalysisRequest request);
 }

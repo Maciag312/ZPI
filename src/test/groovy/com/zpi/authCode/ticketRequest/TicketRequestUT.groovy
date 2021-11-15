@@ -14,19 +14,24 @@ import com.zpi.domain.authCode.authorizationRequest.TicketType
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
 import com.zpi.domain.rest.ams.AmsService
-import com.zpi.domain.rest.analysis.response.AnalysisResponse
+import com.zpi.domain.rest.analysis.AnalysisService
+import com.zpi.domain.rest.analysis.failedLogin.LockoutResponse
+import com.zpi.domain.rest.analysis.failedLogin.LoginAction
 import com.zpi.testUtils.CommonFixtures
 import spock.lang.Specification
 import spock.lang.Subject
+
+import java.time.LocalDateTime
 
 class TicketRequestUT extends Specification {
     def requestValidator = Mock(RequestValidator)
     def ams = Mock(AmsService)
     def consentService = Mock(ConsentServiceImpl)
     def authorizationService = Mock(AuthorizationService)
+    def analysis = Mock(AnalysisService)
 
     @Subject
-    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService, analysis)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -36,6 +41,7 @@ class TicketRequestUT extends Specification {
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
             ams.isAuthenticated(user) >> true
+            analysis.failedLoginLockout(analysisRequest) >> new LockoutResponse(LoginAction.ALLOW, LocalDateTime.now())
             authorizationService.createTicket(user, request, analysisRequest) >> new AuthorizationResponse(CommonFixtures.ticket, TicketType.TICKET, CommonFixtures.state)
 
         when:
@@ -83,6 +89,47 @@ class TicketRequestUT extends Specification {
             thrownException.errorResponse == error
     }
 
+    def "should return error when analysis is not available"() {
+        given:
+            def request = CommonFixtures.request()
+            def user = CommonFixtures.userDTO().toDomain()
+            def analysisRequest = CommonFixtures.analysisRequest()
+
+            requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
+            ams.isAuthenticated(user) >> true
+            analysis.failedLoginLockout(analysisRequest) >> null
+
+        when:
+            tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
+
+        then:
+            def error = new ErrorResponseDTO(Fixtures.analysisUnavailableError(), request.getState())
+            def thrownException = thrown(ErrorResponseException)
+
+            thrownException.errorResponse == error
+    }
+
+    def "should return error with delay till time when analysis returns block"() {
+        given:
+            def request = CommonFixtures.request()
+            def user = CommonFixtures.userDTO().toDomain()
+            def analysisRequest = CommonFixtures.analysisRequest()
+            def lockoutResponse = new LockoutResponse(LoginAction.BLOCK, LocalDateTime.now())
+
+            requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
+            ams.isAuthenticated(user) >> true
+            analysis.failedLoginLockout(analysisRequest) >> lockoutResponse
+
+        when:
+            tokenService.authenticationTicket(user, request, analysisRequest)
+
+        then:
+            def error = new ErrorResponseDTO(Fixtures.lockoutError(lockoutResponse.getDelayTill()), request.getState())
+            def thrownException = thrown(ErrorResponseException)
+
+            thrownException.errorResponse == error
+    }
+
     private class Fixtures {
         static ValidationFailedException sampleException() {
             return new ValidationFailedException(unauthorizedClientError())
@@ -108,8 +155,18 @@ class TicketRequestUT extends Specification {
                     .build()
         }
 
-        static AnalysisResponse stubAnalysisResponse() {
-            return new AnalysisResponse(false)
+        static RequestError analysisUnavailableError() {
+            return RequestError.builder()
+                    .error(AuthenticationRequestErrorType.ANALYSIS_NOT_AVAILABLE)
+                    .errorDescription("Cannot connect to analysis service")
+                    .build()
+        }
+
+        static RequestError lockoutError(LocalDateTime time) {
+            return RequestError.builder()
+                    .error(AuthenticationRequestErrorType.LOGIN_LOCKOUT)
+                    .errorDescription(time.toString())
+                    .build()
         }
     }
 }

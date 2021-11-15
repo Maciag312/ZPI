@@ -10,6 +10,7 @@ public class AnalysisServiceFallbackImpl implements AnalysisServiceFallback {
     }
 
     @Override
-    public void reportLoginFail(AnalysisRequestDTO request) {
+    public LoginFailedDTO reportLoginFail(AnalysisRequestDTO request) {
+        return null;
     }
 }

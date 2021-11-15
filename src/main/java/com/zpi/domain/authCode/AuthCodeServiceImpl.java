@@ -16,7 +16,8 @@ import com.zpi.domain.common.RequestError;
 import com.zpi.domain.rest.ams.AmsService;
 import com.zpi.domain.rest.ams.User;
 import com.zpi.domain.rest.analysis.AnalysisService;
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest;
+import com.zpi.domain.rest.analysis.failedLogin.LoginAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +26,9 @@ import org.springframework.stereotype.Service;
 public class AuthCodeServiceImpl implements AuthCodeService {
     private final RequestValidator requestValidator;
     private final AmsService ams;
-    private final AnalysisService analysis;
     private final ConsentService consentService;
     private final AuthorizationService authorizationService;
+    private final AnalysisService analysis;
 
     public AuthenticationRequest validateAndFillRequest(AuthenticationRequest request) throws ErrorResponseException {
         try {
@@ -40,13 +41,8 @@ public class AuthCodeServiceImpl implements AuthCodeService {
 
     public AuthorizationResponse authenticationTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) throws ErrorResponseException {
         validateAndFillRequest(request);
-
-        try {
-            validateUser(user, request);
-        } catch (ErrorResponseException e) {
-            analysis.reportFailedLogin(analysisRequest);
-            throw e;
-        }
+        validateUser(user, request);
+        validateAnalysisLockout(request, analysisRequest);
 
         return authorizationService.createTicket(user, request, analysisRequest);
     }
@@ -59,9 +55,30 @@ public class AuthCodeServiceImpl implements AuthCodeService {
                     .build();
 
             var errorResponse = new ErrorResponseDTO<>(error, request.getState());
-
             throw new ErrorResponseException(errorResponse);
         }
+    }
+
+    private void validateAnalysisLockout(AuthenticationRequest request, AnalysisRequest analysisRequest) throws ErrorResponseException {
+        var lockout = analysis.failedLoginLockout(analysisRequest);
+
+        RequestError<AuthenticationRequestErrorType> error;
+        if (lockout == null) {
+            error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.ANALYSIS_NOT_AVAILABLE)
+                    .errorDescription("Cannot connect to analysis service")
+                    .build();
+        } else if (lockout.getAction() == LoginAction.BLOCK) {
+            error = RequestError.<AuthenticationRequestErrorType>builder()
+                    .error(AuthenticationRequestErrorType.LOGIN_LOCKOUT)
+                    .errorDescription(lockout.getDelayTill().toString())
+                    .build();
+        } else {
+            return;
+        }
+
+        var errorResponse = new ErrorResponseDTO<>(error, request.getState());
+        throw new ErrorResponseException(errorResponse);
     }
 
     public ConsentResponse consentRequest(ConsentRequest request) throws ErrorConsentResponseException {

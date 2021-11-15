@@ -1,6 +1,6 @@
 package com.zpi.api.authCode.authenticationRequest.audit;
 
-import com.zpi.domain.rest.analysis.request.IpInfo;
+import com.zpi.domain.rest.analysis.afterLogin.IpInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

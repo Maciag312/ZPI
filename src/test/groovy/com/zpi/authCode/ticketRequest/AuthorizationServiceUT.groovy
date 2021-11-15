@@ -25,7 +25,7 @@ class AuthorizationServiceUT extends Specification {
     @Subject
     private AuthorizationService service = new AuthorizationServiceImpl(ticketRepository, generator, analysisService, twoFactorRepository, mail)
 
-    def "should when 2fa is not required"() {
+    def "should return ticket when 2fa is not required"() {
         given:
             def user = CommonFixtures.userDTO().toDomain()
             def analysisRequest = CommonFixtures.analysisRequest()
@@ -48,7 +48,7 @@ class AuthorizationServiceUT extends Specification {
             0 * twoFactorRepository.save(_ as String, _ as TwoFactorData);
     }
 
-    def "should when 2fa is required"() {
+    def "should return ticket when 2fa is required"() {
         given:
             def user = CommonFixtures.userDTO().toDomain()
             def analysisRequest = CommonFixtures.analysisRequest()

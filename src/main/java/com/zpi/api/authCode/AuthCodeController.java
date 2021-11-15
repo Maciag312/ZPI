@@ -82,6 +82,12 @@ public class AuthCodeController {
             var body = new TicketResponseDTO(authCodeService.authenticationTicket(user, ticketRequest, analysisRequest));
             return ResponseEntity.ok(body);
         } catch (ErrorResponseException e) {
+            var type =  e.getErrorResponse().getError().toString();
+            if (type.equals("LOGIN_LOCKOUT")) {
+                return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.TOO_MANY_REQUESTS);
+            } else if (type.equals("ANALYSIS_NOT_AVAILABLE")) {
+                return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.SERVICE_UNAVAILABLE);
+            }
             return new ResponseEntity<>(e.getErrorResponse(), HttpStatus.BAD_REQUEST);
         }
     }

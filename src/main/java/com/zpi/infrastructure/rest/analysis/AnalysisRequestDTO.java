@@ -2,8 +2,8 @@ package com.zpi.infrastructure.rest.analysis;
 
 import com.zpi.api.authCode.authenticationRequest.audit.DeviceInfoDTO;
 import com.zpi.api.authCode.authenticationRequest.audit.IpInfoDTO;
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
-import com.zpi.domain.rest.analysis.request.AuditUser;
+import com.zpi.domain.rest.analysis.afterLogin.AnalysisRequest;
+import com.zpi.domain.rest.analysis.afterLogin.AuditUser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

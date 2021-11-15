@@ -40,8 +40,8 @@ class TicketRequestFT extends Specification {
     private static final String baseUri = "/api/authenticate"
 
     def setup() {
-        ClientMocks.setupMockClientDetailsResponse(mockServer)
-        UserMocks.setupMockUserAuthenticateResponse(mockServer)
+        ClientMocks.clientDetails(mockServer)
+        UserMocks.userAuthenticate(mockServer)
     }
 
     def "should return success on correct request when 2fa is not required"() {
@@ -50,7 +50,8 @@ class TicketRequestFT extends Specification {
             def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
 
         and:
-            AnalysisMocks.setupMockNegativeAnalysisResponse(mockServer)
+            AnalysisMocks.lockoutAllow(mockServer)
+            AnalysisMocks.negativeAnalysis(mockServer)
 
         when:
             def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
@@ -68,7 +69,8 @@ class TicketRequestFT extends Specification {
             def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
 
         and:
-            AnalysisMocks.setupMockPositiveAnalysisResponse(mockServer)
+            AnalysisMocks.lockoutAllow(mockServer)
+            AnalysisMocks.positiveAnalysis(mockServer)
 
         when:
             def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
@@ -96,6 +98,44 @@ class TicketRequestFT extends Specification {
 
         then:
             result.andExpect(status().isBadRequest())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            !ResultHelpers.attributeFromResult("error", result).isEmpty()
+            !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
+    }
+
+    def "should return failure on login lockout"() {
+        given:
+            def request = CommonFixtures.requestDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.blockLockout(mockServer)
+            AnalysisMocks.positiveAnalysis(mockServer)
+
+        when:
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isTooManyRequests())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            !ResultHelpers.attributeFromResult("error", result).isEmpty()
+            !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
+    }
+
+    def "should return failure on lockout analysis not available"() {
+        given:
+            def request = CommonFixtures.requestDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.lockoutNotAvailable(mockServer)
+            AnalysisMocks.positiveAnalysis(mockServer)
+
+        when:
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isServiceUnavailable())
             ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
             !ResultHelpers.attributeFromResult("error", result).isEmpty()
             !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
