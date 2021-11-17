@@ -9,8 +9,8 @@ import javax.validation.Valid;
 @FeignClient(name = "analysis", url = "${analysis.url}/api/authserver")
 public interface AnalysisClient {
     @PostMapping("/analyse")
-    boolean isAdditionalLayerRequired(@Valid @RequestBody AnalysisRequestDTO request);
+    AnalysisResponseDTO analyse(@Valid @RequestBody AnalysisRequestDTO request);
 
     @PostMapping("/login-fail")
-    LoginFailedDTO reportLoginFail(@Valid @RequestBody AnalysisRequestDTO request);
+    void reportLoginFail(@Valid @RequestBody AnalysisRequestDTO request);
 }

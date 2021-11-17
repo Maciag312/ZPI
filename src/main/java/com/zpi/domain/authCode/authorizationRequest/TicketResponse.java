@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AuthorizationResponse {
+public class TicketResponse {
     private final String ticket;
     private final TicketType ticketType;
     private final String state;

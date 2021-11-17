@@ -1,4 +1,4 @@
-package com.zpi.domain.rest.analysis.failedLogin;
+package com.zpi.domain.rest.analysis.lockout;
 
 public enum LoginAction {
     ALLOW,

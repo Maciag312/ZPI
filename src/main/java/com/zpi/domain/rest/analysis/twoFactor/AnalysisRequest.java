@@ -1,4 +1,4 @@
-package com.zpi.domain.rest.analysis.afterLogin;
+package com.zpi.domain.rest.analysis.twoFactor;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

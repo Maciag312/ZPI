@@ -59,8 +59,8 @@ class AuthFlowE2E extends Specification {
         ClientMocks.clientDetails(mockServer)
         UserMocks.userRegister(mockServer)
         UserMocks.userAuthenticate(mockServer)
-        AnalysisMocks.negativeAnalysis(mockServer)
-        AnalysisMocks.lockoutAllow(mockServer)
+        AnalysisMocks.allowLogin2faNotRequired(mockServer)
+        AnalysisMocks.reportLoginFailure(mockServer)
     }
 
     def "should perform whole oauth2 flow"() {
