@@ -40,7 +40,7 @@ class TokenRefreshFT extends Specification {
     private static final String baseURl = "/api/token/refresh"
 
     def setup() {
-        ClientMocks.setupMockClientDetailsResponse(mockServer)
+        ClientMocks.clientDetails(mockServer)
     }
 
     def cleanup() {

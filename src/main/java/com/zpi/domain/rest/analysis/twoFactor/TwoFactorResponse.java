@@ -1,10 +1,10 @@
-package com.zpi.domain.rest.analysis.response;
+package com.zpi.domain.rest.analysis.twoFactor;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class AnalysisResponse {
+public class TwoFactorResponse {
     private final boolean isAdditionalLayerRequired;
 }

@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.zpi.api.authCode.authenticationRequest.AuthenticationRequestDTO
 import com.zpi.api.authCode.ticketRequest.TicketRequestDTO
 import com.zpi.infrastructure.rest.ams.AmsClient
+import com.zpi.infrastructure.rest.analysis.AnalysisClient
 import com.zpi.testUtils.CommonFixtures
 import com.zpi.testUtils.MvcRequestHelpers
 import com.zpi.testUtils.ResultHelpers
@@ -32,6 +33,9 @@ class TicketRequestFT extends Specification {
     private AmsClient ams
 
     @Autowired
+    private AnalysisClient analysis
+
+    @Autowired
     private WireMockServer mockServer
 
     @Autowired
@@ -40,44 +44,9 @@ class TicketRequestFT extends Specification {
     private static final String baseUri = "/api/authenticate"
 
     def setup() {
-        ClientMocks.setupMockClientDetailsResponse(mockServer)
-        UserMocks.setupMockUserAuthenticateResponse(mockServer)
-    }
-
-    def "should return success on correct request when 2fa is not required"() {
-        given:
-            def request = CommonFixtures.requestDTO()
-            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
-
-        and:
-            AnalysisMocks.setupMockNegativeAnalysisResponse(mockServer)
-
-        when:
-            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
-
-        then:
-            result.andExpect(status().isOk())
-            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
-            ResultHelpers.attributeFromResult("ticket", result).length() != 0
-            ResultHelpers.attributeFromResult("ticket_type", result) == "TICKET"
-    }
-
-    def "should return success on correct request when 2fa is required"() {
-        given:
-            def request = CommonFixtures.requestDTO()
-            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
-
-        and:
-            AnalysisMocks.setupMockPositiveAnalysisResponse(mockServer)
-
-        when:
-            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
-
-        then:
-            result.andExpect(status().isOk())
-            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
-            ResultHelpers.attributeFromResult("ticket", result).length() != 0
-            ResultHelpers.attributeFromResult("ticket_type", result) == "TICKET_2FA"
+        ClientMocks.clientDetails(mockServer)
+        UserMocks.userAuthenticate(mockServer)
+        AnalysisMocks.reportLoginFailure(mockServer)
     }
 
     def "should return failure on incorrect request"() {
@@ -96,6 +65,60 @@ class TicketRequestFT extends Specification {
 
         then:
             result.andExpect(status().isBadRequest())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            !ResultHelpers.attributeFromResult("error", result).isEmpty()
+            !ResultHelpers.attributeFromResult("error_description", result).isEmpty()
+    }
+
+    def "should return success on correct request when 2fa is not required"() {
+        given:
+            def request = CommonFixtures.requestDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.allowLogin2faNotRequired(mockServer)
+
+        when:
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isOk())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            ResultHelpers.attributeFromResult("ticket", result).length() != 0
+            ResultHelpers.attributeFromResult("ticket_type", result) == "TICKET"
+    }
+
+    def "should return success on correct request when 2fa is required"() {
+        given:
+            def request = CommonFixtures.requestDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.allowLogin2faRequired(mockServer)
+
+        when:
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isOk())
+            ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
+            ResultHelpers.attributeFromResult("ticket", result).length() != 0
+            ResultHelpers.attributeFromResult("ticket_type", result) == "TICKET_2FA"
+    }
+
+    def "should return failure on login lockout"() {
+        given:
+            def request = CommonFixtures.requestDTO()
+            def requestBody = new AuthenticationRequestDTO(CommonFixtures.userDTO(), CommonFixtures.auditMetadataDTO())
+
+        and:
+            AnalysisMocks.blockLogin2faNotRequired(mockServer)
+
+        when:
+            def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
+
+        then:
+            result.andExpect(status().isTooManyRequests())
             ResultHelpers.attributeFromResult("state", result) == CommonFixtures.state
             !ResultHelpers.attributeFromResult("error", result).isEmpty()
             !ResultHelpers.attributeFromResult("error_description", result).isEmpty()

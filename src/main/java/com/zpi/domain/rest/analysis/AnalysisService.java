@@ -1,7 +1,9 @@
 package com.zpi.domain.rest.analysis;
 
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
+import com.zpi.domain.rest.analysis.twoFactor.AnalysisRequest;
 
 public interface AnalysisService {
-    boolean isAdditionalLayerRequired(AnalysisRequest request);
+    AnalysisResponse analyse(AnalysisRequest request);
+
+    void reportLoginFail(AnalysisRequest request);
 }

@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 
 class UserMocks {
-    static void setupMockUserRegisterResponse(WireMockServer mockService) throws IOException {
+    static void userRegister(WireMockServer mockService) throws IOException {
         def mapper = new ObjectMapper()
         mockService.stubFor(WireMock.post(WireMock.urlMatching("/api/authserver/user/register"))
                 .willReturn(WireMock.aResponse()
@@ -18,7 +18,7 @@ class UserMocks {
         )
     }
 
-    static void setupMockUserAuthenticateResponse(WireMockServer mockService) throws IOException {
+    static void userAuthenticate(WireMockServer mockService) throws IOException {
         def mapper = new ObjectMapper()
         mockService.stubFor(WireMock.post(WireMock.urlMatching("/api/users/authenticate"))
                 .willReturn(WireMock.aResponse()

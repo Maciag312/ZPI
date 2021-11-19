@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 
 class ClientMocks {
-    static void setupMockClientDetailsResponse(WireMockServer mockService) throws IOException {
+    static void clientDetails(WireMockServer mockService) throws IOException {
         def client = new Client(List.of(CommonFixtures.redirectUri), CommonFixtures.clientId)
         def mapper = new ObjectMapper()
         mockService.stubFor(WireMock.get(WireMock.urlMatching("/api/authserver/client/.*"))

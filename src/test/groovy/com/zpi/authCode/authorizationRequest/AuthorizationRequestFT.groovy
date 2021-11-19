@@ -40,7 +40,7 @@ class AuthorizationRequestFT extends Specification {
     private static final String baseUrl = "/api/authorize"
 
     def setup() {
-        ClientMocks.setupMockClientDetailsResponse(mockServer)
+        ClientMocks.clientDetails(mockServer)
     }
 
     def cleanup() {

@@ -1,8 +1,8 @@
 package com.zpi.api.authCode.authenticationRequest.audit;
 
 import com.zpi.api.common.dto.UserDTO;
-import com.zpi.domain.rest.analysis.request.AnalysisRequest;
-import com.zpi.domain.rest.analysis.request.AuditUser;
+import com.zpi.domain.rest.analysis.twoFactor.AnalysisRequest;
+import com.zpi.domain.rest.analysis.twoFactor.AuditUser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

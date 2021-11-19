@@ -10,12 +10,10 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.consentRequest.ConsentRequest
 import com.zpi.domain.authCode.consentRequest.TicketData
 import com.zpi.domain.rest.ams.Client
-import com.zpi.domain.rest.analysis.request.AnalysisRequest
-import com.zpi.domain.rest.analysis.request.AuditUser
-import com.zpi.domain.rest.analysis.request.DeviceInfo
-import com.zpi.domain.rest.analysis.request.IpInfo
-import com.zpi.domain.rest.analysis.response.AnalysisResponse
-import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO
+import com.zpi.domain.rest.analysis.twoFactor.AnalysisRequest
+import com.zpi.domain.rest.analysis.twoFactor.AuditUser
+import com.zpi.domain.rest.analysis.twoFactor.DeviceInfo
+import com.zpi.domain.rest.analysis.twoFactor.IpInfo
 
 class CommonFixtures {
     public static final String clientId = "id"
@@ -63,11 +61,11 @@ class CommonFixtures {
     }
 
     static Client client() {
-        return new Client(List.of(CommonFixtures.redirectUri), clientId)
+        return new Client(List.of(redirectUri), clientId)
     }
 
     static UserDTO userDTO() {
-        return new UserDTO(login, password);
+        return new UserDTO(login, password)
     }
 
     static ConsentRequest consentRequest() {
@@ -86,10 +84,6 @@ class CommonFixtures {
 
     static TicketData ticketData() {
         return new TicketData(redirectUri, scope, login)
-    }
-
-    static AnalysisRequestDTO analysisRequestDTO() {
-        return new AnalysisRequestDTO(analysisRequest())
     }
 
     static AnalysisRequest analysisRequest() {

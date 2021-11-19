@@ -1,4 +1,4 @@
-package com.zpi.domain.authCode.authorizationRequest.mailService;
+package com.zpi.domain.authCode.authorizationRequest;
 
 import com.zpi.domain.rest.ams.User;
 

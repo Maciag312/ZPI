@@ -45,7 +45,7 @@ class TokenRequestFT extends Specification {
     private static final String baseUrl = "/api/token"
 
     def setup() {
-        ClientMocks.setupMockClientDetailsResponse(mockServer)
+        ClientMocks.clientDetails(mockServer)
     }
 
     def cleanup() {

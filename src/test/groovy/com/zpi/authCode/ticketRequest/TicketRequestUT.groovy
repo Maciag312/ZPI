@@ -8,25 +8,23 @@ import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequest
 import com.zpi.domain.authCode.authenticationRequest.AuthenticationRequestErrorType
 import com.zpi.domain.authCode.authenticationRequest.RequestValidator
 import com.zpi.domain.authCode.authenticationRequest.ValidationFailedException
-import com.zpi.domain.authCode.authorizationRequest.AuthorizationResponse
-import com.zpi.domain.authCode.authorizationRequest.AuthorizationService
+import com.zpi.domain.authCode.authorizationRequest.TicketResponse
+import com.zpi.domain.authCode.authorizationRequest.TicketService
 import com.zpi.domain.authCode.authorizationRequest.TicketType
+import com.zpi.domain.authCode.authorizationRequest.UserValidationFailedException
 import com.zpi.domain.authCode.consentRequest.ConsentServiceImpl
 import com.zpi.domain.common.RequestError
-import com.zpi.domain.rest.ams.AmsService
-import com.zpi.domain.rest.analysis.response.AnalysisResponse
 import com.zpi.testUtils.CommonFixtures
 import spock.lang.Specification
 import spock.lang.Subject
 
 class TicketRequestUT extends Specification {
     def requestValidator = Mock(RequestValidator)
-    def ams = Mock(AmsService)
     def consentService = Mock(ConsentServiceImpl)
-    def authorizationService = Mock(AuthorizationService)
+    def ticketService = Mock(TicketService)
 
     @Subject
-    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, ams, consentService, authorizationService)
+    private AuthCodeService tokenService = new AuthCodeServiceImpl(requestValidator, consentService, ticketService)
 
     def "should return auth ticket when request is valid"() {
         given:
@@ -35,8 +33,7 @@ class TicketRequestUT extends Specification {
             def analysisRequest = CommonFixtures.analysisRequest()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
-            ams.isAuthenticated(user) >> true
-            authorizationService.createTicket(user, request, analysisRequest) >> new AuthorizationResponse(CommonFixtures.ticket, TicketType.TICKET, CommonFixtures.state)
+            ticketService.createTicket(user, request, analysisRequest) >> new TicketResponse(CommonFixtures.ticket, TicketType.TICKET, CommonFixtures.state)
 
         when:
             def response = tokenService.authenticationTicket(user, request, analysisRequest)
@@ -65,19 +62,22 @@ class TicketRequestUT extends Specification {
             thrownException.errorResponse == error
     }
 
-    def "should return error when user not authenticated"() {
+    def "should return error on ticket service failure"() {
         given:
             def request = CommonFixtures.request()
             def user = CommonFixtures.userDTO().toDomain()
+            def analysisRequest = CommonFixtures.analysisRequest()
 
             requestValidator.validateAndFillMissingFields(_ as AuthenticationRequest) >> null
-            ams.isAuthenticated(user) >> false
+            ticketService.createTicket(user, request, analysisRequest) >> {
+                throw new UserValidationFailedException(Fixtures.unauthorizedClientError())
+            }
 
         when:
-            tokenService.authenticationTicket(user, request, CommonFixtures.analysisRequest())
+            tokenService.authenticationTicket(user, request, analysisRequest)
 
         then:
-            def error = new ErrorResponseDTO(Fixtures.userAuthenticationFailedError(), request.getState())
+            def error = new ErrorResponseDTO(Fixtures.unauthorizedClientError(), request.getState())
             def thrownException = thrown(ErrorResponseException)
 
             thrownException.errorResponse == error
@@ -96,20 +96,6 @@ class TicketRequestUT extends Specification {
                     .error(errorType)
                     .errorDescription(description)
                     .build()
-        }
-
-        static RequestError userAuthenticationFailedError() {
-            final AuthenticationRequestErrorType errorType = AuthenticationRequestErrorType.USER_AUTH_FAILED
-            final String description = "User authentication failed"
-
-            return RequestError.builder()
-                    .error(errorType)
-                    .errorDescription(description)
-                    .build()
-        }
-
-        static AnalysisResponse stubAnalysisResponse() {
-            return new AnalysisResponse(false)
         }
     }
 }
