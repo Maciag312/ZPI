@@ -29,11 +29,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketResponse createTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) throws LoginLockoutException, UserValidationFailedException {
-        validateUser(user, analysisRequest);
-
         var analysis = analysisService.analyse(analysisRequest);
 
         if (analysis.getLockout().getAction() == LoginAction.ALLOW) {
+            validateUser(user, analysisRequest);
             return handleAllowLogin(user, request, analysis);
         } else {
             var error = RequestError.<AuthenticationRequestErrorType>builder()
