@@ -9,8 +9,8 @@ import com.zpi.domain.common.RequestError
 import com.zpi.domain.rest.ams.AmsService
 import com.zpi.domain.rest.analysis.AnalysisResponse
 import com.zpi.domain.rest.analysis.AnalysisService
-import com.zpi.domain.rest.analysis.lockout.LoginFailedResponse
 import com.zpi.domain.rest.analysis.lockout.LoginAction
+import com.zpi.domain.rest.analysis.lockout.LoginFailedResponse
 import com.zpi.domain.rest.analysis.twoFactor.TwoFactorResponse
 import com.zpi.domain.twoFactorAuth.TwoFactorData
 import com.zpi.domain.twoFactorAuth.TwoFactorRepository
@@ -92,10 +92,12 @@ class TicketServiceUT extends Specification {
             def request = CommonFixtures.request()
             def user = CommonFixtures.userDTO().toDomain()
             def analysisRequest = CommonFixtures.analysisRequest()
+            def analysisResponse = new AnalysisResponse(new LoginFailedResponse(LoginAction.ALLOW, LocalDateTime.now()), new TwoFactorResponse(false))
 
             ams.isAuthenticated(user) >> false
+            analysis.analyse(analysisRequest) >> analysisResponse
 
-        when:
+                    when :
             service.createTicket(user, request, analysisRequest)
 
         then:
