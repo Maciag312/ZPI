@@ -24,4 +24,7 @@ public interface AmsClient {
 
     @GetMapping("authserver/config")
     AuthConfigurationDTO tokenConfig();
+
+    @PostMapping("/users/info")
+    UserInfoDTO userInfo(UserInfoRequestDTO user);
 }

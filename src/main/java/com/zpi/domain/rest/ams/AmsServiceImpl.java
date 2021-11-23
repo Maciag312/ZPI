@@ -4,6 +4,7 @@ import com.zpi.api.common.dto.UserDTO;
 import com.zpi.infrastructure.rest.ams.AmsClient;
 import com.zpi.infrastructure.rest.ams.AmsClientFallback;
 import com.zpi.infrastructure.rest.ams.ClientDTO;
+import com.zpi.infrastructure.rest.ams.UserInfoRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,16 @@ public class AmsServiceImpl implements AmsService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return fallback.tokenConfig().toDomain();
+        }
+    }
+
+    @Override
+    public UserInfo userInfo(String email) {
+        try {
+            return client.userInfo(new UserInfoRequestDTO(email)).toDomain();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return fallback.userInfo(new UserInfoRequestDTO(email)).toDomain();
         }
     }
 }

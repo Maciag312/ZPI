@@ -3,7 +3,9 @@ package com.zpi.token.tokenRequest
 
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.common.CodeGenerator
+import com.zpi.domain.rest.ams.AmsService
 import com.zpi.domain.rest.ams.AuthConfiguration
+import com.zpi.domain.rest.ams.UserInfo
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.TokenRequest
 import com.zpi.domain.token.issuer.TokenIssuer
@@ -20,9 +22,10 @@ class TokenIssuerUT extends Specification {
     def authCodeRepository = Mock(AuthCodeRepository)
     def tokenRepository = Mock(TokenRepository)
     def generator = Mock(CodeGenerator)
+    def ams = Mock(AmsService)
 
     @Subject
-    private TokenIssuer issuer = new TokenIssuerImpl(configProvider, authCodeRepository, tokenRepository, generator)
+    private TokenIssuer issuer = new TokenIssuerImpl(configProvider, authCodeRepository, tokenRepository, generator, ams)
 
     def "should return token when data correct"() {
         given:
@@ -35,6 +38,7 @@ class TokenIssuerUT extends Specification {
             generator.ticketCode() >> "fdsafdsa"
             configProvider.getConfig() >> config
             authCodeRepository.findByKey(TokenCommonFixtures.authCode.getValue()) >> Optional.of(TokenCommonFixtures.authCode)
+            ams.userInfo(_) >> new UserInfo(TokenCommonFixtures.getUserData().getUsername(), List.of(""), List.of(""))
 
         when:
             def result = issuer.issue(request)
@@ -49,7 +53,7 @@ class TokenIssuerUT extends Specification {
         and:
             def body = parsed.getBody()
 
-            body.getIssuer() == ""
+            body.getIssuer() == "AUTH_SERVER"
             TokenCommonFixtures.areDatesQuiteEqual(body.getIssuedAt(), TokenCommonFixtures.claims().getIssuedAt())
             TokenCommonFixtures.areDatesQuiteEqual(body.getExpiration(), TokenCommonFixtures.claims().getExpirationTime())
             body.get("scope") == TokenCommonFixtures.authCode.getUserData().getScope()

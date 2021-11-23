@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -35,5 +36,10 @@ public class AmsClientFallbackImpl implements AmsClientFallback {
     public AuthConfigurationDTO tokenConfig() {
         var token = new TokenConfigurationDTO(expirationTime, secretKey);
         return new AuthConfigurationDTO(token);
+    }
+
+    @Override
+    public UserInfoDTO userInfo(UserInfoRequestDTO user) {
+        return new UserInfoDTO("", List.of(new PermissionDTO("", false)), List.of(""));
     }
 }

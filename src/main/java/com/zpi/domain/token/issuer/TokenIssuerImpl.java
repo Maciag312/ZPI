@@ -3,6 +3,7 @@ package com.zpi.domain.token.issuer;
 import com.zpi.domain.authCode.consentRequest.AuthCode;
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository;
 import com.zpi.domain.common.CodeGenerator;
+import com.zpi.domain.rest.ams.AmsService;
 import com.zpi.domain.token.RefreshRequest;
 import com.zpi.domain.token.Token;
 import com.zpi.domain.token.TokenRepository;
@@ -21,13 +22,15 @@ public class TokenIssuerImpl implements TokenIssuer {
     private final AuthCodeRepository authCodeRepository;
     private final TokenRepository tokenRepository;
     private final CodeGenerator generator;
+    private final AmsService ams;
 
     private static final String tokenType = "Bearer";
 
     @Override
     public Token issue(TokenRequest tokenRequest) throws NoSuchElementException {
         var code = retrieveCode(tokenRequest);
-        var claims = new UserClaims(code);
+        var userInfo = ams.userInfo(code.getUserData().getUsername());
+        var claims = new UserClaims(code, userInfo);
 
         return issueToken(claims);
     }
@@ -35,7 +38,8 @@ public class TokenIssuerImpl implements TokenIssuer {
     @Override
     public Token refresh(RefreshRequest request) throws NoSuchElementException {
         var data = retrieveTokenData(request);
-        var claims = new UserClaims(data);
+        var userInfo = ams.userInfo(data.getUsername());
+        var claims = new UserClaims(data, userInfo);
 
         return issueToken(claims);
     }

@@ -13,6 +13,6 @@ public class TokenData {
     public TokenData(String key, UserClaims claims) {
         this.value = key;
         this.scope = claims.getScope();
-        this.username = claims.getUsername();
+        this.username = claims.getEmail();
     }
 }
