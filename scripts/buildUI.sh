@@ -1,5 +1,8 @@
+#!/bin/bash
+set -e -o pipefail
+
 mkdir -p src/main/resources/static
-rm -r src/main/resources/static/*
+rm -rf src/main/resources/static/*
 cd ../ZPI-authorize-UI
 npm install
 npm run build

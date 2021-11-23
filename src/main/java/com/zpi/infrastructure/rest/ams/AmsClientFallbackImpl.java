@@ -23,4 +23,9 @@ public class AmsClientFallbackImpl implements AmsClientFallback {
     public ResponseEntity<?> authenticate(UserDTO user) {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
+
+    @Override
+    public ResponseEntity<?> generateOtp_FORWARD(OtpRequestDTO_FIXME request) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("AMS not available");
+    }
 }
