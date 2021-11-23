@@ -22,11 +22,8 @@ public class TokenIssuerConfig {
     public TokenIssuerConfig(AuthConfiguration config) {
         this.secretKey = config.getSecretKey();
         this.validityInMilliseconds = config.getExpirationTime();
-
-        System.out.println(config.getSecretKey());
-        System.out.println(config.getExpirationTime());
-
         this.key = generateKey();
+
         final Date issuedAt = new Date();
         final Date expirationTime = new Date(issuedAt.getTime() + config.getExpirationTime());
 

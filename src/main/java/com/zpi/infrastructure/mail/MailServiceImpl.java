@@ -3,6 +3,8 @@ package com.zpi.infrastructure.mail;
 import com.zpi.domain.authCode.authorizationRequest.MailService;
 import com.zpi.domain.rest.ams.User;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
     private final JavaMailSender emailSender;
+
+    Logger logger = LoggerFactory.getLogger(MailServiceImpl.class);
 
     @Value("${spring.mail.username}")
     String emailFrom;
@@ -32,9 +36,8 @@ public class MailServiceImpl implements MailService {
         try {
             emailSender.send(message);
         } catch (MailException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            System.out.println("2FA_CODE: " + code);
+            logger.error(e.getMessage());
+            logger.warn("2FA_CODE: " + code);
         }
     }
 }
