@@ -21,4 +21,7 @@ public interface AmsClient {
 
     @PostMapping("/users/authenticate")
     ResponseEntity<?> authenticate(UserDTO userDTO);
+
+    @PostMapping("/users/otp/generate")
+    ResponseEntity<?> generateOtp_FORWARD(@Valid @RequestBody OtpRequestDTO_FIXME request);
 }
