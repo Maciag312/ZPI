@@ -8,7 +8,6 @@ import com.zpi.domain.common.CodeGenerator;
 import com.zpi.domain.common.RequestError;
 import com.zpi.domain.rest.ams.AmsService;
 import com.zpi.domain.rest.ams.User;
-import com.zpi.domain.rest.analysis.AnalysisResponse;
 import com.zpi.domain.rest.analysis.AnalysisService;
 import com.zpi.domain.rest.analysis.lockout.LoginAction;
 import com.zpi.domain.rest.analysis.twoFactor.AnalysisRequest;
@@ -29,21 +28,22 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketResponse createTicket(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) throws LoginLockoutException, UserValidationFailedException {
-        var analysis = analysisService.analyse(analysisRequest);
+        var lockout = analysisService.lockoutInfo(user);
 
-        if (analysis.getLockout().getAction() == LoginAction.ALLOW) {
+        if (lockout.getAction() == LoginAction.ALLOW) {
             validateUser(user, analysisRequest);
-            return handleAllowLogin(user, request, analysis);
+            return handleAllowLogin(user, request, analysisRequest);
         } else {
             var error = RequestError.<AuthenticationRequestErrorType>builder()
                     .error(AuthenticationRequestErrorType.LOGIN_LOCKOUT)
-                    .errorDescription(analysis.getLockout().getDelayTill().toString())
+                    .errorDescription(lockout.getDelayTill().toString())
                     .build();
             throw new LoginLockoutException(error);
         }
     }
 
-    private TicketResponse handleAllowLogin(User user, AuthenticationRequest request, AnalysisResponse analysis) {
+    private TicketResponse handleAllowLogin(User user, AuthenticationRequest request, AnalysisRequest analysisRequest) {
+        var analysis = analysisService.analyse(analysisRequest);
         var ticket = saveTicket(user, request);
 
         if (analysis.getTwoFactor().isAdditionalLayerRequired()) {

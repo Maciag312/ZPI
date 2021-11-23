@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TwoFactorDTO {
+class TwoFactorDTO {
     private boolean additionalLayerRequired;
 
-    public TwoFactorResponse toDomain() {
+    TwoFactorResponse toDomain() {
         return new TwoFactorResponse(additionalLayerRequired);
     }
 }

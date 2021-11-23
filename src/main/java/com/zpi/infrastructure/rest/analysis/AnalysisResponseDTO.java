@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnalysisResponseDTO {
-    private LoginFailedDTO loginFailed;
+    private LockoutDTO loginFailed;
     private TwoFactorDTO twoFactor;
 
     public AnalysisResponse toDomain() {

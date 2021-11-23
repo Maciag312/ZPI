@@ -46,6 +46,7 @@ class TicketRequestFT extends Specification {
     def setup() {
         ClientMocks.clientDetails(mockServer)
         UserMocks.userAuthenticate(mockServer)
+        AnalysisMocks.noLockout(mockServer)
         AnalysisMocks.reportLoginFailure(mockServer)
     }
 
@@ -113,6 +114,7 @@ class TicketRequestFT extends Specification {
 
         and:
             AnalysisMocks.blockLogin2faNotRequired(mockServer)
+            AnalysisMocks.lockout(mockServer)
 
         when:
             def result = commonHelpers.postRequest(requestBody, ResultHelpers.authParametersToUrl(request, baseUri))
