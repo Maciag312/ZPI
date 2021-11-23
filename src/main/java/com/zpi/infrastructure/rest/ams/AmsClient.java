@@ -16,12 +16,12 @@ public interface AmsClient {
     @GetMapping("authserver/client/{id}/")
     Optional<ClientDTO> clientDetails(@PathVariable String id);
 
-    @PostMapping("/users")
-    ResponseEntity<?> registerUser(@Valid @RequestBody UserDTO user);
-
     @PostMapping("/users/authenticate")
     ResponseEntity<?> authenticate(UserDTO userDTO);
 
     @PostMapping("/users/otp/generate")
     ResponseEntity<?> generateOtp_FORWARD(@Valid @RequestBody OtpRequestDTO_FIXME request);
+
+    @GetMapping("authserver/config")
+    AuthConfigurationDTO tokenConfig();
 }

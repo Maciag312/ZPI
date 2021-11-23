@@ -1,8 +1,8 @@
 package com.zpi.token.refreshRequest
 
-import com.zpi.testUtils.CommonFixtures
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.common.CodeGenerator
+import com.zpi.domain.rest.ams.AuthConfiguration
 import com.zpi.domain.token.RefreshRequest
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.issuer.TokenData
@@ -10,6 +10,7 @@ import com.zpi.domain.token.issuer.TokenIssuer
 import com.zpi.domain.token.issuer.TokenIssuerImpl
 import com.zpi.domain.token.issuer.config.TokenIssuerConfig
 import com.zpi.domain.token.issuer.config.TokenIssuerConfigProvider
+import com.zpi.testUtils.CommonFixtures
 import com.zpi.token.TokenCommonFixtures
 import org.springframework.test.util.ReflectionTestUtils
 import spock.lang.Specification
@@ -28,7 +29,7 @@ class TokenIssuerRefreshUT extends Specification {
         given:
             def refreshToken = "asdf"
             def request = new RefreshRequest(CommonFixtures.clientId, CommonFixtures.grantType, refreshToken, CommonFixtures.scope)
-            def config = new TokenIssuerConfig(TokenCommonFixtures.secretKey)
+            def config = new TokenIssuerConfig(new AuthConfiguration(TokenCommonFixtures.secretKey, 1000L))
 
             ReflectionTestUtils.setField(config, "claims", TokenCommonFixtures.claims())
         and:

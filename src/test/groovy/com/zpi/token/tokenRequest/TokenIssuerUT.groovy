@@ -3,6 +3,7 @@ package com.zpi.token.tokenRequest
 
 import com.zpi.domain.authCode.consentRequest.authCodePersister.AuthCodeRepository
 import com.zpi.domain.common.CodeGenerator
+import com.zpi.domain.rest.ams.AuthConfiguration
 import com.zpi.domain.token.TokenRepository
 import com.zpi.domain.token.TokenRequest
 import com.zpi.domain.token.issuer.TokenIssuer
@@ -27,7 +28,7 @@ class TokenIssuerUT extends Specification {
         given:
             def request = TokenRequest.builder().code(TokenCommonFixtures.authCode.getValue()).build()
 
-            def config = new TokenIssuerConfig(TokenCommonFixtures.secretKey)
+            def config = new TokenIssuerConfig(new AuthConfiguration(TokenCommonFixtures.secretKey, 1000L))
 
             ReflectionTestUtils.setField(config, "claims", TokenCommonFixtures.claims())
         and:

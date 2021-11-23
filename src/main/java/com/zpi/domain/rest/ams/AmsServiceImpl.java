@@ -20,17 +20,9 @@ public class AmsServiceImpl implements AmsService {
     public Optional<Client> clientDetails(String id) {
         try {
             return client.clientDetails(id).map(ClientDTO::toDomain);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return fallback.clientDetails(id).map(ClientDTO::toDomain);
-        }
-    }
-
-    @Override
-    public boolean registerUser(User user) {
-        try {
-            return client.registerUser(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.CREATED;
-        } catch (Exception ignored) {
-            return fallback.registerUser(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.CREATED;
         }
     }
 
@@ -39,7 +31,18 @@ public class AmsServiceImpl implements AmsService {
         try {
             return client.authenticate(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.OK;
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return fallback.authenticate(new UserDTO(user.getEmail(), user.getPassword())).getStatusCode() == HttpStatus.OK;
+        }
+    }
+
+    @Override
+    public AuthConfiguration config() {
+        try {
+            return client.tokenConfig().toDomain();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return fallback.tokenConfig().toDomain();
         }
     }
 }
