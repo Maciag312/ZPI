@@ -1,9 +1,9 @@
 package com.zpi.domain.rest.analysis;
 
+import com.zpi.domain.rest.ams.User;
+import com.zpi.domain.rest.analysis.lockout.Lockout;
 import com.zpi.domain.rest.analysis.twoFactor.AnalysisRequest;
-import com.zpi.infrastructure.rest.analysis.AnalysisClient;
-import com.zpi.infrastructure.rest.analysis.AnalysisRequestDTO;
-import com.zpi.infrastructure.rest.analysis.AnalysisServiceFallback;
+import com.zpi.infrastructure.rest.analysis.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +30,16 @@ public class AnalysisServiceImpl implements AnalysisService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             fallback.reportLoginFail(new AnalysisRequestDTO(request));
+        }
+    }
+
+    @Override
+    public Lockout lockoutInfo(User user) {
+        try {
+            return client.lockoutInfo(user.getEmail()).toDomain();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return fallback.lockoutInfo(user.getEmail()).toDomain();
         }
     }
 }

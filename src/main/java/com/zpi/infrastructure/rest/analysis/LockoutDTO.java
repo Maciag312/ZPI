@@ -1,6 +1,6 @@
 package com.zpi.infrastructure.rest.analysis;
 
-import com.zpi.domain.rest.analysis.lockout.LoginFailedResponse;
+import com.zpi.domain.rest.analysis.lockout.Lockout;
 import com.zpi.domain.rest.analysis.lockout.LoginAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginFailedDTO {
+public class LockoutDTO {
     private String loginAction;
     private String delayTill;
 
-    public LoginFailedResponse toDomain() {
+    public Lockout toDomain() {
         var action = this.loginAction.equals("ALLOW") ? LoginAction.ALLOW : LoginAction.BLOCK;
         var delay = LocalDateTime.parse(this.delayTill);
-        return new LoginFailedResponse(action, delay);
+        return new Lockout(action, delay);
     }
 }
