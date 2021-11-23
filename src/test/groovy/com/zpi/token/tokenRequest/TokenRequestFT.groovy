@@ -46,6 +46,7 @@ class TokenRequestFT extends Specification {
 
     def setup() {
         ClientMocks.clientDetails(mockServer)
+        ClientMocks.clientTokenConfig(mockServer)
     }
 
     def cleanup() {
@@ -69,7 +70,7 @@ class TokenRequestFT extends Specification {
             !ResultHelpers.attributeFromResult("access_token", response).isEmpty()
             ResultHelpers.attributeFromResult("token_type", response) == "Bearer"
             !ResultHelpers.attributeFromResult("refresh_token", response).isEmpty()
-            ResultHelpers.attributeFromResult("expires_in", response) == "3600"
+            ResultHelpers.attributeFromResult("expires_in", response) == "1"
 
         and:
             ResultHelpers.headerFromResult("Cache-Control", response).contains("no-store")

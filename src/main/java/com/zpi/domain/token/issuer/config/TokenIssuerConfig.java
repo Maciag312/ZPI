@@ -1,5 +1,6 @@
 package com.zpi.domain.token.issuer.config;
 
+import com.zpi.domain.rest.ams.AuthConfiguration;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.WeakKeyException;
 import lombok.AllArgsConstructor;
@@ -14,15 +15,17 @@ import java.util.Date;
 @AllArgsConstructor
 public class TokenIssuerConfig {
     private final TokenClaims claims;
-    private final long validityInMilliseconds = 3600000L;
     private final String secretKey;
+    private final long validityInMilliseconds;
     private final Key key;
 
-    public TokenIssuerConfig(String secretKey) {
-        this.secretKey = secretKey;
+    public TokenIssuerConfig(AuthConfiguration config) {
+        this.secretKey = config.getSecretKey();
+        this.validityInMilliseconds = config.getExpirationTime();
         this.key = generateKey();
+
         final Date issuedAt = new Date();
-        final Date expirationTime = new Date(issuedAt.getTime() + validityInMilliseconds);
+        final Date expirationTime = new Date(issuedAt.getTime() + config.getExpirationTime());
 
         claims = new TokenClaims(issuedAt, expirationTime);
     }

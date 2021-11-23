@@ -57,8 +57,10 @@ class AuthFlowE2E extends Specification {
         ticketRepository.clear()
 
         ClientMocks.clientDetails(mockServer)
+        ClientMocks.clientTokenConfig(mockServer)
         UserMocks.userRegister(mockServer)
         UserMocks.userAuthenticate(mockServer)
+        UserMocks.userInfo(mockServer)
         AnalysisMocks.allowLogin2faNotRequired(mockServer)
         AnalysisMocks.reportLoginFailure(mockServer)
         AnalysisMocks.noLockout(mockServer)
@@ -122,6 +124,6 @@ class AuthFlowE2E extends Specification {
         and:
             refreshedToken != token
             refreshedToken.getBody().get("username") == user.toDomain().getEmail()
-            refreshedToken.getBody().getIssuer() == ""
+            refreshedToken.getBody().getIssuer() == "AUTH_SERVER"
     }
 }
