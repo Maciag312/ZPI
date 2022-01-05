@@ -1,12 +1,8 @@
 # syntax=docker/dockerfile:1
-FROM alpine/git AS git
-WORKDIR /app
-ADD "https://api.github.com/repos/bachm44/ZPI-authorize-UI/commits?per_page=1" latest_commit
-RUN git clone --depth 1 https://github.com/bachm44/ZPI-authorize-UI ui
 
 FROM node:16-alpine AS build
-COPY --from=git /app/ui/ /app
 WORKDIR /app
+COPY ./ZPI-authorize-UI .
 RUN npm ci
 RUN npm run build
 

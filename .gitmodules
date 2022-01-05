@@ -1,0 +1,3 @@
+[submodule "ZPI-authorize-UI"]
+	path = ZPI-authorize-UI
+	url = https://github.com/bachm44/ZPI-authorize-UI
