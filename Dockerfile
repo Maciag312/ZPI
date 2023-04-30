@@ -3,7 +3,7 @@
 FROM node:16-alpine AS build
 WORKDIR /app
 COPY ./ZPI-authorize-UI .
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 RUN npm run build
 
 FROM gradle:7.2.0-jdk11-alpine AS jar
@@ -12,7 +12,7 @@ WORKDIR /app
 RUN mkdir -p src/main/resources/static
 RUN rm -rf src/main/resources/static
 COPY --from=build /app/build/ src/main/resources/static/
-RUN gradle bootJar
+RUN gradle bootJar --no-daemon --parallel
 
 FROM openjdk:11-jre-slim
 EXPOSE 8080
